@@ -1,9 +1,33 @@
-import Link from 'next/link';
+import { useState, useEffect } from 'react';
+import { Link, useParams } from 'react-router-dom';
 
-export default async function Page({ params }) {
-    const { name } = params;
-    const response = await fetch(`https://pokeapi.co/api/v2/pokemon-species/${name}`);
-    const responseJSON = await response.json();
+const PokemonDetails = () => {
+    const [pokemonObject, setPokemonObject] = useState(undefined);
+    const [pokeInfoListJSON, setpokeInfoListResponse] = useState(undefined);
+    const { name } = useParams();
+
+    useEffect(() => {
+        const fetchPokemonObject = async () => {
+            const response = await fetch(`https://pokeapi.co/api/v2/pokemon-species/${name}`);
+            const responseJSON = await response.json();
+            setPokemonObject(responseJSON);
+        }
+        fetchPokemonObject();
+    }, []);
+
+    useEffect(() => {
+        const fetchPokeInfoListJSON = async () => {
+            const varietyPromises = pokemonObject.varieties.map(({ pokemon }) => fetch(pokemon.url));
+            const pokeInfoListResponse = await Promise.all(varietyPromises);
+            const pokeInfoListJSON = await Promise.all(pokeInfoListResponse.map((response) => response.json()));
+            setpokeInfoListResponse(pokeInfoListJSON);
+        }
+        fetchPokeInfoListJSON();
+    }, [pokemonObject]);
+
+    if (!pokemonObject || !pokeInfoListJSON) {
+        return <h1>...Loading</h1>
+    }
 
     const {
         capture_rate,
@@ -13,13 +37,9 @@ export default async function Page({ params }) {
         generation,
         growth_rate,
         id,
-        varieties,
-    } = responseJSON
+    } = pokemonObject;
 
     const description = flavor_text_entries.find(({language}) => language.name === 'en');
-    const varietyPromises = varieties.map(({ pokemon }) => fetch(pokemon.url));
-    const pokeInfoListResponse = await Promise.all(varietyPromises);
-    const pokeInfoListJSON = await Promise.all(pokeInfoListResponse.map((response) => response.json()));
 
     return (
         <>
@@ -31,7 +51,7 @@ export default async function Page({ params }) {
                 <div><strong>Capture Rate:</strong> {capture_rate}</div>
                 <div>
                     <strong>Evolves From: </strong>
-                    <Link href={`/pokemons/${evolves_from_species?.name}`}>
+                    <Link to={`/pokemons/${evolves_from_species?.name}`}>
                         {evolves_from_species?.name.toUpperCase()}
                     </Link>
                 </div>
@@ -69,7 +89,7 @@ export default async function Page({ params }) {
                                     <i>{moves.map(({move}) => ` ${move.name.toUpperCase()}`)}</i>
                                 </div>
                                 <br></br>
-                                <audio controls><source src={cries.latest} type="audio/ogg"></source></audio>
+                                <audio controls><source src={cries.latest} type='audio/ogg'></source></audio>
                                 <hr></hr>
                             </div>
                         ))}
@@ -79,3 +99,5 @@ export default async function Page({ params }) {
         </>
     )
 }
+
+export default PokemonDetails;
