@@ -1,0 +1,114 @@
+@use 'variables' as *;
+
+@import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Outfit:wght@300;400;600;700&display=swap');
+
+/* Global Reset */
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  background: radial-gradient(circle at 50% 0%, #1a2236 0%, $bg-gradient-start 70%), $bg-gradient-start;
+  color: $text-main;
+  font-family: $font-sans;
+  min-height: 100vh;
+  overflow-x: hidden;
+  padding-bottom: 2rem;
+  line-height: 1.5;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+/* Scrollbar Customization */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: $bg-gradient-start;
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.15);
+  border-radius: 4px;
+
+  &:hover {
+    background: $accent-cyan;
+  }
+}
+
+/* Container & Header layout */
+.app-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 1.5rem;
+}
+
+.pokedex-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 2rem;
+  border-bottom: 1px solid $panel-border;
+  padding-bottom: 1rem;
+}
+
+.pokedex-logo {
+  font-family: $font-digital;
+  font-size: 1.8rem;
+  font-weight: 900;
+  letter-spacing: 2px;
+  background: linear-gradient(135deg, #00f2fe 0%, #4facfe 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+
+  &::before {
+    content: '';
+    display: inline-block;
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    background: #00f2fe;
+    box-shadow: 0 0 12px #00f2fe, 0 0 20px #00f2fe;
+    animation: pulse-glow 2s infinite alternate;
+  }
+}
+
+@keyframes pulse-glow {
+  0% {
+    transform: scale(0.9);
+    opacity: 0.7;
+    box-shadow: 0 0 4px #00f2fe;
+  }
+
+  100% {
+    transform: scale(1.1);
+    opacity: 1;
+    box-shadow: 0 0 16px #00f2fe, 0 0 24px #00f2fe;
+  }
+}
+
+/* Glassmorphism Panel styles */
+.glass-panel {
+  background: $panel-bg;
+  border: 1px solid $panel-border;
+  border-radius: 16px;
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  padding: 1.5rem;
+  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+
+  &:hover {
+    background: $panel-hover-bg;
+    border-color: $panel-hover-border;
+  }
+}

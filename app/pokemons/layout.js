@@ -1,19 +1,12 @@
 export const metadata = {
-    title: 'Pokemon Dex',
-    description: 'Information about the Pokemons.',
+    title: 'Explore PokeDex | PokeDexter',
+    description: 'Browse, search, and filter through the complete list of Pokémon species across all generations.',
 }
 
-export default function PokemonsLayout({
-    children, // will be a page or nested layout
-}) {
+export default function PokemonsLayout({ children }) {
     return (
-        <section>
-            {/* Include shared UI here e.g. a header or sidebar */}
-
-            <h1>Pokemon Dex</h1>
-            <nav></nav>
-
+        <div className="pokemons-layout-wrapper" id="pokemons-layout-root">
             {children}
-        </section>
+        </div>
     )
 }
