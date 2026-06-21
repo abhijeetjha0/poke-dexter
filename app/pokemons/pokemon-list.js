@@ -68,10 +68,15 @@ export default function PokemonList(props) {
         });
     }, [processedList, activeGen, searchTerm]);
 
-    // Reset pagination on filter/search change
-    useMemo(() => {
+    // Reset pagination on filter/search change (state adjustment during render)
+    const [prevSearchTerm, setPrevSearchTerm] = useState(searchTerm);
+    const [prevActiveGen, setPrevActiveGen] = useState(activeGen);
+
+    if (searchTerm !== prevSearchTerm || activeGen !== prevActiveGen) {
+        setPrevSearchTerm(searchTerm);
+        setPrevActiveGen(activeGen);
         setCurrentPage(1);
-    }, [searchTerm, activeGen]);
+    }
 
     // Pagination slice
     const totalPages = Math.ceil(filteredList.length / ITEMS_PER_PAGE);

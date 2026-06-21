@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
 import DamageClassIcon from '../../components/damage-class-icon';
@@ -89,15 +89,22 @@ export default function PokemonDetailView({
     const [activeVarietyIndex, setActiveVarietyIndex] = useState(getInitialIndex());
     const [expandedVersions, setExpandedVersions] = useState({});
 
-    // Update active variety index if query param changes
-    useEffect(() => {
+    // Track previous formParam and varietyList to adjust state on changes
+    const [prevFormParam, setPrevFormParam] = useState(formParam);
+    const [prevVarietyList, setPrevVarietyList] = useState(varietyList);
+
+    if (formParam !== prevFormParam || varietyList !== prevVarietyList) {
+        setPrevFormParam(formParam);
+        setPrevVarietyList(varietyList);
         if (formParam) {
             const index = varietyList.findIndex(v => v.name === formParam);
             if (index !== -1) {
                 setActiveVarietyIndex(index);
             }
+        } else {
+            setActiveVarietyIndex(0);
         }
-    }, [formParam, varietyList]);
+    }
     
     const activeVariety = varietyList[activeVarietyIndex] || varietyList[0];
     const {

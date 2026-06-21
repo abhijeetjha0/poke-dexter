@@ -6,7 +6,8 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint",
+    "lint": "eslint",
+    "lint:style": "stylelint \"app/**/*.scss\"",
     "clean": "rm -rf .next && rm -rf node_modules"
   },
   "keywords": [],
@@ -19,6 +20,10 @@
     "react-dom": "^19.0.0"
   },
   "devDependencies": {
-    "sass-embedded": "^1.100.0"
+    "eslint": "^9.0.0",
+    "eslint-config-next": "^16.0.0",
+    "sass-embedded": "^1.100.0",
+    "stylelint": "^16.0.0",
+    "stylelint-config-standard-scss": "^13.0.0"
   }
 }

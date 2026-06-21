@@ -15,14 +15,16 @@ const NAV_ITEMS = [
 export default function Navbar() {
     const [isOpen, setIsOpen] = useState(false);
     const pathname = usePathname();
+    const [prevPathname, setPrevPathname] = useState(pathname);
+
+    // Close menu when route changes
+    if (pathname !== prevPathname) {
+        setPrevPathname(pathname);
+        setIsOpen(false);
+    }
 
     const toggleMenu = () => setIsOpen(!isOpen);
     const closeMenu = () => setIsOpen(false);
-
-    // Close menu when route changes
-    useEffect(() => {
-        closeMenu();
-    }, [pathname]);
 
     // Close menu on resize to desktop view
     useEffect(() => {

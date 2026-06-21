@@ -1,6 +1,5 @@
 @use 'variables' as *;
-
-@import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Outfit:wght@300;400;600;700&display=swap');
+@import 'https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Outfit:wght@300;400;600;700&display=swap';
 
 /* Global Reset */
 * {
@@ -65,7 +64,7 @@ a {
   font-weight: 900;
   letter-spacing: 2px;
   background: linear-gradient(135deg, #00f2fe 0%, #4facfe 100%);
-  -webkit-background-clip: text;
+  background-clip: text;
   -webkit-text-fill-color: transparent;
   display: flex;
   align-items: center;
@@ -103,7 +102,6 @@ a {
   border: 1px solid $panel-border;
   border-radius: 16px;
   backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
   padding: 1.5rem;
   box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
