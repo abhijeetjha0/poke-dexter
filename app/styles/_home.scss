@@ -1,0 +1,121 @@
+@use 'variables' as *;
+
+.hero-section {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 3rem;
+  margin-top: 2rem;
+  margin-bottom: 4rem;
+
+  @media (max-width: 768px) {
+    flex-direction: column-reverse;
+    text-align: center;
+    gap: 2rem;
+  }
+}
+
+.hero-text {
+  h1 {
+    font-size: 3rem;
+    font-weight: 800;
+    line-height: 1.1;
+    margin-bottom: 1rem;
+
+    span {
+      background: linear-gradient(135deg, $accent-cyan 0%, $accent-blue 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+  }
+
+  p {
+    color: $text-muted;
+    font-size: 1.2rem;
+    margin-bottom: 2rem;
+    max-width: 500px;
+  }
+}
+
+.hero-buttons-container {
+  display: flex;
+  gap: 1rem;
+  align-items: center;
+  flex-wrap: wrap;
+
+  @media (max-width: 768px) {
+    justify-content: center;
+  }
+}
+
+.hero-likes-wrapper {
+  margin-top: 2rem;
+}
+
+.feedback-panel {
+  display: inline-block;
+  min-width: 250px;
+
+  h2 {
+    font-size: 1.2rem;
+    margin-bottom: 0.5rem;
+    font-weight: 600;
+  }
+
+  p {
+    font-size: 0.9rem;
+    color: $text-muted;
+    margin-bottom: 1rem;
+  }
+}
+
+.btn-explore {
+  font-size: 1.1rem;
+  padding: 0.8rem 2rem;
+}
+
+.hero-artwork {
+  position: relative;
+  flex-shrink: 0;
+  width: 380px;
+  height: 320px;
+  background: radial-gradient(circle, rgba(6, 182, 212, 0.15) 0%, transparent 70%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+
+  .mascot-img-bulba {
+    width: 150px;
+    height: 150px;
+    object-fit: contain;
+    animation: float-pokemon 4s ease-in-out infinite;
+    z-index: 2;
+  }
+
+  .mascot-img-chari {
+    width: 220px;
+    height: 220px;
+    object-fit: contain;
+    animation: float-pokemon 4s ease-in-out infinite reverse;
+    animation-delay: 0.5s;
+    z-index: 1;
+    margin-left: -40px; /* Slight overlap */
+  }
+}
+
+.collaborators-text {
+  font-size: 0.9rem;
+  color: $text-muted;
+  margin-top: 0.5rem;
+
+  a {
+    text-decoration: underline;
+    color: $accent-cyan;
+    transition: color 0.2s ease;
+
+    &:hover {
+      color: #3b82f6; /* lighten cyan */
+    }
+  }
+}
