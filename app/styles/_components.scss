@@ -82,3 +82,27 @@
 .type-dark { background-color: $type-dark; box-shadow: 0 0 10px rgba(112, 87, 70, 0.4); }
 .type-steel { background-color: $type-steel; box-shadow: 0 0 10px rgba(183, 183, 206, 0.4); }
 .type-fairy { background-color: $type-fairy; box-shadow: 0 0 10px rgba(214, 133, 173, 0.4); }
+
+/* Page Headers */
+.page-header {
+  margin-bottom: 2rem;
+  padding: 1.5rem 1.75rem;
+
+  h1 {
+    font-size: 2.5rem;
+    font-weight: 800;
+    font-family: $font-digital;
+    background: linear-gradient(135deg, #00f2fe 0%, #4facfe 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    margin-bottom: 0.25rem;
+  }
+
+  p {
+    color: $text-muted;
+    font-size: 1.05rem;
+    line-height: 1.5;
+    margin-top: 0.25rem;
+  }
+}
+

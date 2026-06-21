@@ -13,11 +13,9 @@ export default async function AbilitiesPage() {
     return (
         <div>
             {/* Header Panel */}
-            <div className="glass-panel" style={{ marginBottom: '2rem' }}>
-                <h1 style={{ fontSize: '2.5rem', fontWeight: 800, fontFamily: 'var(--font-digital)' }}>
-                    Pokémon Abilities Index
-                </h1>
-                <p style={{ color: 'var(--text-muted)', marginTop: '0.5rem' }}>
+            <div className="glass-panel page-header">
+                <h1>Pokémon Abilities Index</h1>
+                <p>
                     Browse all catalogued passive and active combat abilities. Select an ability to view its in-game effects and a complete list of compatible Pokémon.
                 </p>
             </div>
