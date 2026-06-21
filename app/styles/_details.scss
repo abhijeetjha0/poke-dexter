@@ -196,8 +196,8 @@
 /* Audio Player */
 .cry-player-container {
   display: flex;
-  align-items: center;
-  gap: 1rem;
+  flex-direction: column;
+  align-items: stretch;
   padding: 0.75rem 1.25rem;
   border-radius: 12px;
   background: rgba(255, 255, 255, 0.02);
@@ -264,40 +264,112 @@
   margin-left: auto;
 }
 
-.moves-list {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.5rem;
-  max-height: 200px;
+.moves-table-wrapper {
+  max-height: 280px;
   overflow-y: auto;
-  padding-right: 0.5rem;
-  margin-top: 0.35rem;
-}
+  margin-top: 0.5rem;
+  border-radius: 8px;
+  background: rgba(0, 0, 0, 0.25);
+  border: 1px solid rgba(255, 255, 255, 0.05);
 
-.move-badge {
-  padding: 0.35rem 0.75rem;
-  border-radius: 6px;
-  font-size: 0.85rem;
-  font-weight: 700;
-  text-transform: capitalize;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 0.3rem;
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  color: #fff;
-  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.4);
-  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-  cursor: pointer;
-
-  .damage-class-icon {
-    filter: brightness(1.8) drop-shadow(0 0 2px rgba(0, 0, 0, 0.3));
+  /* Custom scrollbar styling for the table container */
+  &::-webkit-scrollbar {
+    width: 6px;
   }
 
-  &:hover {
-    transform: translateY(-2px) scale(1.03);
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4);
-    filter: brightness(1.15);
+  &::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 3px;
+
+    &:hover {
+      background: var(--accent-color, $accent-cyan);
+    }
+  }
+}
+
+.moves-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.88rem;
+  text-align: left;
+
+  th {
+    position: sticky;
+    top: 0;
+    background: rgba(13, 17, 28, 0.95);
+    backdrop-filter: blur(10px);
+    z-index: 10;
+    color: $text-muted;
+    font-size: 0.75rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    padding: 0.65rem 1rem;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  }
+
+  td {
+    padding: 0.6rem 1rem;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.03);
+    vertical-align: middle;
+  }
+
+  tr:hover td {
+    background: rgba(255, 255, 255, 0.02);
+  }
+
+  tr:last-child td {
+    border-bottom: none;
+  }
+
+  .move-name-cell {
+    font-weight: 700;
+    text-transform: capitalize;
+
+    .move-link {
+      color: #fff;
+      transition: color 0.15s ease;
+
+      &:hover {
+        color: var(--accent-color, var(--accent-cyan));
+      }
+    }
+  }
+
+  .move-type-cell {
+    .type-badge {
+      font-size: 0.68rem;
+      padding: 0.15rem 0.5rem;
+      border-radius: 4px;
+      font-weight: 700;
+      text-transform: uppercase;
+      display: inline-block;
+      text-align: center;
+      min-width: 60px;
+    }
+  }
+
+  .move-stat-cell {
+    font-family: var(--font-digital);
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: var(--text-muted);
+
+    &.power-val {
+      color: rgba(239, 68, 68, 0.85); /* subtle red */
+    }
+
+    &.accuracy-val {
+      color: rgba(245, 158, 11, 0.85); /* subtle amber */
+    }
+
+    &.pp-val {
+      color: rgba(16, 185, 129, 0.85); /* subtle emerald */
+    }
   }
 }
 
@@ -610,3 +682,41 @@
     font-style: italic;
   }
 }
+
+/* Collapsible Panels */
+.panel-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  cursor: pointer;
+  user-select: none;
+  width: 100%;
+  
+  h3, .cry-title {
+    margin: 0 !important;
+  }
+  
+  &:hover {
+    .collapse-chevron {
+      color: var(--accent-color, var(--accent-cyan));
+    }
+  }
+}
+
+.collapse-chevron {
+  font-size: 0.95rem;
+  color: var(--text-muted);
+  transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1), color 0.15s ease;
+  transform: rotate(0deg);
+
+  &.expanded {
+    transform: rotate(90deg);
+  }
+}
+
+.glass-panel {
+  &.collapsed {
+    padding: 0.8rem 1.5rem !important;
+  }
+}
+

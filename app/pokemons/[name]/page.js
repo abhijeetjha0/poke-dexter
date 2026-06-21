@@ -162,12 +162,53 @@ export default async function Page({ params }) {
         console.error('Failed to fetch encounters:', e);
     }
 
+    // --- 4. Move Details ---
+    const uniqueMoveNames = new Set();
+    pokeInfoListJSON.forEach(variety => {
+        (variety.moves || []).forEach(m => {
+            if (m.move?.name) {
+                uniqueMoveNames.add(m.move.name);
+            }
+        });
+    });
+
+    const uniqueMoveNamesArray = Array.from(uniqueMoveNames);
+
+    const moveDetailsResponses = await Promise.all(
+        uniqueMoveNamesArray.map(moveName =>
+            fetch(`https://pokeapi.co/api/v2/move/${moveName}`, {
+                next: { revalidate: 86400 },
+            }).then(r => r.ok ? r.json() : null).catch(() => null)
+        )
+    );
+
+    const moveDetailsMap = {};
+    moveDetailsResponses.forEach((detail, idx) => {
+        const moveName = uniqueMoveNamesArray[idx];
+        if (detail) {
+            moveDetailsMap[moveName] = {
+                power: detail.power,
+                accuracy: detail.accuracy,
+                pp: detail.pp,
+                type: detail.type?.name || 'normal',
+                damage_class: detail.damage_class?.name || 'physical',
+            };
+        } else {
+            moveDetailsMap[moveName] = {
+                power: null,
+                accuracy: null,
+                pp: null,
+                type: moveTypeMap[moveName] || 'normal',
+                damage_class: moveDamageClassMap[moveName] || 'physical',
+            };
+        }
+    });
+
     return (
         <PokemonDetailView 
             speciesInfo={responseJSON} 
             varietyList={pokeInfoListJSON}
-            moveTypeMap={moveTypeMap}
-            moveDamageClassMap={moveDamageClassMap}
+            moveDetailsMap={moveDetailsMap}
             pokedexEntry={pokedexEntry}
             typeDefenses={typeDefenses}
             encountersByVersion={encountersByVersion}

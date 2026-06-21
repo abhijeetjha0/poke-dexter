@@ -68,8 +68,7 @@ function getMultiplierClass(value) {
 export default function PokemonDetailView({
     speciesInfo,
     varietyList,
-    moveTypeMap = {},
-    moveDamageClassMap = {},
+    moveDetailsMap = {},
     pokedexEntry = null,
     typeDefenses = {},
     encountersByVersion = {},
@@ -88,6 +87,24 @@ export default function PokemonDetailView({
 
     const [activeVarietyIndex, setActiveVarietyIndex] = useState(getInitialIndex());
     const [expandedVersions, setExpandedVersions] = useState({});
+    const [collapsed, setCollapsed] = useState({
+        entry: false,
+        predecessor: false,
+        cry: false,
+        varieties: false,
+        specs: false,
+        stats: false,
+        defenses: false,
+        abilitiesMoves: false,
+        locations: false,
+    });
+
+    const toggleCollapse = (key) => {
+        setCollapsed(prev => ({
+            ...prev,
+            [key]: !prev[key]
+        }));
+    };
 
     // Track previous formParam and varietyList to adjust state on changes
     const [prevFormParam, setPrevFormParam] = useState(formParam);
@@ -200,54 +217,76 @@ export default function PokemonDetailView({
 
                     {/* Pokédex Entry */}
                     {pokedexEntry && (
-                        <div className="glass-panel pokedex-entry-panel" id="detail-pokedex-entry">
-                            <h3>Pokédex Entry</h3>
-                            <p className="pokedex-entry-text">
-                                "{pokedexEntry.text}"
-                            </p>
-                            <span className="pokedex-entry-version">
-                                — Pokémon {VERSION_NAMES[pokedexEntry.version] || pokedexEntry.version}
-                            </span>
+                        <div className={`glass-panel pokedex-entry-panel ${collapsed.entry ? 'collapsed' : ''}`} id="detail-pokedex-entry">
+                            <div className="panel-header" onClick={() => toggleCollapse('entry')}>
+                                <h3>Pokédex Entry</h3>
+                                <span className={`collapse-chevron ${collapsed.entry ? '' : 'expanded'}`}>▸</span>
+                            </div>
+                            {!collapsed.entry && (
+                                <div style={{ marginTop: '0.75rem' }}>
+                                    <p className="pokedex-entry-text">
+                                        "{pokedexEntry.text}"
+                                    </p>
+                                    <span className="pokedex-entry-version">
+                                        — Pokémon {VERSION_NAMES[pokedexEntry.version] || pokedexEntry.version}
+                                    </span>
+                                </div>
+                            )}
                         </div>
                     )}
 
                     {/* Predecessor Form */}
                     {evolves_from_species && (
-                        <div className="glass-panel" id="detail-evolution-panel">
-                            <h3>Evolution Predecessor</h3>
-                            <Link href={`/pokemons/${evolves_from_species.name}`}>
-                                <div className="evolution-link-card">
-                                    {predecessorId && (
-                                        <img
-                                            src={`https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${predecessorId}.png`}
-                                            alt={evolves_from_species.name}
-                                            width="56"
-                                            height="56"
-                                        />
-                                    )}
-                                    <div>
-                                        <div className="name">
-                                            {evolves_from_species.name.replace('-', ' ')}
+                        <div className={`glass-panel ${collapsed.predecessor ? 'collapsed' : ''}`} id="detail-evolution-panel">
+                            <div className="panel-header" onClick={() => toggleCollapse('predecessor')}>
+                                <h3>Evolution Predecessor</h3>
+                                <span className={`collapse-chevron ${collapsed.predecessor ? '' : 'expanded'}`}>▸</span>
+                            </div>
+                            {!collapsed.predecessor && (
+                                <div style={{ marginTop: '1rem' }}>
+                                    <Link href={`/pokemons/${evolves_from_species.name}`}>
+                                        <div className="evolution-link-card">
+                                            {predecessorId && (
+                                                <img
+                                                    src={`https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${predecessorId}.png`}
+                                                    alt={evolves_from_species.name}
+                                                    width="56"
+                                                    height="56"
+                                                />
+                                            )}
+                                            <div>
+                                                <div className="name">
+                                                    {evolves_from_species.name.replace('-', ' ')}
+                                                </div>
+                                                <div className="subtext">
+                                                    Click to view details
+                                                </div>
+                                            </div>
                                         </div>
-                                        <div className="subtext">
-                                            Click to view details
-                                        </div>
-                                    </div>
+                                    </Link>
                                 </div>
-                            </Link>
+                            )}
                         </div>
                     )}
 
                     {/* Audio Cry */}
                     {cries?.latest && (
-                        <div className="glass-panel cry-player-container" id="detail-cry-panel">
-                            <button className="play-cry-btn" onClick={playCry} id="detail-play-cry-btn">
-                                🔊
-                            </button>
-                            <div>
-                                <div className="cry-title">Audio Cry</div>
-                                <div className="cry-subtitle">Play vocalization cry</div>
+                        <div className={`glass-panel cry-player-container ${collapsed.cry ? 'collapsed' : ''}`} id="detail-cry-panel">
+                            <div className="panel-header" onClick={() => toggleCollapse('cry')} style={{ width: '100%' }}>
+                                <div className="cry-title" style={{ fontWeight: 700, fontSize: '0.95rem', textTransform: 'uppercase', color: 'var(--text-muted)' }}>Audio Cry</div>
+                                <span className={`collapse-chevron ${collapsed.cry ? '' : 'expanded'}`}>▸</span>
                             </div>
+                            {!collapsed.cry && (
+                                <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginTop: '0.75rem', width: '100%' }}>
+                                    <button className="play-cry-btn" onClick={playCry} id="detail-play-cry-btn">
+                                        🔊
+                                    </button>
+                                    <div>
+                                        <div className="cry-title">Playback Vocalization</div>
+                                        <div className="cry-subtitle">Play vocalization cry</div>
+                                    </div>
+                                </div>
+                            )}
                         </div>
                     )}
                 </div>
@@ -256,223 +295,286 @@ export default function PokemonDetailView({
                 <div className="detail-main-content">
                     {/* Varieties Tabs */}
                     {varietyList.length > 1 && (
-                        <div className="glass-panel" id="detail-varieties-tabs">
-                            <h3>Select Alternative Form</h3>
-                            <div className="tabs-header">
-                                {varietyList.map((variety, index) => (
-                                    <button
-                                        key={variety.name}
-                                        className={`tab-btn ${activeVarietyIndex === index ? 'active' : ''}`}
-                                        onClick={() => setActiveVarietyIndex(index)}
-                                    >
-                                        {index === 0 ? 'Standard Form' : variety.name.replace(name + '-', '').replace('-', ' ')}
-                                    </button>
-                                ))}
+                        <div className={`glass-panel ${collapsed.varieties ? 'collapsed' : ''}`} id="detail-varieties-tabs">
+                            <div className="panel-header" onClick={() => toggleCollapse('varieties')}>
+                                <h3>Select Alternative Form</h3>
+                                <span className={`collapse-chevron ${collapsed.varieties ? '' : 'expanded'}`}>▸</span>
                             </div>
+                            {!collapsed.varieties && (
+                                <div className="tabs-header" style={{ marginTop: '1rem', marginBottom: 0, paddingBottom: 0, borderBottom: 'none' }}>
+                                    {varietyList.map((variety, index) => (
+                                        <button
+                                            key={variety.name}
+                                            className={`tab-btn ${activeVarietyIndex === index ? 'active' : ''}`}
+                                            onClick={() => setActiveVarietyIndex(index)}
+                                        >
+                                            {index === 0 ? 'Standard Form' : variety.name.replace(name + '-', '').replace('-', ' ')}
+                                        </button>
+                                    ))}
+                                </div>
+                            )}
                         </div>
                     )}
 
                     {/* Specs Panel */}
-                    <div className="glass-panel info-grid" id="detail-specs-panel">
-                        <div className="info-item">
-                            <div className="info-item-label">Height</div>
-                            <div className="info-item-value">{height / 10} m</div>
+                    <div className={`glass-panel ${collapsed.specs ? 'collapsed' : ''}`} id="detail-specs-panel">
+                        <div className="panel-header" onClick={() => toggleCollapse('specs')}>
+                            <h3 style={{ fontSize: '1.2rem', fontWeight: 700, fontFamily: 'var(--font-digital)' }}>Characteristics</h3>
+                            <span className={`collapse-chevron ${collapsed.specs ? '' : 'expanded'}`}>▸</span>
                         </div>
-                        <div className="info-item">
-                            <div className="info-item-label">Weight</div>
-                            <div className="info-item-value">{weight / 10} kg</div>
-                        </div>
-                        <div className="info-item">
-                            <div className="info-item-label">Capture Rate</div>
-                            <div className="info-item-value">{capture_rate} / 255</div>
-                        </div>
-                        <div className="info-item">
-                            <div className="info-item-label">Growth Rate</div>
-                            <div className="info-item-value" style={{ textTransform: 'capitalize' }}>
-                                {growth_rate?.name?.replace('-', ' ')}
+                        {!collapsed.specs && (
+                            <div className="info-grid" style={{ marginTop: '1rem' }}>
+                                <div className="info-item">
+                                    <div className="info-item-label">Height</div>
+                                    <div className="info-item-value">{height / 10} m</div>
+                                </div>
+                                <div className="info-item">
+                                    <div className="info-item-label">Weight</div>
+                                    <div className="info-item-value">{weight / 10} kg</div>
+                                </div>
+                                <div className="info-item">
+                                    <div className="info-item-label">Capture Rate</div>
+                                    <div className="info-item-value">{capture_rate} / 255</div>
+                                </div>
+                                <div className="info-item">
+                                    <div className="info-item-label">Growth Rate</div>
+                                    <div className="info-item-value" style={{ textTransform: 'capitalize' }}>
+                                        {growth_rate?.name?.replace('-', ' ')}
+                                    </div>
+                                </div>
                             </div>
-                        </div>
+                        )}
                     </div>
 
                     {/* Stats Panel */}
                     {stats && (
-                        <div className="glass-panel" id="detail-stats-panel">
-                            <h3 style={{ fontSize: '1.2rem', fontWeight: 700, marginBottom: '1rem', fontFamily: 'var(--font-digital)' }}>
-                                Base Stats
-                            </h3>
-                            <div>
-                                {stats.map(s => {
-                                    // Map percentage relative to max base stat (approx 255)
-                                    const percent = Math.min((s.base_stat / 200) * 100, 100);
-                                    return (
-                                        <div className="stat-row" key={s.stat.name}>
-                                            <div className="stat-header">
-                                                <span className="stat-label">{s.stat.name.replace('-', ' ')}</span>
-                                                <span className="stat-value">{s.base_stat}</span>
-                                            </div>
-                                            <div className="stat-bar-container">
-                                                <div 
-                                                    className="stat-bar" 
-                                                    style={{ width: `${percent}%` }}
-                                                />
-                                            </div>
-                                        </div>
-                                    );
-                                })}
+                        <div className={`glass-panel ${collapsed.stats ? 'collapsed' : ''}`} id="detail-stats-panel">
+                            <div className="panel-header" onClick={() => toggleCollapse('stats')}>
+                                <h3 style={{ fontSize: '1.2rem', fontWeight: 700, fontFamily: 'var(--font-digital)' }}>Base Stats</h3>
+                                <span className={`collapse-chevron ${collapsed.stats ? '' : 'expanded'}`}>▸</span>
                             </div>
+                            {!collapsed.stats && (
+                                <div style={{ marginTop: '1rem' }}>
+                                    {stats.map(s => {
+                                        // Map percentage relative to max base stat (approx 200)
+                                        const percent = Math.min((s.base_stat / 200) * 100, 100);
+                                        return (
+                                            <div className="stat-row" key={s.stat.name}>
+                                                <div className="stat-header">
+                                                    <span className="stat-label">{s.stat.name.replace('-', ' ')}</span>
+                                                    <span className="stat-value">{s.base_stat}</span>
+                                                </div>
+                                                <div className="stat-bar-container">
+                                                    <div 
+                                                        className="stat-bar" 
+                                                        style={{ width: `${percent}%` }}
+                                                    />
+                                                </div>
+                                            </div>
+                                        );
+                                    })}
+                                </div>
+                            )}
                         </div>
                     )}
 
                     {/* Type Defenses */}
                     {Object.keys(typeDefenses).length > 0 && (
-                        <div className="glass-panel" id="detail-type-defenses">
-                            <h3 style={{ fontSize: '1.2rem', fontWeight: 700, marginBottom: '0.5rem', fontFamily: 'var(--font-digital)' }}>
-                                Type Defenses
-                            </h3>
-                            <p style={{ fontSize: '0.8rem', color: 'var(--text-muted)', marginBottom: '1rem' }}>
-                                Damage multipliers when this Pokémon is attacked by each type.
-                            </p>
-                            <div className="type-defense-grid">
-                                {ALL_TYPES.map(attackType => {
-                                    const multiplier = typeDefenses[attackType] ?? 1;
-                                    return (
-                                        <div key={attackType} className={`type-defense-cell ${getMultiplierClass(multiplier)}`}>
-                                            <Link href={`/types/${attackType}`} className={`type-badge type-${attackType}`} style={{ fontSize: '0.65rem', padding: '0.15rem 0.5rem' }}>
-                                                {attackType}
-                                            </Link>
-                                            <span className="defense-multiplier-value">
-                                                {getMultiplierLabel(multiplier)}
-                                            </span>
-                                        </div>
-                                    );
-                                })}
+                        <div className={`glass-panel ${collapsed.defenses ? 'collapsed' : ''}`} id="detail-type-defenses">
+                            <div className="panel-header" onClick={() => toggleCollapse('defenses')}>
+                                <h3 style={{ fontSize: '1.2rem', fontWeight: 700, fontFamily: 'var(--font-digital)' }}>Type Defenses</h3>
+                                <span className={`collapse-chevron ${collapsed.defenses ? '' : 'expanded'}`}>▸</span>
                             </div>
+                            {!collapsed.defenses && (
+                                <div style={{ marginTop: '1rem' }}>
+                                    <p style={{ fontSize: '0.8rem', color: 'var(--text-muted)', marginBottom: '1rem' }}>
+                                        Damage multipliers when this Pokémon is attacked by each type.
+                                    </p>
+                                    <div className="type-defense-grid">
+                                        {ALL_TYPES.map(attackType => {
+                                            const multiplier = typeDefenses[attackType] ?? 1;
+                                            return (
+                                                <div key={attackType} className={`type-defense-cell ${getMultiplierClass(multiplier)}`}>
+                                                    <Link href={`/types/${attackType}`} className={`type-badge type-${attackType}`} style={{ fontSize: '0.65rem', padding: '0.15rem 0.5rem' }}>
+                                                        {attackType}
+                                                    </Link>
+                                                    <span className="defense-multiplier-value">
+                                                        {getMultiplierLabel(multiplier)}
+                                                    </span>
+                                                </div>
+                                            );
+                                        })}
+                                    </div>
+                                </div>
+                            )}
                         </div>
                     )}
 
                     {/* Abilities and Moves */}
-                    <div className="glass-panel" id="detail-abilities-panel">
-                        <h3 style={{ fontSize: '1.2rem', fontWeight: 700, marginBottom: '0.75rem' }}>Abilities</h3>
-                        <div className="abilities-container">
-                            {abilities.map(({ ability, is_hidden }) => (
-                                <Link 
-                                    key={ability.name} 
-                                    href={`/abilities/${ability.name}`}
-                                    className={`ability-item ${is_hidden ? 'hidden-ability' : ''}`}
-                                    id={`detail-ability-link-${ability.name}`}
-                                >
-                                    <span className="ability-name">
-                                        {ability.name.replace('-', ' ')}
-                                    </span>
-                                    {is_hidden && (
-                                        <span className="hidden-badge">
-                                            Hidden
-                                        </span>
-                                    )}
-                                </Link>
-                            ))}
+                    <div className={`glass-panel ${collapsed.abilitiesMoves ? 'collapsed' : ''}`} id="detail-abilities-panel">
+                        <div className="panel-header" onClick={() => toggleCollapse('abilitiesMoves')}>
+                            <h3 style={{ fontSize: '1.2rem', fontWeight: 700, fontFamily: 'var(--font-digital)' }}>Abilities & Moves</h3>
+                            <span className={`collapse-chevron ${collapsed.abilitiesMoves ? '' : 'expanded'}`}>▸</span>
                         </div>
+                        {!collapsed.abilitiesMoves && (
+                            <div style={{ marginTop: '1.5rem' }}>
+                                <h4 style={{ fontSize: '1.1rem', fontWeight: 700, marginBottom: '0.75rem', color: 'var(--text-muted)' }}>Abilities</h4>
+                                <div className="abilities-container" style={{ marginBottom: '2rem' }}>
+                                    {abilities.map(({ ability, is_hidden }) => (
+                                        <Link 
+                                            key={ability.name} 
+                                            href={`/abilities/${ability.name}`}
+                                            className={`ability-item ${is_hidden ? 'hidden-ability' : ''}`}
+                                            id={`detail-ability-link-${ability.name}`}
+                                        >
+                                            <span className="ability-name">
+                                                {ability.name.replace('-', ' ')}
+                                            </span>
+                                            {is_hidden && (
+                                                <span className="hidden-badge">
+                                                    Hidden
+                                                </span>
+                                            )}
+                                        </Link>
+                                    ))}
+                                </div>
 
-                        <h3 style={{ fontSize: '1.2rem', fontWeight: 700, marginTop: '2rem', marginBottom: '0.5rem' }}>Moves List</h3>
-                        {(() => {
-                            // Group moves by damage class
-                            const grouped = { physical: [], special: [], status: [], unknown: [] };
-                            moves.forEach(({ move }) => {
-                                const dc = moveDamageClassMap[move.name] || 'unknown';
-                                (grouped[dc] || grouped.unknown).push(move);
-                            });
+                                <h4 style={{ fontSize: '1.1rem', fontWeight: 700, marginBottom: '0.75rem', color: 'var(--text-muted)' }}>Moves List</h4>
+                                {(() => {
+                                    // Group moves by damage class
+                                    const grouped = { physical: [], special: [], status: [], unknown: [] };
+                                    moves.forEach(({ move }) => {
+                                        const detail = moveDetailsMap[move.name] || {};
+                                        const dc = detail.damage_class || 'unknown';
+                                        (grouped[dc] || grouped.unknown).push(move);
+                                    });
 
-                            const categories = [
-                                { key: 'physical', label: 'Physical' },
-                                { key: 'special', label: 'Special' },
-                                { key: 'status', label: 'Status' },
-                            ];
-                            // Include "unknown" only if there are uncategorized moves
-                            if (grouped.unknown.length > 0) {
-                                categories.push({ key: 'unknown', label: 'Other' });
-                            }
+                                    const categories = [
+                                        { key: 'physical', label: 'Physical' },
+                                        { key: 'special', label: 'Special' },
+                                        { key: 'status', label: 'Status' },
+                                    ];
+                                    // Include "unknown" only if there are uncategorized moves
+                                    if (grouped.unknown.length > 0) {
+                                        categories.push({ key: 'unknown', label: 'Other' });
+                                    }
 
-                            return categories
-                                .filter(cat => grouped[cat.key].length > 0)
-                                .map(cat => (
-                                    <div key={cat.key} style={{ marginBottom: '1.25rem' }}>
-                                        <div className="moves-category-header">
-                                            {cat.key !== 'unknown' && <DamageClassIcon damageClass={cat.key} size="1.1em" />}
-                                            <span>{cat.label}</span>
-                                            <span className="moves-category-count">{grouped[cat.key].length}</span>
-                                        </div>
-                                        <div className="moves-list">
-                                            {grouped[cat.key].map(move => {
-                                                const moveType = moveTypeMap[move.name] || 'normal';
-                                                return (
-                                                    <Link href={`/moves/${move.name}`} key={move.name}>
-                                                        <span className={`move-badge type-${moveType}`}>
-                                                            {move.name.replace('-', ' ')}
-                                                        </span>
-                                                    </Link>
-                                                );
-                                            })}
-                                        </div>
-                                    </div>
-                                ));
-                        })()}
+                                    return categories
+                                        .filter(cat => grouped[cat.key].length > 0)
+                                        .map(cat => (
+                                            <div key={cat.key} style={{ marginBottom: '1.5rem' }}>
+                                                <div className="moves-category-header">
+                                                    {cat.key !== 'unknown' && <DamageClassIcon damageClass={cat.key} size="1.1em" />}
+                                                    <span>{cat.label}</span>
+                                                    <span className="moves-category-count">{grouped[cat.key].length}</span>
+                                                </div>
+                                                <div className="moves-table-wrapper">
+                                                    <table className="moves-table">
+                                                        <thead>
+                                                            <tr>
+                                                                <th>Move Name</th>
+                                                                <th>Type</th>
+                                                                <th>Power</th>
+                                                                <th>Accuracy</th>
+                                                                <th>PP</th>
+                                                            </tr>
+                                                        </thead>
+                                                        <tbody>
+                                                            {grouped[cat.key].map(move => {
+                                                                const detail = moveDetailsMap[move.name] || {};
+                                                                const moveType = detail.type || 'normal';
+                                                                const power = detail.power !== null && detail.power !== undefined ? detail.power : '—';
+                                                                const accuracy = detail.accuracy !== null && detail.accuracy !== undefined ? `${detail.accuracy}%` : '—';
+                                                                const pp = detail.pp !== null && detail.pp !== undefined ? detail.pp : '—';
+
+                                                                return (
+                                                                    <tr key={move.name}>
+                                                                        <td className="move-name-cell">
+                                                                            <Link href={`/moves/${move.name}`} className="move-link">
+                                                                                {move.name.replace('-', ' ')}
+                                                                            </Link>
+                                                                        </td>
+                                                                        <td className="move-type-cell">
+                                                                            <span className={`type-badge type-${moveType}`}>
+                                                                                {moveType}
+                                                                            </span>
+                                                                        </td>
+                                                                        <td className="move-stat-cell power-val">{power}</td>
+                                                                        <td className="move-stat-cell accuracy-val">{accuracy}</td>
+                                                                        <td className="move-stat-cell pp-val">{pp}</td>
+                                                                    </tr>
+                                                                );
+                                                            })}
+                                                        </tbody>
+                                                    </table>
+                                                </div>
+                                            </div>
+                                        ));
+                                })()}
+                            </div>
+                        )}
                     </div>
 
                     {/* Game Locations */}
-                    <div className="glass-panel" id="detail-game-locations">
-                        <h3 style={{ fontSize: '1.2rem', fontWeight: 700, marginBottom: '0.5rem', fontFamily: 'var(--font-digital)' }}>
-                            Game Locations
-                        </h3>
-                        <p style={{ fontSize: '0.8rem', color: 'var(--text-muted)', marginBottom: '1rem' }}>
-                            Where to find {name.replace('-', ' ')} in each main series game.
-                        </p>
+                    <div className={`glass-panel ${collapsed.locations ? 'collapsed' : ''}`} id="detail-game-locations">
+                        <div className="panel-header" onClick={() => toggleCollapse('locations')}>
+                            <h3 style={{ fontSize: '1.2rem', fontWeight: 700, fontFamily: 'var(--font-digital)' }}>Game Locations</h3>
+                            <span className={`collapse-chevron ${collapsed.locations ? '' : 'expanded'}`}>▸</span>
+                        </div>
+                        {!collapsed.locations && (
+                            <div style={{ marginTop: '1rem' }}>
+                                <p style={{ fontSize: '0.8rem', color: 'var(--text-muted)', marginBottom: '1rem' }}>
+                                    Where to find {name.replace('-', ' ')} in each main series game.
+                                </p>
 
-                        {sortedVersions.length > 0 ? (
-                            <div className="game-locations-list">
-                                {sortedVersions.map(version => {
-                                    const locations = encountersByVersion[version];
-                                    const isExpanded = expandedVersions[version];
-                                    const prettyName = VERSION_NAMES[version] || version.replace(/-/g, ' ');
+                                {sortedVersions.length > 0 ? (
+                                    <div className="game-locations-list">
+                                        {sortedVersions.map(version => {
+                                            const locations = encountersByVersion[version];
+                                            const isExpanded = expandedVersions[version];
+                                            const prettyName = VERSION_NAMES[version] || version.replace(/-/g, ' ');
 
-                                    return (
-                                        <div key={version} className="game-version-row">
-                                            <button
-                                                className="game-version-header"
-                                                onClick={() => toggleVersion(version)}
-                                            >
-                                                <span className="game-version-name">{prettyName}</span>
-                                                <span className="game-version-count">{locations.length} location{locations.length !== 1 ? 's' : ''}</span>
-                                                <span className={`game-version-chevron ${isExpanded ? 'expanded' : ''}`}>▸</span>
-                                            </button>
-                                            {isExpanded && (
-                                                <div className="game-version-locations">
-                                                    {locations.map((loc, i) => (
-                                                        <div key={i} className="location-entry">
-                                                            <div className="location-name">📍 {loc.location}</div>
-                                                            <div className="location-details">
-                                                                {loc.methods.map((m, j) => (
-                                                                    <span key={j} className="encounter-method">
-                                                                        {m.method}
-                                                                        {m.minLevel && m.maxLevel && (
-                                                                            <span className="encounter-level">
-                                                                                Lv. {m.minLevel === m.maxLevel ? m.minLevel : `${m.minLevel}–${m.maxLevel}`}
+                                            return (
+                                                <div key={version} className="game-version-row">
+                                                    <button
+                                                        className="game-version-header"
+                                                        onClick={() => toggleVersion(version)}
+                                                    >
+                                                        <span className="game-version-name">{prettyName}</span>
+                                                        <span className="game-version-count">{locations.length} location{locations.length !== 1 ? 's' : ''}</span>
+                                                        <span className={`game-version-chevron ${isExpanded ? 'expanded' : ''}`}>▸</span>
+                                                    </button>
+                                                    {isExpanded && (
+                                                        <div className="game-version-locations">
+                                                            {locations.map((loc, i) => (
+                                                                <div key={i} className="location-entry">
+                                                                    <div className="location-name">📍 {loc.location}</div>
+                                                                    <div className="location-details">
+                                                                        {loc.methods.map((m, j) => (
+                                                                            <span key={j} className="encounter-method">
+                                                                                {m.method}
+                                                                                {m.minLevel && m.maxLevel && (
+                                                                                    <span className="encounter-level">
+                                                                                        Lv. {m.minLevel === m.maxLevel ? m.minLevel : `${m.minLevel}–${m.maxLevel}`}
+                                                                                    </span>
+                                                                                )}
                                                                             </span>
-                                                                        )}
-                                                                    </span>
-                                                                ))}
-                                                            </div>
+                                                                        ))}
+                                                                    </div>
+                                                                </div>
+                                                            ))}
                                                         </div>
-                                                    ))}
+                                                    )}
                                                 </div>
-                                            )}
-                                        </div>
-                                    );
-                                })}
-                            </div>
-                        ) : (
-                            <div className="no-encounters-message">
-                                <span style={{ fontSize: '1.5rem' }}>🎁</span>
-                                <p>This Pokémon is not found in the wild — it must be obtained as a starter, gift, trade, or special event.</p>
+                                            );
+                                        })}
+                                    </div>
+                                ) : (
+                                    <div className="no-encounters-message">
+                                        <span style={{ fontSize: '1.5rem' }}>🎁</span>
+                                        <p>This Pokémon is not found in the wild — it must be obtained as a starter, gift, trade, or special event.</p>
+                                    </div>
+                                )}
                             </div>
                         )}
                     </div>
