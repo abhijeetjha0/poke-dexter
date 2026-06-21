@@ -174,3 +174,17 @@ export default async function Page({ params }) {
         />
     );
 }
+
+export async function generateStaticParams() {
+    try {
+        const response = await fetch('https://pokeapi.co/api/v2/pokemon-species?limit=2000');
+        if (!response.ok) return [];
+        const data = await response.json();
+        return data.results.map((pokemon) => ({
+            name: pokemon.name,
+        }));
+    } catch (e) {
+        console.error("Failed to generate static params for pokemons:", e);
+        return [];
+    }
+}

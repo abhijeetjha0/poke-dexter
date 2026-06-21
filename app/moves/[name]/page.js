@@ -146,3 +146,17 @@ export default async function MoveDetailPage({ params }) {
         </div>
     );
 }
+
+export async function generateStaticParams() {
+    try {
+        const response = await fetch('https://pokeapi.co/api/v2/move?limit=1000');
+        if (!response.ok) return [];
+        const data = await response.json();
+        return data.results.map((move) => ({
+            name: move.name,
+        }));
+    } catch (e) {
+        console.error("Failed to generate static params for moves:", e);
+        return [];
+    }
+}
