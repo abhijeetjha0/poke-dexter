@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import Link from 'next/link';
 import DamageClassIcon from '../components/damage-class-icon';
 
@@ -9,6 +9,22 @@ const MOVES_PER_PAGE = 50;
 export default function MovesList({ initialMoves, moveTypeMap, moveDamageClassMap = {} }) {
     const [searchTerm, setSearchTerm] = useState('');
     const [currentPage, setCurrentPage] = useState(1);
+
+    // View mode state with localStorage persistence (safe from SSR hydration mismatch)
+    const [viewMode, setViewMode] = useState('grid');
+    useEffect(() => {
+        const savedMode = localStorage.getItem('viewMode');
+        if (savedMode === 'grid' || savedMode === 'list') {
+            setTimeout(() => {
+                setViewMode(savedMode);
+            }, 0);
+        }
+    }, []);
+
+    const handleViewModeChange = (mode) => {
+        setViewMode(mode);
+        localStorage.setItem('viewMode', mode);
+    };
 
     const filteredMoves = useMemo(() => {
         return initialMoves
@@ -51,64 +67,123 @@ export default function MovesList({ initialMoves, moveTypeMap, moveDamageClassMa
                 <span className="search-icon">🔍</span>
             </div>
 
-            {/* Results Count & Pagination Info */}
+            {/* Results Count & Pagination Info & View Toggle */}
             <div style={{
                 display: 'flex',
                 justifyContent: 'space-between',
                 alignItems: 'center',
-                marginTop: '1rem',
+                marginTop: '1.5rem',
+                marginBottom: '1rem',
                 color: 'var(--text-muted)',
                 fontSize: '0.9rem',
-                fontFamily: 'var(--font-digital)',
             }}>
-                <span>{filteredMoves.length} moves found</span>
-                {totalPages > 1 && (
-                    <span>Page {safeCurrentPage} of {totalPages}</span>
-                )}
+                <div style={{ display: 'flex', gap: '1.5rem', alignItems: 'center', fontFamily: 'var(--font-digital)' }}>
+                    <span>{filteredMoves.length} moves found</span>
+                    {totalPages > 1 && (
+                        <span>Page {safeCurrentPage} of {totalPages}</span>
+                    )}
+                </div>
+                <div className="view-toggle-container">
+                    <button
+                        className={`view-toggle-btn ${viewMode === 'grid' ? 'active' : ''}`}
+                        onClick={() => handleViewModeChange('grid')}
+                        id="view-toggle-grid"
+                    >
+                        <span>田</span> Grid
+                    </button>
+                    <button
+                        className={`view-toggle-btn ${viewMode === 'list' ? 'active' : ''}`}
+                        onClick={() => handleViewModeChange('list')}
+                        id="view-toggle-list"
+                    >
+                        <span>☰</span> List
+                    </button>
+                </div>
             </div>
 
-            {/* Moves Grid */}
+            {/* Moves Grid or List */}
             {paginatedMoves.length > 0 ? (
-                <div 
-                    style={{ 
-                        display: 'grid', 
-                        gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))', 
-                        gap: '1.25rem',
-                        marginTop: '1rem'
-                    }}
-                >
-                    {paginatedMoves.map(move => {
-                        const moveType = moveTypeMap[move.name] || 'normal';
-                        const damageClass = moveDamageClassMap[move.name] || null;
-                        return (
-                            <Link href={`/moves/${move.name}`} key={move.name}>
-                                <div 
-                                    className="glass-panel ability-link-card" 
-                                    style={{ 
-                                        display: 'flex',
-                                        flexDirection: 'column',
-                                        alignItems: 'center',
-                                        gap: '0.75rem',
-                                        padding: '1.25rem', 
-                                        borderRadius: '12px', 
-                                        cursor: 'pointer',
-                                        transition: 'all 0.2s ease',
-                                    }}
-                                >
-                                    <span style={{ fontWeight: 700, textTransform: 'capitalize', fontSize: '1.05rem' }}>
-                                        {move.name.replace('-', ' ')}
-                                    </span>
-                                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                                        <span className={`type-badge type-${moveType}`} style={{ fontSize: '0.75rem', padding: '0.2rem 0.6rem' }}>
-                                            {moveType}
+                viewMode === 'grid' ? (
+                    <div 
+                        style={{ 
+                            display: 'grid', 
+                            gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))', 
+                            gap: '1.25rem',
+                            marginTop: '1rem'
+                        }}
+                    >
+                        {paginatedMoves.map(move => {
+                            const moveType = moveTypeMap[move.name] || 'normal';
+                            const damageClass = moveDamageClassMap[move.name] || null;
+                            return (
+                                <Link href={`/moves/${move.name}`} key={move.name}>
+                                    <div 
+                                        className="glass-panel ability-link-card" 
+                                        style={{ 
+                                            display: 'flex',
+                                            flexDirection: 'column',
+                                            alignItems: 'center',
+                                            gap: '0.75rem',
+                                            padding: '1.25rem', 
+                                            borderRadius: '12px', 
+                                            cursor: 'pointer',
+                                            transition: 'all 0.2s ease',
+                                        }}
+                                    >
+                                        <span style={{ fontWeight: 700, textTransform: 'capitalize', fontSize: '1.05rem' }}>
+                                            {move.name.replace('-', ' ')}
                                         </span>
-                                        {damageClass && <DamageClassIcon damageClass={damageClass} />}
+                                        <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                                            <span className={`type-badge type-${moveType}`} style={{ fontSize: '0.75rem', padding: '0.2rem 0.6rem' }}>
+                                                {moveType}
+                                            </span>
+                                            {damageClass && <DamageClassIcon damageClass={damageClass} />}
+                                        </div>
                                     </div>
-                                </div>
-                            </Link>
-                        );
-                    })}
-                </div>
+                                </Link>
+                            );
+                        })}
+                    </div>
+                ) : (
+                    <div className="moves-list-view" style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem', marginTop: '1rem' }}>
+                        {paginatedMoves.map(move => {
+                            const moveType = moveTypeMap[move.name] || 'normal';
+                            const damageClass = moveDamageClassMap[move.name] || null;
+                            return (
+                                <Link href={`/moves/${move.name}`} key={move.name}>
+                                    <div 
+                                        className="glass-panel move-list-item" 
+                                        style={{ 
+                                            display: 'flex',
+                                            alignItems: 'center',
+                                            justifyContent: 'space-between',
+                                            padding: '0.85rem 1.5rem',
+                                            borderRadius: '12px',
+                                            cursor: 'pointer',
+                                            transition: 'all 0.2s ease',
+                                        }}
+                                    >
+                                        <span style={{ fontWeight: 700, textTransform: 'capitalize', fontSize: '1.1rem', color: 'var(--text-main)' }}>
+                                            {move.name.replace('-', ' ')}
+                                        </span>
+                                        <div style={{ display: 'flex', alignItems: 'center', gap: '1.5rem' }}>
+                                            <span className={`type-badge type-${moveType}`} style={{ fontSize: '0.8rem', padding: '0.25rem 0.75rem' }}>
+                                                {moveType}
+                                            </span>
+                                            {damageClass && (
+                                                <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
+                                                    <DamageClassIcon damageClass={damageClass} />
+                                                    <span style={{ fontSize: '0.85rem', textTransform: 'capitalize', color: 'var(--text-muted)' }}>{damageClass}</span>
+                                                </div>
+                                            )}
+                                            <span className="arrow">→</span>
+                                        </div>
+                                    </div>
+                                </Link>
+                            );
+                        })}
+                    </div>
+                )
             ) : (
                 <div className="glass-panel no-results">
                     <h3>No moves found matching your search.</h3>

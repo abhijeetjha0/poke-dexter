@@ -1,5 +1,5 @@
 import './global.scss';
-import Link from 'next/link';
+import Navbar from './components/navbar';
 
 export const metadata = {
     title: 'PokeDexter | The Ultimate Pokemon Database',
@@ -11,28 +11,7 @@ export default function RootLayout({ children }) {
         <html lang="en">
             <body>
                 <div className="app-container">
-                    <header className="pokedex-header">
-                        <Link href="/" id="nav-logo-link">
-                            <div className="pokedex-logo">POKEDEXTER</div>
-                        </Link>
-                        <nav className="pokedex-nav">
-                            <Link href="/pokemons" className="pokedex-nav-link" id="nav-pokemons-link">
-                                Pokedex
-                            </Link>
-                            <Link href="/abilities" className="pokedex-nav-link" id="nav-abilities-link">
-                                Abilities
-                            </Link>
-                            <Link href="/moves" className="pokedex-nav-link" id="nav-moves-link">
-                                Moves
-                            </Link>
-                            <Link href="/types" className="pokedex-nav-link" id="nav-types-link">
-                                Types
-                            </Link>
-                            <Link href="/generations" className="pokedex-nav-link" id="nav-generations-link">
-                                Generations
-                            </Link>
-                        </nav>
-                    </header>
+                    <Navbar />
                     <main>{children}</main>
                 </div>
             </body>

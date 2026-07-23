@@ -106,3 +106,17 @@ export default async function AbilityDetailPage({ params }) {
         </div>
     );
 }
+
+export async function generateStaticParams() {
+    try {
+        const response = await fetch('https://pokeapi.co/api/v2/ability?limit=500');
+        if (!response.ok) return [];
+        const data = await response.json();
+        return data.results.map((ability) => ({
+            name: ability.name,
+        }));
+    } catch (e) {
+        console.error("Failed to generate static params for abilities:", e);
+        return [];
+    }
+}

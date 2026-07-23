@@ -15,11 +15,9 @@ export default function TypesPage() {
     return (
         <div>
             {/* Header Panel */}
-            <div className="glass-panel" style={{ marginBottom: '2rem' }}>
-                <h1 style={{ fontSize: '2.5rem', fontWeight: 800, fontFamily: 'var(--font-digital)' }}>
-                    Pokémon Types Directory
-                </h1>
-                <p style={{ color: 'var(--text-muted)', marginTop: '0.5rem' }}>
+            <div className="glass-panel page-header">
+                <h1>Pokémon Types Directory</h1>
+                <p>
                     Select an element type to catalog Pokémon and explore battle effectiveness mappings.
                 </p>
             </div>
