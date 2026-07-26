@@ -39,6 +39,7 @@ export default [
     ignores: [
       ".next/**",
       "out/**",
+      "coverage/**",
       "node_modules/**",
       "**/node_modules/**",
       "package-lock.json",

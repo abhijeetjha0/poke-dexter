@@ -3,6 +3,7 @@
 import { useState, useMemo, useEffect, useRef } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
+import { fetchPokemonByIdOrName } from '../api-requests';
 
 const GENERATIONS = [
     { name: 'All', start: 1, end: 9999 },
@@ -187,7 +188,7 @@ export default function PokemonList(props) {
         const fetchDetails = async () => {
             try {
                 const promises = idsToFetch.map(id =>
-                    fetch(`https://pokeapi.co/api/v2/pokemon/${id}`)
+                    fetchPokemonByIdOrName(id)
                         .then(res => res.json())
                 );
                 const results = await Promise.all(promises);
@@ -241,7 +242,7 @@ export default function PokemonList(props) {
                 if (missingIds.length > 0) {
                     try {
                         const promises = missingIds.map(id =>
-                            fetch(`https://pokeapi.co/api/v2/pokemon/${id}`)
+                            fetchPokemonByIdOrName(id)
                                 .then(res => res.json())
                         );
                         const results = await Promise.all(promises);

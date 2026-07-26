@@ -1,4 +1,5 @@
 import AbilitiesList from './abilities-list';
+import { fetchAbilityList } from '../api-requests';
 
 export const metadata = {
     title: 'Pokemon Abilities Directory | PokeDexter',
@@ -6,7 +7,7 @@ export const metadata = {
 }
 
 export default async function AbilitiesPage() {
-    const response = await fetch('https://pokeapi.co/api/v2/ability?limit=500');
+    const response = await fetchAbilityList(500);
     const responseJSON = await response.json();
     const abilities = responseJSON.results || [];
 

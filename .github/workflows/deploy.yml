@@ -37,8 +37,17 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
+      - name: Run tests
+        run: npm test
+
+      - name: Generate dynamic coverage badge
+        run: bash scripts/generate-coverage-badge.sh
+
       - name: Build with Next.js
         run: npm run build
+
+      - name: Copy coverage report to out
+        run: cp -r coverage/lcov-report out/coverage
 
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3

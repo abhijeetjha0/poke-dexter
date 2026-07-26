@@ -1,13 +1,14 @@
 import Link from 'next/link';
 import PokemonGrid from '../../components/pokemon-grid';
 import DamageClassIcon from '../../components/damage-class-icon';
+import { fetchMoveByNameOrId, fetchPokemonByUrl, fetchMoveList } from '../../api-requests';
 
 export default async function MoveDetailPage({ params }) {
     const { name } = await params;
     const moveName = name.toLowerCase();
 
     // Fetch move details
-    const response = await fetch(`https://pokeapi.co/api/v2/move/${moveName}`);
+    const response = await fetchMoveByNameOrId(moveName);
     if (!response.ok) {
         return (
             <div className="glass-panel" style={{ textAlign: 'center', padding: '3rem' }}>
@@ -38,7 +39,7 @@ export default async function MoveDetailPage({ params }) {
         
         if (id >= 10000) {
             try {
-                const res = await fetch(pokemon.url);
+                const res = await fetchPokemonByUrl(pokemon.url);
                 if (res.ok) {
                     const pokemonData = await res.json();
                     speciesName = pokemonData.species.name;
@@ -149,7 +150,7 @@ export default async function MoveDetailPage({ params }) {
 
 export async function generateStaticParams() {
     try {
-        const response = await fetch('https://pokeapi.co/api/v2/move?limit=1000');
+        const response = await fetchMoveList(1000);
         if (!response.ok) return [];
         const data = await response.json();
         return data.results.map((move) => ({

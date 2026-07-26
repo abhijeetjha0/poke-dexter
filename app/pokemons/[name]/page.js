@@ -1,5 +1,13 @@
 import PokemonDetailView from './pokemon-detail-view';
 import { buildMoveMetaMaps } from '../../lib/move-type-utils';
+import {
+    fetchPokemonSpecies,
+    fetchPokemonByUrl,
+    fetchTypeByNameOrId,
+    fetchPokemonEncounters,
+    fetchMoveByNameOrId,
+    fetchPokemonSpeciesList,
+} from '../../api-requests';
 
 const ALL_TYPES = [
     'normal', 'fighting', 'flying', 'poison', 'ground', 'rock',
@@ -114,7 +122,7 @@ export default async function Page({ params }) {
 
     // Fetch species info and build move meta maps in parallel
     const [response, { moveTypeMap, moveDamageClassMap }] = await Promise.all([
-        fetch(`https://pokeapi.co/api/v2/pokemon-species/${name}`),
+        fetchPokemonSpecies(name),
         buildMoveMetaMaps(),
     ]);
     const responseJSON = await response.json();
@@ -122,7 +130,7 @@ export default async function Page({ params }) {
     const { varieties } = responseJSON;
     
     // Fetch all variety detail endpoints in parallel
-    const varietyPromises = varieties.map(({ pokemon }) => fetch(pokemon.url));
+    const varietyPromises = varieties.map(({ pokemon }) => fetchPokemonByUrl(pokemon.url));
     const pokeInfoListResponse = await Promise.all(varietyPromises);
     const pokeInfoListJSON = await Promise.all(
         pokeInfoListResponse.map((r) => r.json())
@@ -136,7 +144,7 @@ export default async function Page({ params }) {
     const baseForm = pokeInfoListJSON[0];
     const typeNames = baseForm.types.map(t => t.type.name);
     const typeDetailResponses = await Promise.all(
-        typeNames.map(t => fetch(`https://pokeapi.co/api/v2/type/${t}`, {
+        typeNames.map(t => fetchTypeByNameOrId(t, {
             next: { revalidate: 86400 },
         }))
     );
@@ -150,8 +158,8 @@ export default async function Page({ params }) {
     const baseId = baseForm.id;
     let encountersByVersion = {};
     try {
-        const encountersResponse = await fetch(
-            `https://pokeapi.co/api/v2/pokemon/${baseId}/encounters`,
+        const encountersResponse = await fetchPokemonEncounters(
+            baseId,
             { next: { revalidate: 86400 } }
         );
         if (encountersResponse.ok) {
@@ -176,7 +184,7 @@ export default async function Page({ params }) {
 
     const moveDetailsResponses = await Promise.all(
         uniqueMoveNamesArray.map(moveName =>
-            fetch(`https://pokeapi.co/api/v2/move/${moveName}`, {
+            fetchMoveByNameOrId(moveName, {
                 next: { revalidate: 86400 },
             }).then(r => r.ok ? r.json() : null).catch(() => null)
         )
@@ -218,7 +226,7 @@ export default async function Page({ params }) {
 
 export async function generateStaticParams() {
     try {
-        const response = await fetch('https://pokeapi.co/api/v2/pokemon-species?limit=2000');
+        const response = await fetchPokemonSpeciesList(2000);
         if (!response.ok) return [];
         const data = await response.json();
         return data.results.map((pokemon) => ({

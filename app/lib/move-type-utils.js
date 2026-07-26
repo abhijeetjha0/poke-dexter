@@ -6,6 +6,8 @@
  * leverages Next.js fetch caching (24h revalidation) to prevent rate limits.
  */
 
+import { fetchTypeByNameOrId, fetchMoveDamageClass } from '../api-requests';
+
 const ALL_TYPES = [
     'normal', 'fighting', 'flying', 'poison', 'ground', 'rock',
     'bug', 'ghost', 'steel', 'fire', 'water', 'grass',
@@ -34,7 +36,7 @@ export async function buildMoveTypeMap() {
 
     const typeResponses = await Promise.all(
         ALL_TYPES.map(typeName =>
-            fetch(`https://pokeapi.co/api/v2/type/${typeName}`, {
+            fetchTypeByNameOrId(typeName, {
                 next: { revalidate: 86400 },
             })
         )
@@ -74,7 +76,7 @@ export async function buildMoveDamageClassMap() {
 
     const classResponses = await Promise.all(
         ALL_DAMAGE_CLASSES.map(className =>
-            fetch(`https://pokeapi.co/api/v2/move-damage-class/${className}`, {
+            fetchMoveDamageClass(className, {
                 next: { revalidate: 86400 },
             })
         )
