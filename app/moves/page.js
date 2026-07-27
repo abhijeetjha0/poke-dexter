@@ -1,5 +1,6 @@
 import MovesList from './moves-list';
 import { buildMoveMetaMaps } from '../lib/move-type-utils';
+import { fetchMoveList } from '../api-requests';
 
 export const metadata = {
     title: 'Pokémon Moves Directory | PokeDexter',
@@ -9,7 +10,7 @@ export const metadata = {
 export default async function MovesPage() {
     // Fetch all moves from PokeAPI and build type + damage class mappings in parallel
     const [movesResponse, { moveTypeMap, moveDamageClassMap }] = await Promise.all([
-        fetch('https://pokeapi.co/api/v2/move?limit=1000', {
+        fetchMoveList(1000, {
             next: { revalidate: 86400 },
         }),
         buildMoveMetaMaps(),

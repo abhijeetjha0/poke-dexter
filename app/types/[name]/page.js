@@ -1,12 +1,13 @@
 import Link from 'next/link';
 import PokemonGrid from '../../components/pokemon-grid';
+import { fetchTypeByNameOrId, fetchPokemonByUrl, fetchTypeList } from '../../api-requests';
 
 export default async function TypePage({ params }) {
     const { name } = await params;
     const typeName = name.toLowerCase();
 
     // Fetch type data
-    const response = await fetch(`https://pokeapi.co/api/v2/type/${typeName}`);
+    const response = await fetchTypeByNameOrId(typeName);
     if (!response.ok) {
         return (
             <div className="glass-panel" style={{ textAlign: 'center', padding: '3rem' }}>
@@ -31,7 +32,7 @@ export default async function TypePage({ params }) {
         
         if (id >= 10000) {
             try {
-                const res = await fetch(pokemon.url);
+                const res = await fetchPokemonByUrl(pokemon.url);
                 if (res.ok) {
                     const pokemonData = await res.json();
                     speciesName = pokemonData.species.name;
@@ -91,7 +92,7 @@ export default async function TypePage({ params }) {
 
 export async function generateStaticParams() {
     try {
-        const response = await fetch('https://pokeapi.co/api/v2/type?limit=100');
+        const response = await fetchTypeList(100);
         if (!response.ok) return [];
         const data = await response.json();
         return data.results.map((type) => ({

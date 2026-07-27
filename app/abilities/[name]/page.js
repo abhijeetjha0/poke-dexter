@@ -1,12 +1,13 @@
 import Link from 'next/link';
 import PokemonGrid from '../../components/pokemon-grid';
+import { fetchAbilityByNameOrId, fetchPokemonByUrl, fetchAbilityList } from '../../api-requests';
 
 export default async function AbilityDetailPage({ params }) {
     const { name } = await params;
     const abilityName = name.toLowerCase();
 
     // Fetch ability details
-    const response = await fetch(`https://pokeapi.co/api/v2/ability/${abilityName}`);
+    const response = await fetchAbilityByNameOrId(abilityName);
     if (!response.ok) {
         return (
             <div className="glass-panel" style={{ textAlign: 'center', padding: '3rem' }}>
@@ -37,7 +38,7 @@ export default async function AbilityDetailPage({ params }) {
         
         if (id >= 10000) {
             try {
-                const res = await fetch(pokemon.url);
+                const res = await fetchPokemonByUrl(pokemon.url);
                 if (res.ok) {
                     const pokemonData = await res.json();
                     speciesName = pokemonData.species.name;
@@ -109,7 +110,7 @@ export default async function AbilityDetailPage({ params }) {
 
 export async function generateStaticParams() {
     try {
-        const response = await fetch('https://pokeapi.co/api/v2/ability?limit=500');
+        const response = await fetchAbilityList(500);
         if (!response.ok) return [];
         const data = await response.json();
         return data.results.map((ability) => ({

@@ -1,8 +1,9 @@
 import { Suspense } from 'react';
 import PokemonList from './pokemon-list';
+import { fetchPokemonSpeciesList } from '../api-requests';
 
 export default async function Page() {
-    const response = await fetch('https://pokeapi.co/api/v2/pokemon-species?limit=2000');
+    const response = await fetchPokemonSpeciesList(2000);
     const responseJSON = await response.json();
 
     return (
