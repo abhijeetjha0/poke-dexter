@@ -1,5 +1,6 @@
 import PokemonDetailView from './pokemon-detail-view';
 import { buildMoveMetaMaps } from '../../lib/move-type-utils';
+import { limitConcurrency } from '../../lib/promise-utils';
 import {
     fetchPokemonSpecies,
     fetchPokemonByUrl,
@@ -8,6 +9,7 @@ import {
     fetchMoveByNameOrId,
     fetchPokemonSpeciesList,
 } from '../../api-requests';
+import { generateCommonStaticParams } from '../../lib/static-params-util';
 
 const ALL_TYPES = [
     'normal', 'fighting', 'flying', 'poison', 'ground', 'rock',
@@ -23,34 +25,32 @@ const ALL_TYPES = [
 function computeTypeDefenses(typeDataList) {
     // Start with all 1× (neutral)
     const defenses = {};
-    ALL_TYPES.forEach(t => { defenses[t] = 1; });
+    ALL_TYPES.forEach(type => { defenses[type] = 1; });
 
     for (const typeData of typeDataList) {
         const dr = typeData.damage_relations;
         // double_damage_from → 2× against this type
-        (dr.double_damage_from || []).forEach(t => {
-            defenses[t.name] = (defenses[t.name] || 1) * 2;
+        (dr.double_damage_from || []).forEach(typeRef => {
+            defenses[typeRef.name] = (defenses[typeRef.name] || 1) * 2;
         });
         // half_damage_from → 0.5× against this type
-        (dr.half_damage_from || []).forEach(t => {
-            defenses[t.name] = (defenses[t.name] || 1) * 0.5;
+        (dr.half_damage_from || []).forEach(typeRef => {
+            defenses[typeRef.name] = (defenses[typeRef.name] || 1) * 0.5;
         });
         // no_damage_from → 0× against this type
-        (dr.no_damage_from || []).forEach(t => {
-            defenses[t.name] = 0;
+        (dr.no_damage_from || []).forEach(typeRef => {
+            defenses[typeRef.name] = 0;
         });
     }
 
     return defenses;
 }
 
-/**
- * Extract the latest English Pokédex entry (flavor text) from species data.
- */
+// Extract the latest English Pokédex entry (flavor text) from species data.
 function extractLatestPokedexEntry(speciesData) {
     const entries = speciesData.flavor_text_entries || [];
     // Filter English entries, take the last one (latest game)
-    const englishEntries = entries.filter(e => e.language?.name === 'en');
+    const englishEntries = entries.filter(entry => entry.language?.name === 'en');
     if (englishEntries.length === 0) return null;
     const latest = englishEntries[englishEntries.length - 1];
     return {
@@ -59,59 +59,70 @@ function extractLatestPokedexEntry(speciesData) {
     };
 }
 
-/**
- * Process encounter data: group by game version with locations and methods.
- */
+// Process encounter data: group by game version with locations and methods.
 function processEncounters(encounterData) {
     const byVersion = {};
     for (const area of encounterData) {
         const locationName = area.location_area?.name
             ?.replace(/-/g, ' ')
-            .replace(/\b\w/g, c => c.toUpperCase()) || 'Unknown';
+            .replace(/\b\w/g, char => char.toUpperCase()) || 'Unknown';
 
         for (const vd of (area.version_details || [])) {
             const version = vd.version?.name || 'unknown';
-            if (!byVersion[version]) byVersion[version] = [];
+            if (!byVersion[version]) byVersion[version] = {};
 
-            const methods = (vd.encounter_details || []).map(ed => ({
-                method: ed.method?.name?.replace(/-/g, ' ') || 'unknown',
-                minLevel: ed.min_level,
-                maxLevel: ed.max_level,
-                chance: ed.chance,
+            const methods = (vd.encounter_details || []).map(encounterDetail => ({
+                method: encounterDetail.method?.name?.replace(/-/g, ' ') || 'unknown',
+                minLevel: encounterDetail.min_level,
+                maxLevel: encounterDetail.max_level,
+                chance: encounterDetail.chance,
             }));
 
             // Deduplicate methods per location
             const uniqueMethods = [];
             const seen = new Set();
-            for (const m of methods) {
-                const key = m.method;
+            let batchMinLevel = Infinity;
+            let batchMaxLevel = -Infinity;
+            for (const methodObj of methods) {
+                const key = methodObj.method;
                 if (!seen.has(key)) {
                     seen.add(key);
-                    uniqueMethods.push(m);
+                    uniqueMethods.push(methodObj);
+                    batchMinLevel = Math.min(batchMinLevel, methodObj.minLevel);
+                    batchMaxLevel = Math.max(batchMaxLevel, methodObj.maxLevel);
                 }
             }
 
             // Check if this location already exists for this version
-            const existing = byVersion[version].find(l => l.location === locationName);
-            if (existing) {
-                // Merge methods
-                for (const m of uniqueMethods) {
-                    if (!existing.methods.find(em => em.method === m.method)) {
-                        existing.methods.push(m);
+            if (byVersion[version][locationName]) {
+                const existing = byVersion[version][locationName];
+                // Merge methods using O(1) Set lookup
+                const existingMethodNames = new Set(existing.methods.map(existingMethod => existingMethod.method));
+                for (const uniqueMethod of uniqueMethods) {
+                    if (!existingMethodNames.has(uniqueMethod.method)) {
+                        existing.methods.push(uniqueMethod);
+                        existingMethodNames.add(uniqueMethod.method);
                     }
                 }
                 // Update level range
-                existing.minLevel = Math.min(existing.minLevel, ...uniqueMethods.map(m => m.minLevel));
-                existing.maxLevel = Math.max(existing.maxLevel, ...uniqueMethods.map(m => m.maxLevel));
+                if (uniqueMethods.length > 0) {
+                    existing.minLevel = Math.min(existing.minLevel, batchMinLevel);
+                    existing.maxLevel = Math.max(existing.maxLevel, batchMaxLevel);
+                }
             } else {
-                byVersion[version].push({
+                byVersion[version][locationName] = {
                     location: locationName,
                     methods: uniqueMethods,
-                    minLevel: Math.min(...uniqueMethods.map(m => m.minLevel)),
-                    maxLevel: Math.max(...uniqueMethods.map(m => m.maxLevel)),
-                });
+                    minLevel: uniqueMethods.length > 0 ? batchMinLevel : 0,
+                    maxLevel: uniqueMethods.length > 0 ? batchMaxLevel : 0,
+                };
             }
         }
+    }
+
+    // Convert Object map back to Arrays for the UI
+    for (const version in byVersion) {
+        byVersion[version] = Object.values(byVersion[version]);
     }
 
     return byVersion;
@@ -129,12 +140,11 @@ export default async function Page({ params }) {
 
     const { varieties } = responseJSON;
     
-    // Fetch all variety detail endpoints in parallel
-    const varietyPromises = varieties.map(({ pokemon }) => fetchPokemonByUrl(pokemon.url));
-    const pokeInfoListResponse = await Promise.all(varietyPromises);
-    const pokeInfoListJSON = await Promise.all(
-        pokeInfoListResponse.map((r) => r.json())
-    );
+    // Fetch all variety detail endpoints in parallel with limit
+    const pokeInfoListJSON = await limitConcurrency(varieties, 10, async ({ pokemon }) => {
+        const res = await fetchPokemonByUrl(pokemon.url);
+        return res.json();
+    });
 
     // --- 1. Pokédex Entry ---
     const pokedexEntry = extractLatestPokedexEntry(responseJSON);
@@ -142,15 +152,11 @@ export default async function Page({ params }) {
     // --- 2. Type Defenses ---
     // Fetch type detail data for the base form's types (for damage_relations)
     const baseForm = pokeInfoListJSON[0];
-    const typeNames = baseForm.types.map(t => t.type.name);
-    const typeDetailResponses = await Promise.all(
-        typeNames.map(t => fetchTypeByNameOrId(t, {
-            next: { revalidate: 86400 },
-        }))
-    );
-    const typeDetailData = await Promise.all(
-        typeDetailResponses.map(r => r.json())
-    );
+    const typeNames = baseForm.types.map(typeObj => typeObj.type.name);
+    const typeDetailData = await limitConcurrency(typeNames, 10, async (typeName) => {
+        const res = await fetchTypeByNameOrId(typeName, { next: { revalidate: 86400 } });
+        return res.json();
+    });
     const typeDefenses = computeTypeDefenses(typeDetailData);
 
     // --- 3. Encounters ---
@@ -173,21 +179,19 @@ export default async function Page({ params }) {
     // --- 4. Move Details ---
     const uniqueMoveNames = new Set();
     pokeInfoListJSON.forEach(variety => {
-        (variety.moves || []).forEach(m => {
-            if (m.move?.name) {
-                uniqueMoveNames.add(m.move.name);
+        (variety.moves || []).forEach(moveObj => {
+            if (moveObj.move?.name) {
+                uniqueMoveNames.add(moveObj.move.name);
             }
         });
     });
 
     const uniqueMoveNamesArray = Array.from(uniqueMoveNames);
 
-    const moveDetailsResponses = await Promise.all(
-        uniqueMoveNamesArray.map(moveName =>
-            fetchMoveByNameOrId(moveName, {
-                next: { revalidate: 86400 },
-            }).then(r => r.ok ? r.json() : null).catch(() => null)
-        )
+    const moveDetailsResponses = await limitConcurrency(uniqueMoveNamesArray, 10, moveName =>
+        fetchMoveByNameOrId(moveName, {
+            next: { revalidate: 86400 },
+        }).then(response => response.ok ? response.json() : null).catch(() => null)
     );
 
     const moveDetailsMap = {};
@@ -225,15 +229,5 @@ export default async function Page({ params }) {
 }
 
 export async function generateStaticParams() {
-    try {
-        const response = await fetchPokemonSpeciesList(2000);
-        if (!response.ok) return [];
-        const data = await response.json();
-        return data.results.map((pokemon) => ({
-            name: pokemon.name,
-        }));
-    } catch (e) {
-        console.error("Failed to generate static params for pokemons:", e);
-        return [];
-    }
+    return generateCommonStaticParams(fetchPokemonSpeciesList, 2000, "pokemons");
 }

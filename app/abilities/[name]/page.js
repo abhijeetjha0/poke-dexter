@@ -1,6 +1,8 @@
 import Link from 'next/link';
 import PokemonGrid from '../../components/pokemon-grid';
 import { fetchAbilityByNameOrId, fetchPokemonByUrl, fetchAbilityList } from '../../api-requests';
+import { generateCommonStaticParams } from '../../lib/static-params-util';
+import { limitConcurrency } from '../../lib/promise-utils';
 
 export default async function AbilityDetailPage({ params }) {
     const { name } = await params;
@@ -29,7 +31,7 @@ export default async function AbilityDetailPage({ params }) {
     const pokemonList = abilityJSON.pokemon || [];
 
     // Process Pokémon list
-    const processedPokemon = await Promise.all(pokemonList.map(async ({ pokemon, is_hidden }) => {
+    const processedPokemon = await limitConcurrency(pokemonList, 10, async ({ pokemon, is_hidden }) => {
         const parts = pokemon.url.split('/').filter(Boolean);
         const id = parseInt(parts[parts.length - 1], 10);
         
@@ -57,9 +59,9 @@ export default async function AbilityDetailPage({ params }) {
             speciesId,
             is_hidden,
             paddedId: `#${String(speciesId).padStart(4, '0')}`,
-            imageUrl: `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/${id}.png`,
+            imageUrl: `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/${speciesId}.png`,
         };
-    }));
+    });
 
     return (
         <div>
@@ -109,15 +111,5 @@ export default async function AbilityDetailPage({ params }) {
 }
 
 export async function generateStaticParams() {
-    try {
-        const response = await fetchAbilityList(500);
-        if (!response.ok) return [];
-        const data = await response.json();
-        return data.results.map((ability) => ({
-            name: ability.name,
-        }));
-    } catch (e) {
-        console.error("Failed to generate static params for abilities:", e);
-        return [];
-    }
+    return generateCommonStaticParams(fetchAbilityList, 500, "abilities");
 }

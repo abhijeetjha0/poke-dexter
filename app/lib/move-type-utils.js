@@ -7,6 +7,7 @@
  */
 
 import { fetchTypeByNameOrId, fetchMoveDamageClass } from '../api-requests';
+import { limitConcurrency } from './promise-utils';
 
 const ALL_TYPES = [
     'normal', 'fighting', 'flying', 'poison', 'ground', 'rock',
@@ -34,12 +35,10 @@ export async function buildMoveTypeMap() {
         return cachedTypeMap;
     }
 
-    const typeResponses = await Promise.all(
-        ALL_TYPES.map(typeName =>
-            fetchTypeByNameOrId(typeName, {
-                next: { revalidate: 86400 },
-            })
-        )
+    const typeResponses = await limitConcurrency(ALL_TYPES, 10, typeName =>
+        fetchTypeByNameOrId(typeName, {
+            next: { revalidate: 86400 },
+        })
     );
 
     const moveTypeMap = {};
@@ -74,12 +73,10 @@ export async function buildMoveDamageClassMap() {
         return cachedDamageClassMap;
     }
 
-    const classResponses = await Promise.all(
-        ALL_DAMAGE_CLASSES.map(className =>
-            fetchMoveDamageClass(className, {
-                next: { revalidate: 86400 },
-            })
-        )
+    const classResponses = await limitConcurrency(ALL_DAMAGE_CLASSES, 10, className =>
+        fetchMoveDamageClass(className, {
+            next: { revalidate: 86400 },
+        })
     );
 
     const moveDamageClassMap = {};

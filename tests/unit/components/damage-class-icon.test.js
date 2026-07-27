@@ -1,5 +1,5 @@
 import { render } from '@testing-library/react';
-import DamageClassIcon from '../../app/components/damage-class-icon';
+import DamageClassIcon from '../../../app/components/damage-class-icon';
 
 describe('DamageClassIcon Component', () => {
     test('renders physical damage class SVG icon container with custom size', () => {

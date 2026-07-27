@@ -11,7 +11,7 @@ import {
     fetchMoveDamageClass,
     fetchAbilityByNameOrId,
     fetchAbilityList,
-} from '../../app/api-requests';
+} from '../../../app/api-requests';
 
 describe('Centralized PokeAPI Requests Module', () => {
     beforeEach(() => {

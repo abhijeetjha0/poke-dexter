@@ -33,7 +33,10 @@ Use this skill whenever asked to analyze the current Git changeset and draft a P
    - **`.github/workflows/deploy.yml`**: When modified, explicitly specify the exact workflow step additions (e.g., added mandatory `npm test` step prior to `npm run build`).
    - **Testing (`tests/`, `jest.config.js`)**: If test configuration is touched, explicitly mention it (e.g., `Added Jest unit test runner and setupTests environment configuration`). If test cases are added or fixed, summarize them with an 'Added' or 'Fixed' message around the feature/component name without listing individual test filenames.
    - **Core & High-Impact Architectural Changes**: Any change, refactoring, module creation, or breaking update that impacts whole application functionality (e.g. centralized network fetching layer, global state, routing boundaries, core helpers) MUST be explained in detail so reviewers immediately understand the scope and architectural impact.
-   - **Documentation**: Mention specific documentation updates across master `AGENTS.md` and modular `AGENTS.md` files.
+   - **Performance & Micro-Optimizations**: Explicitly capture code-level optimizations that improve performance, such as time complexity reductions (e.g. $O(N^2)$ to $O(1)$), redundancy elimination (e.g. caching static evaluations outside loops like `toLowerCase()`), or lazy loading implementations.
+   - **Error Handling & Reliability**: Mention any explicit error handling improvements, such as throwing errors on `!response.ok` to trigger Next.js error boundaries, or adding fallback states.
+   - **Documentation & Agent Rules**: Mention specific updates across master `AGENTS.md` and modular `AGENTS.md` files, including any new architectural rules (e.g. hydration mismatch prevention).
+   - **Refactoring & Convention Enforcement**: Explicitly list structural realignments (e.g. moving tests to mirror application directory structure) and codebase standardization efforts (e.g. renaming variables to adhere to descriptive naming rules or updating ESLint exclusions).
 
 7. **Bug Fix Guidelines**:
    - For bug fix changesets, state the exact bug resolved in the title (e.g. `Fix search input crash on empty query`).

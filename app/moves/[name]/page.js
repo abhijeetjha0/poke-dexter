@@ -2,6 +2,8 @@ import Link from 'next/link';
 import PokemonGrid from '../../components/pokemon-grid';
 import DamageClassIcon from '../../components/damage-class-icon';
 import { fetchMoveByNameOrId, fetchPokemonByUrl, fetchMoveList } from '../../api-requests';
+import { generateCommonStaticParams } from '../../lib/static-params-util';
+import { limitConcurrency } from '../../lib/promise-utils';
 
 export default async function MoveDetailPage({ params }) {
     const { name } = await params;
@@ -30,7 +32,7 @@ export default async function MoveDetailPage({ params }) {
     const pokemonList = moveJSON.learned_by_pokemon || [];
 
     // Process Pokémon list (resolve base species IDs for varieties asynchronously)
-    const processedPokemon = await Promise.all(pokemonList.map(async (pokemon) => {
+    const processedPokemon = await limitConcurrency(pokemonList, 10, async (pokemon) => {
         const parts = pokemon.url.split('/').filter(Boolean);
         const id = parseInt(parts[parts.length - 1], 10);
         
@@ -57,9 +59,9 @@ export default async function MoveDetailPage({ params }) {
             id,
             speciesId,
             paddedId: `#${String(speciesId).padStart(4, '0')}`,
-            imageUrl: `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/${id}.png`,
+            imageUrl: `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/${speciesId}.png`,
         };
-    }));
+    });
 
     const moveType = moveJSON.type?.name || 'normal';
     const moveClass = moveJSON.damage_class?.name || 'physical';
@@ -149,15 +151,5 @@ export default async function MoveDetailPage({ params }) {
 }
 
 export async function generateStaticParams() {
-    try {
-        const response = await fetchMoveList(1000);
-        if (!response.ok) return [];
-        const data = await response.json();
-        return data.results.map((move) => ({
-            name: move.name,
-        }));
-    } catch (e) {
-        console.error("Failed to generate static params for moves:", e);
-        return [];
-    }
+    return generateCommonStaticParams(fetchMoveList, 1000, "moves");
 }

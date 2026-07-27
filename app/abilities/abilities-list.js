@@ -7,11 +7,12 @@ export default function AbilitiesList({ initialAbilities }) {
     const [searchTerm, setSearchTerm] = useState('');
 
     const filteredAbilities = useMemo(() => {
+        const lowerCaseSearchTerm = searchTerm.toLowerCase();
         return initialAbilities
             .filter(ability => 
-                ability.name.toLowerCase().includes(searchTerm.toLowerCase())
+                ability.name.toLowerCase().includes(lowerCaseSearchTerm)
             )
-            .sort((a, b) => a.name.localeCompare(b.name));
+            .sort((abilityA, abilityB) => abilityA.name.localeCompare(abilityB.name));
     }, [initialAbilities, searchTerm]);
 
     return (

@@ -1,5 +1,5 @@
 import { render, screen, fireEvent } from '@testing-library/react';
-import Navbar from '../../app/components/navbar';
+import Navbar from '../../../app/components/navbar';
 
 jest.mock('next/navigation', () => ({
     usePathname: () => '/pokemons',

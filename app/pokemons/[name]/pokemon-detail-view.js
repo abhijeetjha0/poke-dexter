@@ -79,7 +79,7 @@ export default function PokemonDetailView({
     // Determine initial active variety index based on URL 'form' query parameter
     const getInitialIndex = () => {
         if (formParam) {
-            const index = varietyList.findIndex(v => v.name === formParam);
+            const index = varietyList.findIndex(variety => variety.name === formParam);
             if (index !== -1) return index;
         }
         return 0;
@@ -114,7 +114,7 @@ export default function PokemonDetailView({
         setPrevFormParam(formParam);
         setPrevVarietyList(varietyList);
         if (formParam) {
-            const index = varietyList.findIndex(v => v.name === formParam);
+            const index = varietyList.findIndex(variety => variety.name === formParam);
             if (index !== -1) {
                 setActiveVarietyIndex(index);
             }
@@ -174,10 +174,11 @@ export default function PokemonDetailView({
 
     // Sort game versions chronologically
     const versionOrder = Object.keys(VERSION_NAMES);
-    const sortedVersions = Object.keys(encountersByVersion).sort((a, b) => {
-        const ai = versionOrder.indexOf(a);
-        const bi = versionOrder.indexOf(b);
-        return (ai === -1 ? 999 : ai) - (bi === -1 ? 999 : bi);
+    const versionOrderMap = new Map(versionOrder.map((version, index) => [version, index]));
+    const sortedVersions = Object.keys(encountersByVersion).sort((versionA, versionB) => {
+        const ai = versionOrderMap.has(versionA) ? versionOrderMap.get(versionA) : 999;
+        const bi = versionOrderMap.has(versionB) ? versionOrderMap.get(versionB) : 999;
+        return ai - bi;
     });
 
     return (
@@ -355,14 +356,14 @@ export default function PokemonDetailView({
                             </div>
                             {!collapsed.stats && (
                                 <div style={{ marginTop: '1rem' }}>
-                                    {stats.map(s => {
+                                    {stats.map(statObj => {
                                         // Map percentage relative to max base stat (approx 200)
-                                        const percent = Math.min((s.base_stat / 200) * 100, 100);
+                                        const percent = Math.min((statObj.base_stat / 200) * 100, 100);
                                         return (
-                                            <div className="stat-row" key={s.stat.name}>
+                                            <div className="stat-row" key={statObj.stat.name}>
                                                 <div className="stat-header">
-                                                    <span className="stat-label">{s.stat.name.replace('-', ' ')}</span>
-                                                    <span className="stat-value">{s.base_stat}</span>
+                                                    <span className="stat-label">{statObj.stat.name.replace('-', ' ')}</span>
+                                                    <span className="stat-value">{statObj.base_stat}</span>
                                                 </div>
                                                 <div className="stat-bar-container">
                                                     <div 
@@ -546,16 +547,16 @@ export default function PokemonDetailView({
                                                     </button>
                                                     {isExpanded && (
                                                         <div className="game-version-locations">
-                                                            {locations.map((loc, i) => (
-                                                                <div key={i} className="location-entry">
-                                                                    <div className="location-name">📍 {loc.location}</div>
+                                                            {locations.map((locationObj, locIndex) => (
+                                                                <div key={locIndex} className="location-entry">
+                                                                    <div className="location-name">📍 {locationObj.location}</div>
                                                                     <div className="location-details">
-                                                                        {loc.methods.map((m, j) => (
-                                                                            <span key={j} className="encounter-method">
-                                                                                {m.method}
-                                                                                {m.minLevel && m.maxLevel && (
+                                                                        {locationObj.methods.map((methodObj, methodIndex) => (
+                                                                            <span key={methodIndex} className="encounter-method">
+                                                                                {methodObj.method}
+                                                                                {methodObj.minLevel && methodObj.maxLevel && (
                                                                                     <span className="encounter-level">
-                                                                                        Lv. {m.minLevel === m.maxLevel ? m.minLevel : `${m.minLevel}–${m.maxLevel}`}
+                                                                                        Lv. {methodObj.minLevel === methodObj.maxLevel ? methodObj.minLevel : `${methodObj.minLevel}–${methodObj.maxLevel}`}
                                                                                     </span>
                                                                                 )}
                                                                             </span>
