@@ -1,4 +1,4 @@
-import { buildMoveTypeMap, buildMoveDamageClassMap, buildMoveMetaMaps } from '../../app/lib/move-type-utils';
+import { buildMoveTypeMap, buildMoveDamageClassMap, buildMoveMetaMaps } from '../../../app/lib/move-type-utils';
 
 describe('move-type-utils helper module', () => {
     beforeEach(() => {

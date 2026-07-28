@@ -4,6 +4,8 @@ import { useState, useMemo, useEffect, useRef } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { fetchPokemonByIdOrName } from '../api-requests';
+import { limitConcurrency } from '../lib/promise-utils';
+import PokemonGrid from '../components/pokemon-grid';
 
 const GENERATIONS = [
     { name: 'All', start: 1, end: 9999 },
@@ -94,15 +96,16 @@ export default function PokemonList(props) {
                     imageUrl: `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/${id}.png`,
                 };
             })
-            .sort((a, b) => a.id - b.id);
+            .sort((pokemonA, pokemonB) => pokemonA.id - pokemonB.id);
     }, [pokemonList]);
 
     // Apply filters and search
     const filteredList = useMemo(() => {
-        const gen = GENERATIONS.find(g => g.name === activeGen);
+        const gen = GENERATIONS.find(generation => generation.name === activeGen);
+        const lowerCaseSearchTerm = searchTerm.toLowerCase();
         return processedList.filter(pokemon => {
             const matchesGen = pokemon.id >= gen.start && pokemon.id <= gen.end;
-            const matchesSearch = pokemon.name.toLowerCase().includes(searchTerm.toLowerCase()) || 
+            const matchesSearch = pokemon.name.toLowerCase().includes(lowerCaseSearchTerm) || 
                                   String(pokemon.id).includes(searchTerm);
             return matchesGen && matchesSearch;
         });
@@ -122,33 +125,33 @@ export default function PokemonList(props) {
     const sortedList = useMemo(() => {
         if (!sortColumn) return filteredList;
 
-        return [...filteredList].sort((a, b) => {
+        return [...filteredList].sort((pokemonA, pokemonB) => {
             if (sortColumn === 'id') {
-                return sortDirection === 'asc' ? a.id - b.id : b.id - a.id;
+                return sortDirection === 'asc' ? pokemonA.id - pokemonB.id : pokemonB.id - pokemonA.id;
             }
             if (sortColumn === 'name') {
                 return sortDirection === 'asc' 
-                    ? a.name.localeCompare(b.name) 
-                    : b.name.localeCompare(a.name);
+                    ? pokemonA.name.localeCompare(pokemonB.name) 
+                    : pokemonB.name.localeCompare(pokemonA.name);
             }
 
             // Stats sorting
-            const statsA = pokemonDetails[a.id]?.stats;
-            const statsB = pokemonDetails[b.id]?.stats;
+            const statsA = pokemonDetails[pokemonA.id]?.stats;
+            const statsB = pokemonDetails[pokemonB.id]?.stats;
 
             let valA = 0;
             let valB = 0;
 
             if (sortColumn === 'total') {
-                valA = statsA ? Object.values(statsA).reduce((sum, s) => sum + s, 0) : 0;
-                valB = statsB ? Object.values(statsB).reduce((sum, s) => sum + s, 0) : 0;
+                valA = statsA ? Object.values(statsA).reduce((sum, statVal) => sum + statVal, 0) : 0;
+                valB = statsB ? Object.values(statsB).reduce((sum, statVal) => sum + statVal, 0) : 0;
             } else {
                 valA = statsA ? (statsA[sortColumn] || 0) : 0;
                 valB = statsB ? (statsB[sortColumn] || 0) : 0;
             }
 
             // Push items without loaded stats to the bottom
-            if (!statsA && !statsB) return a.id - b.id; 
+            if (!statsA && !statsB) return pokemonA.id - pokemonB.id; 
             if (!statsA) return 1;  
             if (!statsB) return -1; 
 
@@ -178,7 +181,7 @@ export default function PokemonList(props) {
 
         // Find which pokemon IDs in the active page don't have cached details
         const idsToFetch = visibleList
-            .map(p => p.id)
+            .map(pokemon => pokemon.id)
             .filter(id => !pokemonDetails[id]);
 
         if (idsToFetch.length === 0) return;
@@ -187,19 +190,17 @@ export default function PokemonList(props) {
 
         const fetchDetails = async () => {
             try {
-                const promises = idsToFetch.map(id =>
-                    fetchPokemonByIdOrName(id)
-                        .then(res => res.json())
+                const results = await limitConcurrency(idsToFetch, 10, id =>
+                    fetchPokemonByIdOrName(id).then(res => res.json())
                 );
-                const results = await Promise.all(promises);
                 if (active) {
                     setPokemonDetails(prev => {
                         const next = { ...prev };
                         results.forEach(detail => {
                             next[detail.id] = {
-                                types: detail.types.map(t => t.type.name),
-                                stats: detail.stats.reduce((acc, s) => {
-                                    acc[s.stat.name] = s.base_stat;
+                                types: detail.types.map(typeObj => typeObj.type.name),
+                                stats: detail.stats.reduce((acc, statObj) => {
+                                    acc[statObj.stat.name] = statObj.base_stat;
                                     return acc;
                                 }, {})
                             };
@@ -230,7 +231,7 @@ export default function PokemonList(props) {
             // Wait 1.5 seconds after initial mounting to let primary content load first
             await new Promise(resolve => setTimeout(resolve, 1500));
 
-            const allIds = processedList.map(p => p.id);
+            const allIds = processedList.map(pokemon => pokemon.id);
 
             for (let i = 0; i < allIds.length; i += CHUNK_SIZE) {
                 if (!active) break;
@@ -241,20 +242,18 @@ export default function PokemonList(props) {
 
                 if (missingIds.length > 0) {
                     try {
-                        const promises = missingIds.map(id =>
-                            fetchPokemonByIdOrName(id)
-                                .then(res => res.json())
+                        const results = await limitConcurrency(missingIds, 10, id =>
+                            fetchPokemonByIdOrName(id).then(res => res.json())
                         );
-                        const results = await Promise.all(promises);
                         if (active) {
                             setPokemonDetails(prev => {
                                 const next = { ...prev };
                                 results.forEach(detail => {
                                     if (!next[detail.id]) {
                                         next[detail.id] = {
-                                            types: detail.types.map(t => t.type.name),
-                                            stats: detail.stats.reduce((acc, s) => {
-                                                acc[s.stat.name] = s.base_stat;
+                                            types: detail.types.map(typeObj => typeObj.type.name),
+                                            stats: detail.stats.reduce((acc, statObj) => {
+                                                acc[statObj.stat.name] = statObj.base_stat;
                                                 return acc;
                                             }, {})
                                         };
@@ -346,29 +345,7 @@ export default function PokemonList(props) {
             {/* Pokemon Grid or Tabular List */}
             {visibleList.length > 0 ? (
                 viewMode === 'grid' ? (
-                    <div className="pokemon-grid">
-                        {visibleList.map((pokemon) => (
-                            <Link href={`/pokemons/${pokemon.name}`} key={pokemon.name}>
-                                <div className="glass-panel pokemon-card" id={`pokemon-card-${pokemon.id}`}>
-                                    <div className="sprite-wrapper">
-                                        <img
-                                            src={pokemon.imageUrl}
-                                            alt={pokemon.name}
-                                            width="96"
-                                            height="96"
-                                            loading="lazy"
-                                            onError={(e) => {
-                                                // Fallback to standard sprite if official artwork is missing
-                                                e.target.src = `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${pokemon.id}.png`;
-                                            }}
-                                        />
-                                    </div>
-                                    <div className="pokemon-id">{pokemon.paddedId}</div>
-                                    <div className="pokemon-name">{pokemon.name.replace('-', ' ')}</div>
-                                </div>
-                            </Link>
-                        ))}
-                    </div>
+                    <PokemonGrid pokemonList={visibleList} />
                 ) : (
                     <div className="pokedex-table-wrapper glass-panel">
                         <table className="pokedex-table">
@@ -390,7 +367,7 @@ export default function PokemonList(props) {
                                 {visibleList.map((pokemon) => {
                                     const details = pokemonDetails[pokemon.id];
                                     const totalStats = details 
-                                        ? Object.values(details.stats).reduce((sum, s) => sum + s, 0)
+                                        ? Object.values(details.stats).reduce((sum, statVal) => sum + statVal, 0)
                                         : null;
 
                                     return (
@@ -423,10 +400,10 @@ export default function PokemonList(props) {
                                             <td>
                                                 {details ? (
                                                     <div style={{ display: 'flex', gap: '0.3rem', flexWrap: 'wrap' }}>
-                                                        {details.types.map(t => (
+                                                        {details.types.map(typeStr => (
                                                             <span 
-                                                                key={t} 
-                                                                className={`type-badge type-${t}`} 
+                                                                key={typeStr} 
+                                                                className={`type-badge type-${typeStr}`} 
                                                                 style={{ 
                                                                     fontSize: '0.7rem', 
                                                                     padding: '0.15rem 0.4rem', 
@@ -437,7 +414,7 @@ export default function PokemonList(props) {
                                                                     minWidth: '50px'
                                                                 }}
                                                             >
-                                                                {t}
+                                                                {typeStr}
                                                             </span>
                                                         ))}
                                                     </div>

@@ -1,5 +1,5 @@
 import { render, screen } from '@testing-library/react';
-import PokemonGrid from '../../app/components/pokemon-grid';
+import PokemonGrid from '../../../app/components/pokemon-grid';
 
 describe('PokemonGrid Component', () => {
     const mockPokemonList = [

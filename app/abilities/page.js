@@ -8,6 +8,9 @@ export const metadata = {
 
 export default async function AbilitiesPage() {
     const response = await fetchAbilityList(500);
+    if (!response.ok) {
+        throw new Error('Failed to fetch abilities from PokéAPI');
+    }
     const responseJSON = await response.json();
     const abilities = responseJSON.results || [];
 

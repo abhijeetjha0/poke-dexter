@@ -27,11 +27,12 @@ export default function MovesList({ initialMoves, moveTypeMap, moveDamageClassMa
     };
 
     const filteredMoves = useMemo(() => {
+        const lowerCaseSearchTerm = searchTerm.toLowerCase();
         return initialMoves
             .filter(move => 
-                move.name.toLowerCase().includes(searchTerm.toLowerCase())
+                move.name.toLowerCase().includes(lowerCaseSearchTerm)
             )
-            .sort((a, b) => a.name.localeCompare(b.name));
+            .sort((moveA, moveB) => moveA.name.localeCompare(moveB.name));
     }, [initialMoves, searchTerm]);
 
     // Reset to page 1 when search changes

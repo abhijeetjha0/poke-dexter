@@ -24,7 +24,7 @@ Subdirectory-specific guidelines are maintained in modular `AGENTS.md` files thr
 │   ├── generations/         # Generation hub route & interactive client component
 │   ├── lib/                 # Utility functions & helpers (move-type-utils.js)
 │   ├── moves/               # Moves index and details routes
-│   ├── pokemons/            # Pokédex index and details routes
+│   ├── pokemons/            # Pokédex routes & pokemons AGENTS.md
 │   ├── styles/              # SCSS architecture & styles AGENTS.md
 │   ├── types/               # Types hub route & type-filtered listings
 │   ├── global-error.js      # Global Next.js error boundary
@@ -71,6 +71,7 @@ Subdirectory-specific guidelines are maintained in modular `AGENTS.md` files thr
 1. **Verification Requirement**: Never declare a task resolved without running `npm test`, `npm run lint`, `npm run lint-style`, and `npm run build` when modifying application code files. Verification commands can be skipped when only updating Markdown (`.md`) documentation files.
 2. **No Placeholders**: Maintain accurate PokéAPI integration parameters and valid Pokémon domain models across all dynamic and static views.
 3. **Keep AGENTS.md Up to Date**: Update relevant modular `AGENTS.md` files whenever tooling, configuration, routing, or SCSS style architecture changes.
+4. **Linting Exclusions**: Markdown (`**/*.md`) and other non-JS/TS documentation or asset files (e.g., `.txt`, `.json`, `.css`, `.svg`) must be globally ignored in `eslint.config.mjs` following industry standards, preventing the linter from unnecessarily scanning or parsing them.
 
 > **Note**: Subdirectory-specific guidelines (React component patterns, SCSS style structure, App Router conventions, PR description generation skill, and GitHub Actions workflows) are maintained directly within their respective modular `AGENTS.md` files:
 > - [.agents/skills/generate-pr/SKILL.md](file:///.agents/skills/generate-pr/SKILL.md)
@@ -78,5 +79,6 @@ Subdirectory-specific guidelines are maintained in modular `AGENTS.md` files thr
 > - [app/AGENTS.md](file:///app/AGENTS.md)
 > - [app/api-requests/AGENTS.md](file:///app/api-requests/AGENTS.md)
 > - [app/components/AGENTS.md](file:///app/components/AGENTS.md)
+> - [app/pokemons/AGENTS.md](file:///app/pokemons/AGENTS.md)
 > - [app/styles/AGENTS.md](file:///app/styles/AGENTS.md)
 > - [tests/AGENTS.md](file:///tests/AGENTS.md)

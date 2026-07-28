@@ -40,10 +40,15 @@ export default [
       ".next/**",
       "out/**",
       "coverage/**",
-      "node_modules/**",
       "**/node_modules/**",
       "package-lock.json",
-      "README.md"
+      "**/*.md",
+      "**/*.txt",
+      "**/*.json",
+      "**/*.css",
+      "**/*.scss",
+      "**/*.svg",
+      "PR/**"
     ],
   }
 ];
