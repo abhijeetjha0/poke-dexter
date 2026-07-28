@@ -23,33 +23,10 @@ export default function TypesPage() {
             </div>
 
             {/* Types Grid */}
-            <div 
-                style={{ 
-                    display: 'grid', 
-                    gridTemplateColumns: 'repeat(auto-fill, minmax(180px, 1fr))', 
-                    gap: '1.25rem',
-                    marginTop: '1.5rem'
-                }}
-            >
+            <div className="types-grid">
                 {TYPES.map(typeName => (
                     <Link href={`/types/${typeName}`} key={typeName}>
-                        <div 
-                            className={`type-badge type-${typeName} ability-link-card`} 
-                            style={{ 
-                                display: 'flex',
-                                width: '100%',
-                                padding: '1.5rem', 
-                                borderRadius: '12px', 
-                                cursor: 'pointer',
-                                fontSize: '1.1rem',
-                                fontWeight: 700,
-                                textTransform: 'uppercase',
-                                textAlign: 'center',
-                                justifyContent: 'center',
-                                transition: 'all 0.2s ease',
-                                border: '1px solid rgba(255,255,255,0.15)'
-                            }}
-                        >
+                        <div className={`type-badge type-${typeName} ability-link-card type-card`}>
                             {typeName}
                         </div>
                     </Link>

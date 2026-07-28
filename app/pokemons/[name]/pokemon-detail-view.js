@@ -52,6 +52,7 @@ function getMultiplierLabel(value) {
     if (value === 1) return '1×';
     if (value === 2) return '2×';
     if (value === 4) return '4×';
+
     return `${value}×`;
 }
 
@@ -62,6 +63,7 @@ function getMultiplierClass(value) {
     if (value === 1) return 'defense-neutral';
     if (value === 2) return 'defense-double';
     if (value === 4) return 'defense-quad';
+
     return 'defense-neutral';
 }
 
@@ -82,6 +84,7 @@ export default function PokemonDetailView({
             const index = varietyList.findIndex(variety => variety.name === formParam);
             if (index !== -1) return index;
         }
+
         return 0;
     };
 
@@ -129,7 +132,6 @@ export default function PokemonDetailView({
         id: speciesId,
         color,
         capture_rate,
-        generation,
         growth_rate,
         evolves_from_species,
     } = speciesInfo;
@@ -178,18 +180,13 @@ export default function PokemonDetailView({
     const sortedVersions = Object.keys(encountersByVersion).sort((versionA, versionB) => {
         const ai = versionOrderMap.has(versionA) ? versionOrderMap.get(versionA) : 999;
         const bi = versionOrderMap.has(versionB) ? versionOrderMap.get(versionB) : 999;
+
         return ai - bi;
     });
 
     return (
+        // eslint-disable-next-line react/forbid-dom-props
         <div style={{ '--accent-color': themeColor }}>
-            {/* Back Button */}
-            <div className="back-button-container">
-                <Link href="/pokemons" className="btn" id="detail-back-btn">
-                    ← Back to Directory
-                </Link>
-            </div>
-
             <div className="detail-layout">
                 {/* Sidebar */}
                 <div className="pokemon-sidebar">
@@ -224,7 +221,7 @@ export default function PokemonDetailView({
                                 <span className={`collapse-chevron ${collapsed.entry ? '' : 'expanded'}`}>▸</span>
                             </div>
                             {!collapsed.entry && (
-                                <div style={{ marginTop: '0.75rem' }}>
+                                <div className="mt-075">
                                     <p className="pokedex-entry-text">
                                         "{pokedexEntry.text}"
                                     </p>
@@ -244,7 +241,7 @@ export default function PokemonDetailView({
                                 <span className={`collapse-chevron ${collapsed.predecessor ? '' : 'expanded'}`}>▸</span>
                             </div>
                             {!collapsed.predecessor && (
-                                <div style={{ marginTop: '1rem' }}>
+                                <div className="mt-1">
                                     <Link href={`/pokemons/${evolves_from_species.name}`}>
                                         <div className="evolution-link-card">
                                             {predecessorId && (
@@ -273,12 +270,12 @@ export default function PokemonDetailView({
                     {/* Audio Cry */}
                     {cries?.latest && (
                         <div className={`glass-panel cry-player-container ${collapsed.cry ? 'collapsed' : ''}`} id="detail-cry-panel">
-                            <div className="panel-header" onClick={() => toggleCollapse('cry')} style={{ width: '100%' }}>
-                                <div className="cry-title" style={{ fontWeight: 700, fontSize: '0.95rem', textTransform: 'uppercase', color: 'var(--text-muted)' }}>Audio Cry</div>
+                            <div className="panel-header w-full" onClick={() => toggleCollapse('cry')}>
+                                <div className="cry-title">Audio Cry</div>
                                 <span className={`collapse-chevron ${collapsed.cry ? '' : 'expanded'}`}>▸</span>
                             </div>
                             {!collapsed.cry && (
-                                <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginTop: '0.75rem', width: '100%' }}>
+                                <div className="flex-center-gap-1 mt-075 w-full">
                                     <button className="play-cry-btn" onClick={playCry} id="detail-play-cry-btn">
                                         🔊
                                     </button>
@@ -302,7 +299,7 @@ export default function PokemonDetailView({
                                 <span className={`collapse-chevron ${collapsed.varieties ? '' : 'expanded'}`}>▸</span>
                             </div>
                             {!collapsed.varieties && (
-                                <div className="tabs-header" style={{ marginTop: '1rem', marginBottom: 0, paddingBottom: 0, borderBottom: 'none' }}>
+                                <div className="tabs-header tabs-header-flat">
                                     {varietyList.map((variety, index) => (
                                         <button
                                             key={variety.name}
@@ -320,11 +317,11 @@ export default function PokemonDetailView({
                     {/* Specs Panel */}
                     <div className={`glass-panel ${collapsed.specs ? 'collapsed' : ''}`} id="detail-specs-panel">
                         <div className="panel-header" onClick={() => toggleCollapse('specs')}>
-                            <h3 style={{ fontSize: '1.2rem', fontWeight: 700, fontFamily: 'var(--font-digital)' }}>Characteristics</h3>
+                            <h3 className="panel-heading-lg">Characteristics</h3>
                             <span className={`collapse-chevron ${collapsed.specs ? '' : 'expanded'}`}>▸</span>
                         </div>
                         {!collapsed.specs && (
-                            <div className="info-grid" style={{ marginTop: '1rem' }}>
+                            <div className="info-grid mt-1">
                                 <div className="info-item">
                                     <div className="info-item-label">Height</div>
                                     <div className="info-item-value">{height / 10} m</div>
@@ -339,7 +336,7 @@ export default function PokemonDetailView({
                                 </div>
                                 <div className="info-item">
                                     <div className="info-item-label">Growth Rate</div>
-                                    <div className="info-item-value" style={{ textTransform: 'capitalize' }}>
+                                    <div className="info-item-value text-capitalize">
                                         {growth_rate?.name?.replace('-', ' ')}
                                     </div>
                                 </div>
@@ -351,14 +348,15 @@ export default function PokemonDetailView({
                     {stats && (
                         <div className={`glass-panel ${collapsed.stats ? 'collapsed' : ''}`} id="detail-stats-panel">
                             <div className="panel-header" onClick={() => toggleCollapse('stats')}>
-                                <h3 style={{ fontSize: '1.2rem', fontWeight: 700, fontFamily: 'var(--font-digital)' }}>Base Stats</h3>
+                                <h3 className="panel-heading-lg">Base Stats</h3>
                                 <span className={`collapse-chevron ${collapsed.stats ? '' : 'expanded'}`}>▸</span>
                             </div>
                             {!collapsed.stats && (
-                                <div style={{ marginTop: '1rem' }}>
+                                <div className="mt-1">
                                     {stats.map(statObj => {
                                         // Map percentage relative to max base stat (approx 200)
                                         const percent = Math.min((statObj.base_stat / 200) * 100, 100);
+
                                         return (
                                             <div className="stat-row" key={statObj.stat.name}>
                                                 <div className="stat-header">
@@ -368,6 +366,7 @@ export default function PokemonDetailView({
                                                 <div className="stat-bar-container">
                                                     <div 
                                                         className="stat-bar" 
+                                                        // eslint-disable-next-line react/forbid-dom-props
                                                         style={{ width: `${percent}%` }}
                                                     />
                                                 </div>
@@ -383,20 +382,21 @@ export default function PokemonDetailView({
                     {Object.keys(typeDefenses).length > 0 && (
                         <div className={`glass-panel ${collapsed.defenses ? 'collapsed' : ''}`} id="detail-type-defenses">
                             <div className="panel-header" onClick={() => toggleCollapse('defenses')}>
-                                <h3 style={{ fontSize: '1.2rem', fontWeight: 700, fontFamily: 'var(--font-digital)' }}>Type Defenses</h3>
+                                <h3 className="panel-heading-lg">Type Defenses</h3>
                                 <span className={`collapse-chevron ${collapsed.defenses ? '' : 'expanded'}`}>▸</span>
                             </div>
                             {!collapsed.defenses && (
-                                <div style={{ marginTop: '1rem' }}>
-                                    <p style={{ fontSize: '0.8rem', color: 'var(--text-muted)', marginBottom: '1rem' }}>
+                                <div className="mt-1">
+                                    <p className="text-muted-sm">
                                         Damage multipliers when this Pokémon is attacked by each type.
                                     </p>
                                     <div className="type-defense-grid">
                                         {ALL_TYPES.map(attackType => {
                                             const multiplier = typeDefenses[attackType] ?? 1;
+
                                             return (
                                                 <div key={attackType} className={`type-defense-cell ${getMultiplierClass(multiplier)}`}>
-                                                    <Link href={`/types/${attackType}`} className={`type-badge type-${attackType}`} style={{ fontSize: '0.65rem', padding: '0.15rem 0.5rem' }}>
+                                                    <Link href={`/types/${attackType}`} className={`type-badge type-${attackType} type-badge-sm`}>
                                                         {attackType}
                                                     </Link>
                                                     <span className="defense-multiplier-value">
@@ -414,13 +414,13 @@ export default function PokemonDetailView({
                     {/* Abilities and Moves */}
                     <div className={`glass-panel ${collapsed.abilitiesMoves ? 'collapsed' : ''}`} id="detail-abilities-panel">
                         <div className="panel-header" onClick={() => toggleCollapse('abilitiesMoves')}>
-                            <h3 style={{ fontSize: '1.2rem', fontWeight: 700, fontFamily: 'var(--font-digital)' }}>Abilities & Moves</h3>
+                            <h3 className="panel-heading-lg">Abilities & Moves</h3>
                             <span className={`collapse-chevron ${collapsed.abilitiesMoves ? '' : 'expanded'}`}>▸</span>
                         </div>
                         {!collapsed.abilitiesMoves && (
-                            <div style={{ marginTop: '1.5rem' }}>
-                                <h4 style={{ fontSize: '1.1rem', fontWeight: 700, marginBottom: '0.75rem', color: 'var(--text-muted)' }}>Abilities</h4>
-                                <div className="abilities-container" style={{ marginBottom: '2rem' }}>
+                            <div className="mt-15">
+                                <h4 className="panel-subheading">Abilities</h4>
+                                <div className="abilities-container mb-2">
                                     {abilities.map(({ ability, is_hidden }) => (
                                         <Link 
                                             key={ability.name} 
@@ -440,7 +440,7 @@ export default function PokemonDetailView({
                                     ))}
                                 </div>
 
-                                <h4 style={{ fontSize: '1.1rem', fontWeight: 700, marginBottom: '0.75rem', color: 'var(--text-muted)' }}>Moves List</h4>
+                                <h4 className="panel-subheading">Moves List</h4>
                                 {(() => {
                                     // Group moves by damage class
                                     const grouped = { physical: [], special: [], status: [], unknown: [] };
@@ -463,7 +463,7 @@ export default function PokemonDetailView({
                                     return categories
                                         .filter(cat => grouped[cat.key].length > 0)
                                         .map(cat => (
-                                            <div key={cat.key} style={{ marginBottom: '1.5rem' }}>
+                                            <div key={cat.key} className="mb-15">
                                                 <div className="moves-category-header">
                                                     {cat.key !== 'unknown' && <DamageClassIcon damageClass={cat.key} size="1.1em" />}
                                                     <span>{cat.label}</span>
@@ -519,12 +519,12 @@ export default function PokemonDetailView({
                     {/* Game Locations */}
                     <div className={`glass-panel ${collapsed.locations ? 'collapsed' : ''}`} id="detail-game-locations">
                         <div className="panel-header" onClick={() => toggleCollapse('locations')}>
-                            <h3 style={{ fontSize: '1.2rem', fontWeight: 700, fontFamily: 'var(--font-digital)' }}>Game Locations</h3>
+                            <h3 className="panel-heading-lg">Game Locations</h3>
                             <span className={`collapse-chevron ${collapsed.locations ? '' : 'expanded'}`}>▸</span>
                         </div>
                         {!collapsed.locations && (
-                            <div style={{ marginTop: '1rem' }}>
-                                <p style={{ fontSize: '0.8rem', color: 'var(--text-muted)', marginBottom: '1rem' }}>
+                            <div className="mt-1">
+                                <p className="text-muted-sm">
                                     Where to find {name.replace('-', ' ')} in each main series game.
                                 </p>
 
@@ -572,7 +572,7 @@ export default function PokemonDetailView({
                                     </div>
                                 ) : (
                                     <div className="no-encounters-message">
-                                        <span style={{ fontSize: '1.5rem' }}>🎁</span>
+                                        <span className="emoji-lg">🎁</span>
                                         <p>This Pokémon is not found in the wild — it must be obtained as a starter, gift, trade, or special event.</p>
                                     </div>
                                 )}

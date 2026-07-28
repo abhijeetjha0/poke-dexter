@@ -34,11 +34,13 @@ export default function Navbar() {
             }
         };
         window.addEventListener('resize', handleResize);
+
         return () => window.removeEventListener('resize', handleResize);
     }, []);
 
     const isActive = (path) => {
         if (path === '/') return pathname === '/';
+
         return pathname === path || pathname.startsWith(path + '/');
     };
 

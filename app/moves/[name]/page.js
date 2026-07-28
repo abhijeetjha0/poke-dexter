@@ -13,9 +13,9 @@ export default async function MoveDetailPage({ params }) {
     const response = await fetchMoveByNameOrId(moveName);
     if (!response.ok) {
         return (
-            <div className="glass-panel" style={{ textAlign: 'center', padding: '3rem' }}>
+            <div className="glass-panel text-center-padded">
                 <h2>Move "{moveName}" not found.</h2>
-                <Link href="/moves" className="btn" style={{ marginTop: '1rem' }}>
+                <Link href="/moves" className="btn mt-1">
                     Back to Moves Index
                 </Link>
             </div>
@@ -67,9 +67,10 @@ export default async function MoveDetailPage({ params }) {
     const moveClass = moveJSON.damage_class?.name || 'physical';
 
     return (
+        // eslint-disable-next-line react/forbid-dom-props
         <div style={{ '--accent-color': `var(--type-${moveType})` }}>
             {/* Back Buttons */}
-            <div style={{ display: 'flex', gap: '1rem', marginBottom: '1.5rem' }}>
+            <div className="flex-gap-1 mb-1">
                 <Link href="/moves" className="btn" id="move-back-btn">
                     ← Back to Moves Index
                 </Link>
@@ -79,49 +80,40 @@ export default async function MoveDetailPage({ params }) {
             </div>
 
             {/* Header / Info Panel */}
-            <div className="glass-panel" style={{ marginBottom: '2rem' }} id="move-info-panel">
-                <div style={{ display: 'flex', gap: '0.75rem', flexWrap: 'wrap' }}>
-                    <span className={`type-badge type-${moveType}`} style={{ fontSize: '0.8rem', padding: '0.2rem 0.8rem', borderRadius: '15px' }}>
+            <div className="glass-panel mb-2" id="move-info-panel">
+                <div className="flex-gap-075-wrap">
+                    <span className={`type-badge type-${moveType}`}>
                         {moveType}
                     </span>
-                    <span className="type-badge" style={{ background: 'var(--panel-border)', border: '1px solid rgba(255,255,255,0.15)', fontSize: '0.8rem', padding: '0.2rem 0.8rem', borderRadius: '15px', color: 'var(--text-muted)', display: 'inline-flex', alignItems: 'center', gap: '0.35rem' }}>
+                    <span className="type-badge badge-secondary">
                         <DamageClassIcon damageClass={moveClass} size="1em" />
                         {moveClass}
                     </span>
                 </div>
-                <h1 style={{ fontSize: '2.5rem', fontWeight: 800, textTransform: 'capitalize', marginTop: '0.75rem', marginBottom: '1rem' }}>
+                <h1 className="move-header-title">
                     {moveJSON.name.replace('-', ' ')}
                 </h1>
-                <p style={{ fontSize: '1.1rem', lineHeight: '1.6', background: 'rgba(255,255,255,0.02)', padding: '1rem', borderRadius: '8px', borderLeft: '3px solid var(--accent-color, var(--accent-cyan))' }}>
+                <p className="move-description-box">
                     {descriptionText.replace('$effect_chance', moveJSON.effect_chance)}
                 </p>
 
                 {/* Move Stats Grid */}
-                <div 
-                    style={{ 
-                        display: 'grid', 
-                        gridTemplateColumns: 'repeat(auto-fit, minmax(120px, 1fr))', 
-                        gap: '1rem', 
-                        marginTop: '1.5rem',
-                        borderTop: '1px solid rgba(255,255,255,0.06)',
-                        paddingTop: '1.5rem'
-                    }}
-                >
-                    <div style={{ background: 'rgba(255,255,255,0.02)', padding: '0.75rem', borderRadius: '8px', textAlign: 'center' }}>
-                        <div style={{ fontSize: '0.75rem', textTransform: 'uppercase', color: 'var(--text-muted)', marginBottom: '0.25rem' }}>Power</div>
-                        <div style={{ fontSize: '1.4rem', fontWeight: 800, fontFamily: 'var(--font-digital)', color: 'var(--accent-color, var(--accent-cyan))' }}>
+                <div className="move-stats-grid">
+                    <div className="move-stat-card">
+                        <div className="move-stat-label">Power</div>
+                        <div className="move-stat-value">
                             {moveJSON.power !== null ? moveJSON.power : '—'}
                         </div>
                     </div>
-                    <div style={{ background: 'rgba(255,255,255,0.02)', padding: '0.75rem', borderRadius: '8px', textAlign: 'center' }}>
-                        <div style={{ fontSize: '0.75rem', textTransform: 'uppercase', color: 'var(--text-muted)', marginBottom: '0.25rem' }}>Accuracy</div>
-                        <div style={{ fontSize: '1.4rem', fontWeight: 800, fontFamily: 'var(--font-digital)', color: 'var(--accent-color, var(--accent-cyan))' }}>
+                    <div className="move-stat-card">
+                        <div className="move-stat-label">Accuracy</div>
+                        <div className="move-stat-value">
                             {moveJSON.accuracy !== null ? `${moveJSON.accuracy}%` : '—'}
                         </div>
                     </div>
-                    <div style={{ background: 'rgba(255,255,255,0.02)', padding: '0.75rem', borderRadius: '8px', textAlign: 'center' }}>
-                        <div style={{ fontSize: '0.75rem', textTransform: 'uppercase', color: 'var(--text-muted)', marginBottom: '0.25rem' }}>PP</div>
-                        <div style={{ fontSize: '1.4rem', fontWeight: 800, fontFamily: 'var(--font-digital)', color: 'var(--accent-color, var(--accent-cyan))' }}>
+                    <div className="move-stat-card">
+                        <div className="move-stat-label">PP</div>
+                        <div className="move-stat-value">
                             {moveJSON.pp !== null ? moveJSON.pp : '—'}
                         </div>
                     </div>
@@ -129,11 +121,11 @@ export default async function MoveDetailPage({ params }) {
             </div>
 
             {/* Pokémon List Header */}
-            <div style={{ marginBottom: '1.5rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                <h2 style={{ fontSize: '1.5rem', fontWeight: 700 }}>
+            <div className="flex-between-wrap mb-1">
+                <h2 className="section-title">
                     Pokémon that Learn this Move
                 </h2>
-                <div style={{ fontFamily: 'var(--font-digital)', fontSize: '1.2rem', color: 'var(--accent-color, var(--accent-cyan))' }}>
+                <div className="catalog-count-small">
                     {processedPokemon.length} Species Catalogued
                 </div>
             </div>

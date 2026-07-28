@@ -28,6 +28,7 @@ export default function MovesList({ initialMoves, moveTypeMap, moveDamageClassMa
 
     const filteredMoves = useMemo(() => {
         const lowerCaseSearchTerm = searchTerm.toLowerCase();
+
         return initialMoves
             .filter(move => 
                 move.name.toLowerCase().includes(lowerCaseSearchTerm)
@@ -69,16 +70,8 @@ export default function MovesList({ initialMoves, moveTypeMap, moveDamageClassMa
             </div>
 
             {/* Results Count & Pagination Info & View Toggle */}
-            <div style={{
-                display: 'flex',
-                justifyContent: 'space-between',
-                alignItems: 'center',
-                marginTop: '1.5rem',
-                marginBottom: '1rem',
-                color: 'var(--text-muted)',
-                fontSize: '0.9rem',
-            }}>
-                <div style={{ display: 'flex', gap: '1.5rem', alignItems: 'center', fontFamily: 'var(--font-digital)' }}>
+            <div className="list-controls-bar">
+                <div className="list-stats">
                     <span>{filteredMoves.length} moves found</span>
                     {totalPages > 1 && (
                         <span>Page {safeCurrentPage} of {totalPages}</span>
@@ -105,37 +98,19 @@ export default function MovesList({ initialMoves, moveTypeMap, moveDamageClassMa
             {/* Moves Grid or List */}
             {paginatedMoves.length > 0 ? (
                 viewMode === 'grid' ? (
-                    <div 
-                        style={{ 
-                            display: 'grid', 
-                            gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))', 
-                            gap: '1.25rem',
-                            marginTop: '1rem'
-                        }}
-                    >
+                    <div className="moves-grid">
                         {paginatedMoves.map(move => {
                             const moveType = moveTypeMap[move.name] || 'normal';
                             const damageClass = moveDamageClassMap[move.name] || null;
+
                             return (
                                 <Link href={`/moves/${move.name}`} key={move.name}>
-                                    <div 
-                                        className="glass-panel ability-link-card" 
-                                        style={{ 
-                                            display: 'flex',
-                                            flexDirection: 'column',
-                                            alignItems: 'center',
-                                            gap: '0.75rem',
-                                            padding: '1.25rem', 
-                                            borderRadius: '12px', 
-                                            cursor: 'pointer',
-                                            transition: 'all 0.2s ease',
-                                        }}
-                                    >
-                                        <span style={{ fontWeight: 700, textTransform: 'capitalize', fontSize: '1.05rem' }}>
+                                    <div className="glass-panel ability-link-card move-grid-card">
+                                        <span className="move-card-title">
                                             {move.name.replace('-', ' ')}
                                         </span>
-                                        <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                                            <span className={`type-badge type-${moveType}`} style={{ fontSize: '0.75rem', padding: '0.2rem 0.6rem' }}>
+                                        <div className="flex-center-gap">
+                                            <span className={`type-badge type-${moveType} badge-small`}>
                                                 {moveType}
                                             </span>
                                             {damageClass && <DamageClassIcon damageClass={damageClass} />}
@@ -146,35 +121,25 @@ export default function MovesList({ initialMoves, moveTypeMap, moveDamageClassMa
                         })}
                     </div>
                 ) : (
-                    <div className="moves-list-view" style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem', marginTop: '1rem' }}>
+                    <div className="moves-list-view mt-1">
                         {paginatedMoves.map(move => {
                             const moveType = moveTypeMap[move.name] || 'normal';
                             const damageClass = moveDamageClassMap[move.name] || null;
+
                             return (
                                 <Link href={`/moves/${move.name}`} key={move.name}>
-                                    <div 
-                                        className="glass-panel move-list-item" 
-                                        style={{ 
-                                            display: 'flex',
-                                            alignItems: 'center',
-                                            justifyContent: 'space-between',
-                                            padding: '0.85rem 1.5rem',
-                                            borderRadius: '12px',
-                                            cursor: 'pointer',
-                                            transition: 'all 0.2s ease',
-                                        }}
-                                    >
-                                        <span style={{ fontWeight: 700, textTransform: 'capitalize', fontSize: '1.1rem', color: 'var(--text-main)' }}>
+                                    <div className="glass-panel move-list-item">
+                                        <span className="move-list-item-title">
                                             {move.name.replace('-', ' ')}
                                         </span>
-                                        <div style={{ display: 'flex', alignItems: 'center', gap: '1.5rem' }}>
-                                            <span className={`type-badge type-${moveType}`} style={{ fontSize: '0.8rem', padding: '0.25rem 0.75rem' }}>
+                                        <div className="flex-center-gap-large">
+                                            <span className={`type-badge type-${moveType}`}>
                                                 {moveType}
                                             </span>
                                             {damageClass && (
-                                                <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
+                                                <div className="flex-center-gap">
                                                     <DamageClassIcon damageClass={damageClass} />
-                                                    <span style={{ fontSize: '0.85rem', textTransform: 'capitalize', color: 'var(--text-muted)' }}>{damageClass}</span>
+                                                    <span className="text-muted-cap">{damageClass}</span>
                                                 </div>
                                             )}
                                             <span className="arrow">→</span>
@@ -193,19 +158,11 @@ export default function MovesList({ initialMoves, moveTypeMap, moveDamageClassMa
 
             {/* Pagination Controls */}
             {totalPages > 1 && (
-                <div style={{
-                    display: 'flex',
-                    justifyContent: 'center',
-                    alignItems: 'center',
-                    gap: '0.5rem',
-                    marginTop: '2rem',
-                    flexWrap: 'wrap',
-                }}>
+                <div className="pagination-container flex-wrap mt-2 gap-05">
                     <button
                         className="btn"
                         onClick={() => goToPage(1)}
                         disabled={safeCurrentPage === 1}
-                        style={{ opacity: safeCurrentPage === 1 ? 0.4 : 1 }}
                     >
                         « First
                     </button>
@@ -213,7 +170,6 @@ export default function MovesList({ initialMoves, moveTypeMap, moveDamageClassMa
                         className="btn"
                         onClick={() => goToPage(safeCurrentPage - 1)}
                         disabled={safeCurrentPage === 1}
-                        style={{ opacity: safeCurrentPage === 1 ? 0.4 : 1 }}
                     >
                         ‹ Prev
                     </button>
@@ -234,21 +190,14 @@ export default function MovesList({ initialMoves, moveTypeMap, moveDamageClassMa
                             pages.push(
                                 <button
                                     key={i}
-                                    className="btn"
+                                    className={`btn ${i === safeCurrentPage ? 'btn-active' : ''}`}
                                     onClick={() => goToPage(i)}
-                                    style={{
-                                        background: i === safeCurrentPage
-                                            ? 'var(--accent-cyan)'
-                                            : 'var(--panel-bg)',
-                                        color: i === safeCurrentPage ? '#000' : 'var(--text-primary)',
-                                        fontWeight: i === safeCurrentPage ? 800 : 500,
-                                        minWidth: '2.5rem',
-                                    }}
                                 >
                                     {i}
                                 </button>
                             );
                         }
+
                         return pages;
                     })()}
 
@@ -256,7 +205,6 @@ export default function MovesList({ initialMoves, moveTypeMap, moveDamageClassMa
                         className="btn"
                         onClick={() => goToPage(safeCurrentPage + 1)}
                         disabled={safeCurrentPage === totalPages}
-                        style={{ opacity: safeCurrentPage === totalPages ? 0.4 : 1 }}
                     >
                         Next ›
                     </button>
@@ -264,7 +212,6 @@ export default function MovesList({ initialMoves, moveTypeMap, moveDamageClassMa
                         className="btn"
                         onClick={() => goToPage(totalPages)}
                         disabled={safeCurrentPage === totalPages}
-                        style={{ opacity: safeCurrentPage === totalPages ? 0.4 : 1 }}
                     >
                         Last »
                     </button>

@@ -8,6 +8,7 @@ export default function AbilitiesList({ initialAbilities }) {
 
     const filteredAbilities = useMemo(() => {
         const lowerCaseSearchTerm = searchTerm.toLowerCase();
+
         return initialAbilities
             .filter(ability => 
                 ability.name.toLowerCase().includes(lowerCaseSearchTerm)
@@ -32,28 +33,10 @@ export default function AbilitiesList({ initialAbilities }) {
 
             {/* List */}
             {filteredAbilities.length > 0 ? (
-                <div 
-                    style={{ 
-                        display: 'grid', 
-                        gridTemplateColumns: 'repeat(auto-fill, minmax(220px, 1fr))', 
-                        gap: '1.25rem',
-                        marginTop: '1.5rem'
-                    }}
-                >
+                <div className="abilities-grid">
                     {filteredAbilities.map(ability => (
                         <Link href={`/abilities/${ability.name}`} key={ability.name}>
-                            <div 
-                                className="glass-panel ability-link-card" 
-                                style={{ 
-                                    padding: '1.25rem', 
-                                    borderRadius: '12px', 
-                                    cursor: 'pointer',
-                                    textAlign: 'center',
-                                    fontWeight: 700,
-                                    textTransform: 'capitalize',
-                                    transition: 'all 0.2s ease',
-                                }}
-                            >
+                            <div className="glass-panel ability-link-card ability-card">
                                 {ability.name.replace('-', ' ')}
                             </div>
                         </Link>

@@ -48,16 +48,13 @@ export default function DamageClassIcon({ damageClass, size = '1.1em' }) {
 
     return (
         <span
-            className={`damage-class-icon damage-class-${damageClass}`}
+            className={`damage-class-icon damage-class-${damageClass} damage-class-icon-base`}
             title={config.label}
+            // eslint-disable-next-line react/forbid-dom-props
             style={{
-                display: 'inline-flex',
-                alignItems: 'center',
-                justifyContent: 'center',
                 width: size,
                 height: size,
                 color: config.color,
-                flexShrink: 0,
             }}
         >
             {config.svg}

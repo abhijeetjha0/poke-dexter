@@ -58,6 +58,7 @@ export async function buildMoveTypeMap() {
 
     cachedTypeMap = moveTypeMap;
     typeMapTimestamp = now;
+
     return moveTypeMap;
 }
 
@@ -96,6 +97,7 @@ export async function buildMoveDamageClassMap() {
 
     cachedDamageClassMap = moveDamageClassMap;
     damageClassMapTimestamp = now;
+
     return moveDamageClassMap;
 }
 
@@ -108,5 +110,6 @@ export async function buildMoveMetaMaps() {
         buildMoveTypeMap(),
         buildMoveDamageClassMap(),
     ]);
+
     return { moveTypeMap, moveDamageClassMap };
 }

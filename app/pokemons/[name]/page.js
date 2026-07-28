@@ -53,6 +53,7 @@ function extractLatestPokedexEntry(speciesData) {
     const englishEntries = entries.filter(entry => entry.language?.name === 'en');
     if (englishEntries.length === 0) return null;
     const latest = englishEntries[englishEntries.length - 1];
+
     return {
         text: latest.flavor_text.replace(/\f/g, ' ').replace(/\n/g, ' '),
         version: latest.version?.name || 'unknown',
@@ -143,6 +144,7 @@ export default async function Page({ params }) {
     // Fetch all variety detail endpoints in parallel with limit
     const pokeInfoListJSON = await limitConcurrency(varieties, 10, async ({ pokemon }) => {
         const res = await fetchPokemonByUrl(pokemon.url);
+
         return res.json();
     });
 
@@ -155,6 +157,7 @@ export default async function Page({ params }) {
     const typeNames = baseForm.types.map(typeObj => typeObj.type.name);
     const typeDetailData = await limitConcurrency(typeNames, 10, async (typeName) => {
         const res = await fetchTypeByNameOrId(typeName, { next: { revalidate: 86400 } });
+
         return res.json();
     });
     const typeDefenses = computeTypeDefenses(typeDetailData);

@@ -1,5 +1,4 @@
-import Link from 'next/link';
-import PokemonGrid from '../../components/pokemon-grid';
+import PokemonList from '../../pokemons/pokemon-list';
 import { fetchTypeByNameOrId, fetchPokemonByUrl, fetchTypeList } from '../../api-requests';
 import { generateCommonStaticParams } from '../../lib/static-params-util';
 import { limitConcurrency } from '../../lib/promise-utils';
@@ -12,11 +11,8 @@ export default async function TypePage({ params }) {
     const response = await fetchTypeByNameOrId(typeName);
     if (!response.ok) {
         return (
-            <div className="glass-panel" style={{ textAlign: 'center', padding: '3rem' }}>
+            <div className="glass-panel text-center-padded">
                 <h2>Type "{typeName}" not found.</h2>
-                <Link href="/pokemons" className="btn" style={{ marginTop: '1rem' }}>
-                    Back to Directory
-                </Link>
             </div>
         );
     }
@@ -57,32 +53,26 @@ export default async function TypePage({ params }) {
     });
 
     return (
+        // eslint-disable-next-line react/forbid-dom-props
         <div style={{ '--accent-color': `var(--type-${typeName})` }}>
-            {/* Back Button */}
-            <div className="back-button-container">
-                <Link href="/pokemons" className="btn" id="type-back-btn">
-                    ← Back to Directory
-                </Link>
-            </div>
-
             {/* Header */}
-            <div className="glass-panel" style={{ marginBottom: '2rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '1rem' }} id="type-header-panel">
+            <div className="glass-panel flex-between-wrap mb-2" id="type-header-panel">
                 <div>
-                    <span className={`type-badge type-${typeName}`} style={{ fontSize: '1.2rem', padding: '0.5rem 1.25rem', borderRadius: '30px', marginBottom: '0.5rem' }}>
+                    <div className={`type-badge type-${typeName} type-badge-large`}>
                         {typeName}
-                    </span>
-                    <h1 style={{ fontSize: '2.5rem', fontWeight: 800, textTransform: 'capitalize', marginTop: '0.5rem' }}>
+                    </div>
+                    <h1 className="type-header-title">
                         {typeName} Type Pokémon
                     </h1>
                 </div>
-                <div style={{ fontFamily: 'var(--font-digital)', fontSize: '1.5rem', color: 'var(--accent-color)' }}>
+                <div className="type-catalog-count">
                     {processedPokemon.length} Species Catalogued
                 </div>
             </div>
 
-            {/* Pokémon Grid */}
+            {/* Pokémon Grid or List */}
             {processedPokemon.length > 0 ? (
-                <PokemonGrid pokemonList={processedPokemon} />
+                <PokemonList processedListProp={processedPokemon} hideGenFilter={true} />
             ) : (
                 <div className="glass-panel no-results">
                     <h3>No Pokémon found for this type.</h3>

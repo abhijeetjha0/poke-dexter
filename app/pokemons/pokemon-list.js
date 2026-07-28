@@ -2,7 +2,6 @@
 
 import { useState, useMemo, useEffect, useRef } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
-import Link from 'next/link';
 import { fetchPokemonByIdOrName } from '../api-requests';
 import { limitConcurrency } from '../lib/promise-utils';
 import PokemonGrid from '../components/pokemon-grid';
@@ -24,7 +23,7 @@ const INITIAL_LOAD_COUNT = 30;
 const LOAD_MORE_CHUNK = 30;
 
 export default function PokemonList(props) {
-    const { pokemonList } = props;
+    const { pokemonList, processedListProp, hideGenFilter } = props;
     const router = useRouter();
     const searchParams = useSearchParams();
 
@@ -85,10 +84,13 @@ export default function PokemonList(props) {
 
     // Extract ID and filter Pokémon list
     const processedList = useMemo(() => {
+        if (processedListProp) return processedListProp;
+
         return pokemonList
             .map(pokemon => {
                 const parts = pokemon.url.split('/').filter(Boolean);
                 const id = parseInt(parts[parts.length - 1], 10);
+
                 return {
                     ...pokemon,
                     id,
@@ -97,19 +99,21 @@ export default function PokemonList(props) {
                 };
             })
             .sort((pokemonA, pokemonB) => pokemonA.id - pokemonB.id);
-    }, [pokemonList]);
+    }, [pokemonList, processedListProp]);
 
     // Apply filters and search
     const filteredList = useMemo(() => {
         const gen = GENERATIONS.find(generation => generation.name === activeGen);
         const lowerCaseSearchTerm = searchTerm.toLowerCase();
+
         return processedList.filter(pokemon => {
-            const matchesGen = pokemon.id >= gen.start && pokemon.id <= gen.end;
+            const matchesGen = hideGenFilter ? true : (pokemon.id >= gen.start && pokemon.id <= gen.end);
             const matchesSearch = pokemon.name.toLowerCase().includes(lowerCaseSearchTerm) || 
                                   String(pokemon.id).includes(searchTerm);
+
             return matchesGen && matchesSearch;
         });
-    }, [processedList, activeGen, searchTerm]);
+    }, [processedList, activeGen, searchTerm, hideGenFilter]);
 
     // Reset pagination / scroll limit on filter or search change
     const [prevSearchTerm, setPrevSearchTerm] = useState(searchTerm);
@@ -172,6 +176,7 @@ export default function PokemonList(props) {
             }
         };
         window.addEventListener('scroll', handleScroll);
+
         return () => window.removeEventListener('scroll', handleScroll);
     }, [filteredList.length]);
 
@@ -201,10 +206,12 @@ export default function PokemonList(props) {
                                 types: detail.types.map(typeObj => typeObj.type.name),
                                 stats: detail.stats.reduce((acc, statObj) => {
                                     acc[statObj.stat.name] = statObj.base_stat;
+
                                     return acc;
                                 }, {})
                             };
                         });
+
                         return next;
                     });
                 }
@@ -254,11 +261,13 @@ export default function PokemonList(props) {
                                             types: detail.types.map(typeObj => typeObj.type.name),
                                             stats: detail.stats.reduce((acc, statObj) => {
                                                 acc[statObj.stat.name] = statObj.base_stat;
+
                                                 return acc;
                                             }, {})
                                         };
                                     }
                                 });
+
                                 return next;
                             });
                         }
@@ -280,13 +289,15 @@ export default function PokemonList(props) {
 
     const renderSortHeader = (columnKey, label, width = null) => {
         const isActive = sortColumn === columnKey;
+
         return (
             <th 
                 onClick={() => handleSort(columnKey)} 
                 className={`sortable-header ${isActive ? 'active-sort' : ''}`}
+                // eslint-disable-next-line react/forbid-dom-props
                 style={width ? { width } : undefined}
             >
-                <div style={{ display: 'flex', alignItems: 'center', gap: '0.25rem' }}>
+                <div className="flex-center-gap-small">
                     {label}
                     <span className="sort-icon">
                         {isActive ? (sortDirection === 'asc' ? '▲' : '▼') : '⇅'}
@@ -312,9 +323,9 @@ export default function PokemonList(props) {
             </div>
 
             {/* Generation Filters & View Toggle */}
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '1rem', marginBottom: '1.5rem', borderBottom: '1px solid rgba(255, 255, 255, 0.08)', paddingBottom: '0.5rem' }}>
-                <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.5rem' }}>
-                    {GENERATIONS.map(gen => (
+            <div className="filter-bar">
+                <div className="filter-tabs">
+                    {!hideGenFilter && GENERATIONS.map(gen => (
                         <button
                             key={gen.name}
                             className={`tab-btn ${activeGen === gen.name ? 'active' : ''}`}
@@ -353,7 +364,7 @@ export default function PokemonList(props) {
                                 <tr>
                                     {renderSortHeader('id', '#', '100px')}
                                     {renderSortHeader('name', 'Name')}
-                                    <th style={{ whiteSpace: 'nowrap' }}>Type</th>
+                                    <th className="text-nowrap">Type</th>
                                     {renderSortHeader('total', 'Total', '80px')}
                                     {renderSortHeader('hp', 'HP', '60px')}
                                     {renderSortHeader('attack', 'Attack', '60px')}
@@ -373,12 +384,16 @@ export default function PokemonList(props) {
                                     return (
                                         <tr 
                                             key={pokemon.name} 
-                                            onClick={() => router.push(`/pokemons/${pokemon.name}`)}
+                                            onClick={() => {
+                                                const speciesName = pokemon.speciesName || pokemon.name;
+                                                const hasVariety = pokemon.id >= 10000;
+                                                router.push(`/pokemons/${speciesName}${hasVariety ? `?form=${pokemon.name}` : ''}`);
+                                            }}
                                             className="pokedex-row"
                                             id={`pokemon-row-${pokemon.id}`}
                                         >
                                             <td className={sortColumn === 'id' ? 'active-sort-cell' : ''}>
-                                                <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                                                <div className="flex-center-gap">
                                                     <div className="table-sprite-container">
                                                         <img
                                                             src={pokemon.imageUrl}
@@ -399,27 +414,18 @@ export default function PokemonList(props) {
                                             </td>
                                             <td>
                                                 {details ? (
-                                                    <div style={{ display: 'flex', gap: '0.3rem', flexWrap: 'wrap' }}>
+                                                    <div className="flex-gap-075-wrap">
                                                         {details.types.map(typeStr => (
                                                             <span 
                                                                 key={typeStr} 
-                                                                className={`type-badge type-${typeStr}`} 
-                                                                style={{ 
-                                                                    fontSize: '0.7rem', 
-                                                                    padding: '0.15rem 0.4rem', 
-                                                                    textTransform: 'uppercase', 
-                                                                    borderRadius: '4px', 
-                                                                    textAlign: 'center',
-                                                                    display: 'inline-block',
-                                                                    minWidth: '50px'
-                                                                }}
+                                                                className={`type-badge type-${typeStr} type-badge-sm`}
                                                             >
                                                                 {typeStr}
                                                             </span>
                                                         ))}
                                                     </div>
                                                 ) : (
-                                                    <span style={{ color: 'var(--text-muted)', fontSize: '0.8rem', fontStyle: 'italic' }}>Loading...</span>
+                                                    <span className="loading-text">Loading...</span>
                                                 )}
                                             </td>
                                             <td className={`pokedex-stat-txt total-stat ${sortColumn === 'total' ? 'active-sort-cell' : ''}`}>

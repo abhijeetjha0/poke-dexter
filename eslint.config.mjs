@@ -28,6 +28,10 @@ export default [
       "react/prop-types": "off",
       "react/no-unescaped-entities": "off",
       "@next/next/no-img-element": "off",
+      "no-multiple-empty-lines": ["error", { "max": 1, "maxEOF": 0, "maxBOF": 0 }],
+      "react/forbid-dom-props": ["error", { "forbid": ["style"] }],
+      "no-unused-vars": ["error", { "argsIgnorePattern": "^_", "varsIgnorePattern": "^_", "destructuredArrayIgnorePattern": "^_", "caughtErrors": "none" }],
+      "padding-line-between-statements": ["error", { "blankLine": "always", "prev": "*", "next": "return" }],
     },
     settings: {
       react: {
@@ -48,7 +52,8 @@ export default [
       "**/*.css",
       "**/*.scss",
       "**/*.svg",
-      "PR/**"
+      "PR/**",
+      "browser-reports/**"
     ],
   }
 ];

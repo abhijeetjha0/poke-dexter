@@ -12,9 +12,9 @@ export default async function AbilityDetailPage({ params }) {
     const response = await fetchAbilityByNameOrId(abilityName);
     if (!response.ok) {
         return (
-            <div className="glass-panel" style={{ textAlign: 'center', padding: '3rem' }}>
+            <div className="glass-panel text-center-padded">
                 <h2>Ability "{abilityName}" not found.</h2>
-                <Link href="/abilities" className="btn" style={{ marginTop: '1rem' }}>
+                <Link href="/abilities" className="btn mt-1">
                     Back to Abilities Index
                 </Link>
             </div>
@@ -66,7 +66,7 @@ export default async function AbilityDetailPage({ params }) {
     return (
         <div>
             {/* Back Buttons */}
-            <div style={{ display: 'flex', gap: '1rem', marginBottom: '1.5rem' }}>
+            <div className="flex-gap-1 mb-1">
                 <Link href="/abilities" className="btn" id="ability-back-btn">
                     ← Back to Abilities Index
                 </Link>
@@ -76,24 +76,24 @@ export default async function AbilityDetailPage({ params }) {
             </div>
 
             {/* Header / Info Panel */}
-            <div className="glass-panel" style={{ marginBottom: '2rem' }} id="ability-info-panel">
-                <span className="type-badge" style={{ background: 'var(--accent-cyan)', fontSize: '0.8rem', padding: '0.2rem 0.8rem', borderRadius: '15px' }}>
+            <div className="glass-panel mb-2" id="ability-info-panel">
+                <span className="type-badge badge-cyan">
                     Ability Profile
                 </span>
-                <h1 style={{ fontSize: '2.5rem', fontWeight: 800, textTransform: 'capitalize', marginTop: '0.5rem', marginBottom: '1rem' }}>
+                <h1 className="ability-header-title">
                     {abilityJSON.name.replace('-', ' ')}
                 </h1>
-                <p style={{ fontSize: '1.1rem', lineHeight: '1.6', background: 'rgba(255,255,255,0.02)', padding: '1rem', borderRadius: '8px', borderLeft: '3px solid var(--accent-cyan)' }}>
+                <p className="ability-description-box">
                     {descriptionText}
                 </p>
             </div>
 
             {/* Pokémon List Header */}
-            <div style={{ marginBottom: '1.5rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                <h2 style={{ fontSize: '1.5rem', fontWeight: 700 }}>
+            <div className="flex-between-wrap mb-1">
+                <h2 className="section-title">
                     Pokémon with this Ability
                 </h2>
-                <div style={{ fontFamily: 'var(--font-digital)', fontSize: '1.2rem', color: 'var(--accent-cyan)' }}>
+                <div className="catalog-count-small">
                     {processedPokemon.length} Species Found
                 </div>
             </div>
