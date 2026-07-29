@@ -30,11 +30,11 @@ export default function PokemonGrid({ pokemonList, showAbilityType = false }) {
                         <div className="pokemon-name">{pokemon.name.replace('-', ' ')}</div>
                         
                         {showAbilityType && pokemon.is_hidden !== undefined && (
-                            <div style={{ marginTop: '0.5rem', fontSize: '0.75rem', fontWeight: 700, textTransform: 'uppercase' }}>
+                            <div className="ability-type-label">
                                 {pokemon.is_hidden ? (
-                                    <span style={{ color: '#eab308' }}>Hidden Ability</span>
+                                    <span className="text-warning">Hidden Ability</span>
                                 ) : (
-                                    <span style={{ color: 'var(--text-muted)' }}>Standard</span>
+                                    <span className="text-muted">Standard</span>
                                 )}
                             </div>
                         )}

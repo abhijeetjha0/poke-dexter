@@ -12,7 +12,7 @@ jest.mock('../../../app/lib/move-type-utils', () => ({
 }));
 
 jest.mock('../../../app/moves/moves-list', () => {
-    return function MockMovesList({ initialMoves, moveTypeMap, moveDamageClassMap }) {
+    return function MockMovesList({ initialMoves, moveTypeMap, moveDamageClassMap: _moveDamageClassMap }) {
         return (
             <div data-testid="moves-list">
                 <span data-testid="moves">{JSON.stringify(initialMoves)}</span>

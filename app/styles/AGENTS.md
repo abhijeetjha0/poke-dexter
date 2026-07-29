@@ -19,3 +19,6 @@ This document specifies rules and standards for AI Coding Assistants modifying S
    - Run `npm run lint-style` whenever modifying any SCSS stylesheet to ensure compliance with Stylelint rules. Use `npm run lint-style-fix` for automatic formatting fixes.
    - Follow standard SCSS variable usage and clean nesting conventions.
    - Maintain the glassmorphic dark-theme visual style without introducing inline CSS clutter or arbitrary utility framework dependencies.
+
+3. **Unit Preferences**:
+   - Prefer `rem` over `px` for font sizes, margins, paddings, and structural dimensions to ensure better accessibility and responsive scaling.

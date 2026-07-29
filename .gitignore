@@ -4,6 +4,7 @@
 /out
 /coverage
 /PR
+/browser-reports
 
 # Files
 .DS_Store

@@ -14,6 +14,7 @@ describe('move-type-utils helper module', () => {
             if (url.includes('/type/water')) {
                 return Promise.resolve(JSON.stringify({ moves: [{ name: 'surf' }, { name: 'hydro-pump' }] }));
             }
+
             return Promise.resolve(JSON.stringify({ moves: [] }));
         });
 
@@ -34,6 +35,7 @@ describe('move-type-utils helper module', () => {
             if (url.includes('/move-damage-class/status')) {
                 return Promise.resolve(JSON.stringify({ moves: [{ name: 'growl' }] }));
             }
+
             return Promise.resolve(JSON.stringify({ moves: [] }));
         });
 

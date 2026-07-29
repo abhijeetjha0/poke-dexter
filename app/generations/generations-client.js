@@ -34,10 +34,10 @@ export default function GenerationsClient() {
 
     return (
         <div className="generations-container">
-            <div className="glass-panel page-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '1.5rem' }}>
-                <div style={{ flex: '1 1 300px' }}>
-                    <h1 style={{ margin: 0 }}>Pokémon Generations</h1>
-                    <p style={{ margin: '0.5rem 0 0 0', color: 'var(--text-muted)' }}>
+            <div className="glass-panel page-header flex-between-wrap gap-15">
+                <div className="flex-1-300">
+                    <h1 className="mb-0 mt-0">Pokémon Generations</h1>
+                    <p className="mt-075 mb-0 text-muted-sm">
                         Select a region and generation to explore its Pokémon species catalog.
                     </p>
                 </div>
@@ -86,32 +86,10 @@ export default function GenerationsClient() {
             ) : (
                 <div className="generations-list-view">
                     {GENERATIONS.map(gen => (
-                        <Link href={`/pokemons?gen=${gen.id}`} key={gen.id} style={{ textDecoration: 'none' }}>
-                            <div 
-                                className={`glass-panel generation-list-item ${gen.class}`}
-                                style={{
-                                    display: 'flex',
-                                    alignItems: 'center',
-                                    justifyContent: 'space-between',
-                                    padding: '1rem 1.5rem',
-                                    borderRadius: '16px',
-                                    cursor: 'pointer',
-                                    transition: 'all 0.3s ease',
-                                    position: 'relative',
-                                    overflow: 'hidden'
-                                }}
-                            >
-                                <div style={{ display: 'flex', alignItems: 'center', gap: '1.5rem', zIndex: 2 }}>
-                                    <div style={{
-                                        width: '56px',
-                                        height: '56px',
-                                        display: 'flex',
-                                        alignItems: 'center',
-                                        justifyContent: 'center',
-                                        background: 'rgba(255, 255, 255, 0.03)',
-                                        borderRadius: '12px',
-                                        border: '1px solid rgba(255, 255, 255, 0.05)',
-                                    }}>
+                        <Link href={`/pokemons?gen=${gen.id}`} key={gen.id} className="no-underline">
+                            <div className={`glass-panel generation-list-item ${gen.class}`}>
+                                <div className="flex-center-gap-large z-2">
+                                    <div className="mascot-container">
                                         <img 
                                             src={`https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/${gen.mascotId}.png`} 
                                             alt={`${gen.region} mascot`}
@@ -121,13 +99,13 @@ export default function GenerationsClient() {
                                         />
                                     </div>
                                     <div>
-                                        <div style={{ display: 'flex', alignItems: 'baseline', gap: '0.75rem' }}>
-                                            <span style={{ fontSize: '1.25rem', fontWeight: 800, color: 'var(--text-main)' }}>{gen.region}</span>
-                                            <span style={{ fontSize: '0.8rem', fontFamily: 'var(--font-digital)', fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.5px' }}>{gen.roman}</span>
+                                        <div className="flex-baseline-gap">
+                                            <span className="gen-region-lg">{gen.region}</span>
+                                            <span className="gen-roman-sm">{gen.roman}</span>
                                         </div>
-                                        <div style={{ display: 'flex', gap: '1rem', fontSize: '0.85rem', marginTop: '0.2rem' }}>
-                                            <span style={{ color: 'var(--accent-cyan)', fontFamily: 'var(--font-digital)', fontWeight: 700 }}>{gen.range}</span>
-                                            <span style={{ color: 'var(--text-muted)', fontWeight: 600 }}>{gen.count} Pokémon</span>
+                                        <div className="gen-stats-row">
+                                            <span className="gen-range-text">{gen.range}</span>
+                                            <span className="gen-count-text">{gen.count} Pokémon</span>
                                         </div>
                                     </div>
                                 </div>
