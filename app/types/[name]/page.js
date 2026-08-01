@@ -1,3 +1,4 @@
+import { Suspense } from 'react';
 import PokemonList from '../../pokemons/pokemon-list';
 import { fetchTypeByNameOrId, fetchPokemonByUrl, fetchTypeList } from '../../api-requests';
 import { generateCommonStaticParams } from '../../lib/static-params-util';
@@ -72,7 +73,9 @@ export default async function TypePage({ params }) {
 
             {/* Pokémon Grid or List */}
             {processedPokemon.length > 0 ? (
-                <PokemonList processedListProp={processedPokemon} hideGenFilter={true} />
+                <Suspense fallback={<div className="glass-panel no-results"><h3>Loading Pokémon...</h3></div>}>
+                    <PokemonList processedListProp={processedPokemon} hideGenFilter={true} />
+                </Suspense>
             ) : (
                 <div className="glass-panel no-results">
                     <h3>No Pokémon found for this type.</h3>
