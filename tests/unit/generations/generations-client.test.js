@@ -9,7 +9,6 @@ describe('GenerationsClient Component', () => {
     test('renders generations and default grid view', () => {
         const { getByText, container } = render(<GenerationsClient />);
         
-        expect(getByText('Pokémon Generations')).toBeInTheDocument();
         expect(getByText('Kanto')).toBeInTheDocument();
         expect(getByText('Generation I')).toBeInTheDocument();
         expect(getByText('Paldea')).toBeInTheDocument();
@@ -19,9 +18,9 @@ describe('GenerationsClient Component', () => {
     });
 
     test('toggles view mode to list and saves to localStorage', () => {
-        const { getByText, container } = render(<GenerationsClient />);
+        const { container } = render(<GenerationsClient />);
         
-        const listBtn = getByText('List');
+        const listBtn = container.querySelector('#view-toggle-list');
         fireEvent.click(listBtn);
         
         const listContainer = container.querySelector('.generations-list-view');

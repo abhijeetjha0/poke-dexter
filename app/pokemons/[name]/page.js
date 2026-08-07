@@ -8,6 +8,7 @@ import {
     fetchPokemonEncounters,
     fetchMoveByNameOrId,
     fetchPokemonSpeciesList,
+    fetchEvolutionChainByUrl,
 } from '../../api-requests';
 import { generateCommonStaticParams } from '../../lib/static-params-util';
 
@@ -219,6 +220,22 @@ export default async function Page({ params }) {
         }
     });
 
+    // --- 5. Evolution Chain ---
+    let evolutionChainData = null;
+    if (responseJSON.evolution_chain?.url) {
+        try {
+            const evRes = await fetchEvolutionChainByUrl(
+                responseJSON.evolution_chain.url, 
+                { next: { revalidate: 86400 } }
+            );
+            if (evRes.ok) {
+                evolutionChainData = await evRes.json();
+            }
+        } catch (e) {
+            console.error('Failed to fetch evolution chain:', e);
+        }
+    }
+
     return (
         <PokemonDetailView 
             speciesInfo={responseJSON} 
@@ -227,6 +244,7 @@ export default async function Page({ params }) {
             pokedexEntry={pokedexEntry}
             typeDefenses={typeDefenses}
             encountersByVersion={encountersByVersion}
+            evolutionChainData={evolutionChainData}
         />
     );
 }

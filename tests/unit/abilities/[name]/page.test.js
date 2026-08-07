@@ -8,9 +8,9 @@ jest.mock('../../../../app/api-requests', () => ({
     fetchAbilityList: jest.fn()
 }));
 
-jest.mock('../../../../app/components/pokemon-grid', () => {
-    return function MockPokemonGrid({ pokemonList }) {
-        return <div data-testid="pokemon-grid">{pokemonList.length}</div>;
+jest.mock('../../../../app/pokemons/pokemon-list', () => {
+    return function MockPokemonList({ processedListProp }) {
+        return <div data-testid="pokemon-grid">{processedListProp.length}</div>;
     };
 });
 
@@ -35,7 +35,7 @@ describe('AbilityDetailPage (Server Component)', () => {
         const { getByText, getByTestId } = render(Page);
 
         expect(fetchAbilityByNameOrId).toHaveBeenCalledWith('overgrow');
-        expect(getByText('overgrow')).toBeInTheDocument();
+        expect(getByText('overgrow:')).toBeInTheDocument();
         expect(getByText('Boosts Grass moves.')).toBeInTheDocument();
         expect(getByTestId('pokemon-grid')).toHaveTextContent('1');
     });

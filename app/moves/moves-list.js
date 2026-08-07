@@ -56,47 +56,51 @@ export default function MovesList({ initialMoves, moveTypeMap, moveDamageClassMa
 
     return (
         <div>
-            {/* Search Input */}
-            <div className="search-container">
-                <input
-                    type="text"
-                    className="search-input"
-                    placeholder="Search moves (e.g., Thunderbolt, Tackle, Flamethrower)..."
-                    value={searchTerm}
-                    onChange={handleSearchChange}
-                    id="moves-search-bar"
-                />
-                <span className="search-icon">🔍</span>
-            </div>
-
-            {/* Results Count & Pagination Info & View Toggle */}
-            <div className="list-controls-bar">
-                <div className="list-stats">
-                    <span>{filteredMoves.length} moves found</span>
-                    {totalPages > 1 && (
-                        <span>Page {safeCurrentPage} of {totalPages}</span>
-                    )}
+            {/* Search Input & View Toggle */}
+            <div className="search-bar-row">
+                <div className="search-container">
+                    <input
+                        type="text"
+                        className="search-input"
+                        placeholder="Search moves (e.g., Thunderbolt, Tackle, Flamethrower)..."
+                        value={searchTerm}
+                        onChange={handleSearchChange}
+                        id="moves-search-bar"
+                    />
+                    <span className="search-icon"><span className="material-symbols-outlined">search</span></span>
                 </div>
                 <div className="view-toggle-container">
                     <button
                         className={`view-toggle-btn ${viewMode === 'grid' ? 'active' : ''}`}
                         onClick={() => handleViewModeChange('grid')}
                         id="view-toggle-grid"
+                        title="Grid View"
+                        aria-label="Grid View"
                     >
-                        <span>田</span> Grid
+                        <span className="material-symbols-outlined toggle-icon">grid_view</span>
                     </button>
                     <button
                         className={`view-toggle-btn ${viewMode === 'list' ? 'active' : ''}`}
                         onClick={() => handleViewModeChange('list')}
                         id="view-toggle-list"
+                        title="List View"
+                        aria-label="List View"
                     >
-                        <span>☰</span> List
+                        <span className="material-symbols-outlined toggle-icon">format_list_bulleted</span>
                     </button>
                 </div>
             </div>
 
+            {/* Results Count & Pagination Info */}
+            <div className="list-controls-bar flex-between-wrap mb-1">
+                <span className="text-muted">{filteredMoves.length} moves found</span>
+                {totalPages > 1 && (
+                    <span className="text-muted">Page {safeCurrentPage} of {totalPages}</span>
+                )}
+            </div>
+
             {/* Moves Grid or List */}
-            {paginatedMoves.length > 0 ? (
+            {paginatedMoves.length ? (
                 viewMode === 'grid' ? (
                     <div className="moves-grid">
                         {paginatedMoves.map(move => {
@@ -142,7 +146,7 @@ export default function MovesList({ initialMoves, moveTypeMap, moveDamageClassMa
                                                     <span className="text-muted-cap">{damageClass}</span>
                                                 </div>
                                             )}
-                                            <span className="arrow">→</span>
+                                            <span className="material-symbols-outlined arrow">arrow_forward</span>
                                         </div>
                                     </div>
                                 </Link>
@@ -158,20 +162,22 @@ export default function MovesList({ initialMoves, moveTypeMap, moveDamageClassMa
 
             {/* Pagination Controls */}
             {totalPages > 1 && (
-                <div className="pagination-container flex-wrap mt-2 gap-05">
+                <div className="pagination-container">
                     <button
-                        className="btn"
+                        className="btn pagination-first-btn"
                         onClick={() => goToPage(1)}
                         disabled={safeCurrentPage === 1}
                     >
-                        « First
+                        <span className="nav-label">« First</span>
+                        <span className="nav-icon">«</span>
                     </button>
                     <button
                         className="btn"
                         onClick={() => goToPage(safeCurrentPage - 1)}
                         disabled={safeCurrentPage === 1}
                     >
-                        ‹ Prev
+                        <span className="nav-label">‹ Prev</span>
+                        <span className="nav-icon">‹</span>
                     </button>
 
                     {/* Page number buttons */}
@@ -190,7 +196,7 @@ export default function MovesList({ initialMoves, moveTypeMap, moveDamageClassMa
                             pages.push(
                                 <button
                                     key={i}
-                                    className={`btn ${i === safeCurrentPage ? 'btn-active' : ''}`}
+                                    className={`btn pagination-num-btn ${i === safeCurrentPage ? 'btn-active' : ''}`}
                                     onClick={() => goToPage(i)}
                                 >
                                     {i}
@@ -206,14 +212,16 @@ export default function MovesList({ initialMoves, moveTypeMap, moveDamageClassMa
                         onClick={() => goToPage(safeCurrentPage + 1)}
                         disabled={safeCurrentPage === totalPages}
                     >
-                        Next ›
+                        <span className="nav-label">Next ›</span>
+                        <span className="nav-icon">›</span>
                     </button>
                     <button
-                        className="btn"
+                        className="btn pagination-last-btn"
                         onClick={() => goToPage(totalPages)}
                         disabled={safeCurrentPage === totalPages}
                     >
-                        Last »
+                        <span className="nav-label">Last »</span>
+                        <span className="nav-icon">»</span>
                     </button>
                 </div>
             )}

@@ -14,14 +14,6 @@ const TYPES = [
 export default function TypesPage() {
     return (
         <div>
-            {/* Header Panel */}
-            <div className="glass-panel page-header">
-                <h1>Pokémon Types Directory</h1>
-                <p>
-                    Select an element type to catalog Pokémon and explore battle effectiveness mappings.
-                </p>
-            </div>
-
             {/* Types Grid */}
             <div className="types-grid">
                 {TYPES.map(typeName => (

@@ -1,5 +1,25 @@
 @use 'variables' as *;
-@import 'https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Outfit:wght@300;400;600;700&display=swap';
+@import url('https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200');
+@import url('https://fonts.googleapis.com/icon?family=Material+Icons');
+@import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Outfit:wght@300;400;600;700&display=swap');
+
+.material-symbols-outlined {
+  font-family: 'Material Symbols Outlined', 'Material Icons';
+  font-weight: normal;
+  font-style: normal;
+  font-size: 1.25rem;
+  line-height: 1;
+  letter-spacing: normal;
+  text-transform: none;
+  display: inline-block;
+  white-space: nowrap;
+  word-wrap: normal;
+  direction: ltr;
+  font-feature-settings: 'liga';
+  -webkit-font-smoothing: antialiased;
+  vertical-align: middle;
+  user-select: none;
+}
 
 /* Global Reset */
 * {
@@ -53,6 +73,7 @@ a {
   display: flex;
   justify-content: space-between;
   align-items: center;
+  gap: 1.5rem;
   margin-bottom: 2rem;
   border-bottom: 1px solid $panel-border;
   padding-bottom: 1rem;
@@ -69,30 +90,10 @@ a {
   display: flex;
   align-items: center;
   gap: 0.5rem;
+  white-space: nowrap;
 
-  &::before {
-    content: '';
-    display: inline-block;
-    width: 16px;
-    height: 16px;
-    border-radius: 50%;
-    background: #00f2fe;
-    box-shadow: 0 0 12px #00f2fe, 0 0 20px #00f2fe;
-    animation: pulse-glow 2s infinite alternate;
-  }
-}
-
-@keyframes pulse-glow {
-  0% {
-    transform: scale(0.9);
-    opacity: 0.7;
-    box-shadow: 0 0 4px #00f2fe;
-  }
-
-  100% {
-    transform: scale(1.1);
-    opacity: 1;
-    box-shadow: 0 0 16px #00f2fe, 0 0 24px #00f2fe;
+  @media (width <= 1024px) {
+    font-size: 1.5rem;
   }
 }
 

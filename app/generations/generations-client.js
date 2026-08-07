@@ -34,27 +34,25 @@ export default function GenerationsClient() {
 
     return (
         <div className="generations-container">
-            <div className="glass-panel page-header flex-between-wrap gap-15">
-                <div className="flex-1-300">
-                    <h1 className="mb-0 mt-0">Pokémon Generations</h1>
-                    <p className="mt-075 mb-0 text-muted-sm">
-                        Select a region and generation to explore its Pokémon species catalog.
-                    </p>
-                </div>
-                <div className="view-toggle-container">
+            <div className="flex-between-wrap gap-15 mb-15">
+                <div className="view-toggle-container ml-auto">
                     <button
                         className={`view-toggle-btn ${viewMode === 'grid' ? 'active' : ''}`}
                         onClick={() => handleViewModeChange('grid')}
                         id="view-toggle-grid"
+                        title="Grid View"
+                        aria-label="Grid View"
                     >
-                        <span>田</span> Grid
+                        <span className="material-symbols-outlined toggle-icon">grid_view</span>
                     </button>
                     <button
                         className={`view-toggle-btn ${viewMode === 'list' ? 'active' : ''}`}
                         onClick={() => handleViewModeChange('list')}
                         id="view-toggle-list"
+                        title="List View"
+                        aria-label="List View"
                     >
-                        <span>☰</span> List
+                        <span className="material-symbols-outlined toggle-icon">format_list_bulleted</span>
                     </button>
                 </div>
             </div>

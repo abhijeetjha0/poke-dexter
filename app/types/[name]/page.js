@@ -54,27 +54,22 @@ export default async function TypePage({ params }) {
     });
 
     return (
-        // eslint-disable-next-line react/forbid-dom-props
-        <div style={{ '--accent-color': `var(--type-${typeName})` }}>
-            {/* Header */}
-            <div className="glass-panel flex-between-wrap mb-2" id="type-header-panel">
-                <div>
-                    <div className={`type-badge type-${typeName} type-badge-large`}>
-                        {typeName}
-                    </div>
-                    <h1 className="type-header-title">
-                        {typeName} Type Pokémon
-                    </h1>
-                </div>
-                <div className="type-catalog-count">
-                    {processedPokemon.length} Species Catalogued
-                </div>
-            </div>
-
-            {/* Pokémon Grid or List */}
-            {processedPokemon.length > 0 ? (
+        <div>
+            {/* Pokémon Grid or List with Section Header (Type Badge + Title) */}
+            {/* + Count Badge + Grid/List Switcher (No Search) */}
+            {processedPokemon.length ? (
                 <Suspense fallback={<div className="glass-panel no-results"><h3>Loading Pokémon...</h3></div>}>
-                    <PokemonList processedListProp={processedPokemon} hideGenFilter={true} />
+                    <PokemonList
+                        processedListProp={processedPokemon}
+                        hideGenFilter={true}
+                        hideSearch={true}
+                        sectionTitle={
+                            <>
+                                <span className={`type-badge type-${typeName} inline-type-header-badge`}>{typeName}</span> Type Pokémon
+                            </>
+                        }
+                        countBadge={processedPokemon.length}
+                    />
                 </Suspense>
             ) : (
                 <div className="glass-panel no-results">

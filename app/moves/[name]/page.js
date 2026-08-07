@@ -1,5 +1,5 @@
 import Link from 'next/link';
-import PokemonGrid from '../../components/pokemon-grid';
+import PokemonList from '../../pokemons/pokemon-list';
 import DamageClassIcon from '../../components/damage-class-icon';
 import { fetchMoveByNameOrId, fetchPokemonByUrl, fetchMoveList } from '../../api-requests';
 import { generateCommonStaticParams } from '../../lib/static-params-util';
@@ -11,6 +11,7 @@ export default async function MoveDetailPage({ params }) {
 
     // Fetch move details
     const response = await fetchMoveByNameOrId(moveName);
+
     if (!response.ok) {
         return (
             <div className="glass-panel text-center-padded">
@@ -42,6 +43,7 @@ export default async function MoveDetailPage({ params }) {
         if (id >= 10000) {
             try {
                 const res = await fetchPokemonByUrl(pokemon.url);
+
                 if (res.ok) {
                     const pokemonData = await res.json();
                     speciesName = pokemonData.species.name;
@@ -67,21 +69,11 @@ export default async function MoveDetailPage({ params }) {
     const moveClass = moveJSON.damage_class?.name || 'physical';
 
     return (
-        // eslint-disable-next-line react/forbid-dom-props
-        <div style={{ '--accent-color': `var(--type-${moveType})` }}>
-            {/* Back Buttons */}
-            <div className="flex-gap-1 mb-1">
-                <Link href="/moves" className="btn" id="move-back-btn">
-                    ← Back to Moves Index
-                </Link>
-                <Link href="/pokemons" className="btn" id="move-home-btn">
-                    PokeDex Directory
-                </Link>
-            </div>
-
-            {/* Header / Info Panel */}
-            <div className="glass-panel mb-2" id="move-info-panel">
-                <div className="flex-gap-075-wrap">
+        <div>
+            {/* Header / Info Panel (Inline Compact) */}
+            <div className="glass-panel move-detail-header-card mb-2" id="move-info-panel">
+                <div className="move-info-inline-container">
+                    <strong className="move-inline-title">{moveJSON.name.replace('-', ' ')}:</strong>
                     <span className={`type-badge type-${moveType}`}>
                         {moveType}
                     </span>
@@ -89,50 +81,22 @@ export default async function MoveDetailPage({ params }) {
                         <DamageClassIcon damageClass={moveClass} size="1em" />
                         {moveClass}
                     </span>
-                </div>
-                <h1 className="move-header-title">
-                    {moveJSON.name.replace('-', ' ')}
-                </h1>
-                <p className="move-description-box">
-                    {descriptionText.replace('$effect_chance', moveJSON.effect_chance)}
-                </p>
-
-                {/* Move Stats Grid */}
-                <div className="move-stats-grid">
-                    <div className="move-stat-card">
-                        <div className="move-stat-label">Power</div>
-                        <div className="move-stat-value">
-                            {moveJSON.power !== null ? moveJSON.power : '—'}
-                        </div>
-                    </div>
-                    <div className="move-stat-card">
-                        <div className="move-stat-label">Accuracy</div>
-                        <div className="move-stat-value">
-                            {moveJSON.accuracy !== null ? `${moveJSON.accuracy}%` : '—'}
-                        </div>
-                    </div>
-                    <div className="move-stat-card">
-                        <div className="move-stat-label">PP</div>
-                        <div className="move-stat-value">
-                            {moveJSON.pp !== null ? moveJSON.pp : '—'}
-                        </div>
-                    </div>
+                    <span className="move-inline-stat">Power: <strong>{moveJSON.power !== null ? moveJSON.power : '—'}</strong></span>
+                    <span className="move-inline-stat">Acc: <strong>{moveJSON.accuracy !== null ? `${moveJSON.accuracy}%` : '—'}</strong></span>
+                    <span className="move-inline-stat">PP: <strong>{moveJSON.pp !== null ? moveJSON.pp : '—'}</strong></span>
+                    <span className="move-inline-desc">— {descriptionText.replace('$effect_chance', moveJSON.effect_chance)}</span>
                 </div>
             </div>
 
-            {/* Pokémon List Header */}
-            <div className="flex-between-wrap mb-1">
-                <h2 className="section-title">
-                    Pokémon that Learn this Move
-                </h2>
-                <div className="catalog-count-small">
-                    {processedPokemon.length} Species Catalogued
-                </div>
-            </div>
-
-            {/* Pokémon Grid */}
-            {processedPokemon.length > 0 ? (
-                <PokemonGrid pokemonList={processedPokemon} />
+            {/* Pokémon List with Section Header + Count Badge + Grid/List Switcher (No Search) */}
+            {processedPokemon.length ? (
+                <PokemonList
+                    processedListProp={processedPokemon}
+                    hideGenFilter={true}
+                    hideSearch={true}
+                    sectionTitle="Pokémon that Learn this Move"
+                    countBadge={processedPokemon.length}
+                />
             ) : (
                 <div className="glass-panel no-results">
                     <h3>No Pokémon can learn this move.</h3>

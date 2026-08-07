@@ -30,10 +30,9 @@ describe('AbilitiesPage (Server Component)', () => {
 
         // Resolve the server component
         const Page = await AbilitiesPage();
-        const { getByTestId, getByText } = render(Page);
+        const { getByTestId } = render(Page);
 
         expect(fetchAbilityList).toHaveBeenCalledWith(500);
-        expect(getByText('Pokémon Abilities Index')).toBeInTheDocument();
         
         const listContainer = getByTestId('abilities-list');
         expect(listContainer).toBeInTheDocument();

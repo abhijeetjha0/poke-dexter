@@ -5,8 +5,7 @@ describe('HomePage Component', () => {
     test('renders hero text and mascot images', () => {
         const { getByText, getByAltText, getByRole } = render(<HomePage />);
 
-        expect(getByText(/Welcome to the/)).toBeInTheDocument();
-        expect(getByText('PokeDexter')).toBeInTheDocument();
+        expect(getByText(/Poke Dexter is a Pokemon Information/)).toBeInTheDocument();
 
         const bulbasaur = getByAltText('Bulbasaur Mascot');
         expect(bulbasaur).toBeInTheDocument();

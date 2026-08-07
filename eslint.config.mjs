@@ -31,7 +31,14 @@ export default [
       "no-multiple-empty-lines": ["error", { "max": 1, "maxEOF": 0, "maxBOF": 0 }],
       "react/forbid-dom-props": ["error", { "forbid": ["style"] }],
       "no-unused-vars": ["error", { "argsIgnorePattern": "^_", "varsIgnorePattern": "^_", "destructuredArrayIgnorePattern": "^_", "caughtErrors": "none" }],
-      "padding-line-between-statements": ["error", { "blankLine": "always", "prev": "*", "next": "return" }],
+      "space-before-blocks": ["error", "always"],
+      "padding-line-between-statements": [
+        "error",
+        { "blankLine": "always", "prev": "*", "next": ["return", "block-like"] },
+        { "blankLine": "always", "prev": "block-like", "next": "*" }
+      ],
+      "curly": ["error", "all"],
+      "max-len": ["error", { "code": 120, "ignoreUrls": true, "ignoreStrings": true, "ignoreTemplateLiterals": true, "ignoreRegExpLiterals": true }],
     },
     settings: {
       react: {

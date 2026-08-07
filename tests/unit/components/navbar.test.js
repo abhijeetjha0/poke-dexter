@@ -3,13 +3,18 @@ import Navbar from '../../../app/components/navbar';
 
 jest.mock('next/navigation', () => ({
     usePathname: () => '/pokemons',
+    useRouter: () => ({
+        push: jest.fn(),
+        replace: jest.fn(),
+        prefetch: jest.fn(),
+    }),
 }));
 
 describe('Navbar Component', () => {
     test('renders brand logo and main navigation links', () => {
         render(<Navbar />);
 
-        expect(screen.getByText('POKEDEXTER')).toBeInTheDocument();
+        expect(screen.getByText('PokeDexter')).toBeInTheDocument();
         expect(screen.getAllByText('Pokedex').length).toBeGreaterThan(0);
         expect(screen.getAllByText('Abilities').length).toBeGreaterThan(0);
         expect(screen.getAllByText('Moves').length).toBeGreaterThan(0);

@@ -68,17 +68,25 @@ Subdirectory-specific guidelines are maintained in modular `AGENTS.md` files thr
 
 ## 📌 Master Rules for AI Agents
 
-1. **Verification Requirement**: Never declare a task resolved without running `npm test`, `npm run lint`, `npm run lint-style`, and `npm run build` when modifying application code files. Verification commands can be skipped when only updating Markdown (`.md`) documentation files.
+1. **Verification Requirement**: Never declare a task resolved without running `npm test`, `npm run lint`, `npm run lint-style`, and `npm run build` when modifying application code files. **STRICT EXCLUSION**: Verification commands MUST be completely skipped when only updating Markdown (`.md`) documentation files or AGENTS instruction files.
 2. **No Placeholders**: Maintain accurate PokéAPI integration parameters and valid Pokémon domain models across all dynamic and static views.
 3. **Keep AGENTS.md Up to Date**: Update relevant modular `AGENTS.md` files whenever tooling, configuration, routing, or SCSS style architecture changes.
 4. **Linting Exclusions**: Markdown (`**/*.md`) and other non-JS/TS documentation or asset files (e.g., `.txt`, `.json`, `.css`, `.svg`) must be globally ignored in `eslint.config.mjs` following industry standards, preventing the linter from unnecessarily scanning or parsing them.
+5. **Test Coverage Requirements**: Always add or update unit test cases covering any changes, bug fixes, or new features developed during a session.
+6. **Documentation Relative File Links**: File links in documentation files (`README.md`, `AGENTS.md`) MUST use repository-relative paths starting with `./` (e.g., `./app/page.js`). For dynamic route paths containing square brackets (`[name]`), brackets in the link target URL MUST be URL-encoded as `%5B` and `%5D` (e.g., `./app/pokemons/%5Bname%5D/page.js`) to guarantee clickability across markdown parsers.
+7. **No Inline Styles & No Disabled Lint Rules**: NEVER use inline `style={{ ... }}` attributes or `eslint-disable` / `stylelint-disable` comments in application code. All layout, color, and dynamic sizing styles MUST be maintained strictly within SCSS stylesheets (`app/styles/`) using semantic CSS classes or SCSS generators.
+8. **Single-Line Simple Callbacks**: Simple single-statement callbacks or cleanup functions (such as `useEffect` unmount cleanup `return () => { isMounted = false; };`) MUST be written concisely on a single line instead of multi-line blocks.
+9. **Property Destructuring for Repeated Access**: When accessing an object property or event field (e.g. `event.key`, `pokemon.name`) multiple times within a function or callback, destructure it upfront (e.g. `const { key } = event;`) to avoid redundant property lookups and improve code readability.
+10. **Single-Line Unwrapped Concise JSX**: When rendering a single concise JSX element (such as in conditional branches, logical AND expressions `{condition && <Element />}`), write it directly on a single line without wrapping parentheses `(...)`.
+11. **Next.js Client SearchParams Suspense**: Any Next.js Client Component (`"use client"`) that consumes `useSearchParams()` MUST be wrapped in a `<Suspense>` boundary (e.g. `<Suspense fallback={null}>`) when exported. Failure to do so forces Next.js to opt the entire page into client-side rendering and throws a build error (`missing-suspense-with-csr-bailout`).
 
-> **Note**: Subdirectory-specific guidelines (React component patterns, SCSS style structure, App Router conventions, PR description generation skill, and GitHub Actions workflows) are maintained directly within their respective modular `AGENTS.md` files:
-> - [.agents/skills/generate-pr/SKILL.md](file:///.agents/skills/generate-pr/SKILL.md)
-> - [.github/AGENTS.md](file:///.github/AGENTS.md)
-> - [app/AGENTS.md](file:///app/AGENTS.md)
-> - [app/api-requests/AGENTS.md](file:///app/api-requests/AGENTS.md)
-> - [app/components/AGENTS.md](file:///app/components/AGENTS.md)
-> - [app/pokemons/AGENTS.md](file:///app/pokemons/AGENTS.md)
-> - [app/styles/AGENTS.md](file:///app/styles/AGENTS.md)
-> - [tests/AGENTS.md](file:///tests/AGENTS.md)
+> **Note**: Subdirectory-specific guidelines (React component patterns, SCSS style structure, App Router conventions, PR description generation skill, and GitHub Actions workflows) are maintained directly within their respective modular files:
+> - [.agents/skills/browser-automation-test/SKILL.md](.agents/skills/browser-automation-test/SKILL.md)
+> - [.agents/skills/generate-pr/SKILL.md](.agents/skills/generate-pr/SKILL.md)
+> - [.github/AGENTS.md](.github/AGENTS.md)
+> - [app/AGENTS.md](app/AGENTS.md)
+> - [app/api-requests/AGENTS.md](app/api-requests/AGENTS.md)
+> - [app/components/AGENTS.md](app/components/AGENTS.md)
+> - [app/pokemons/AGENTS.md](app/pokemons/AGENTS.md)
+> - [app/styles/AGENTS.md](app/styles/AGENTS.md)
+> - [tests/AGENTS.md](tests/AGENTS.md)
