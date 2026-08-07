@@ -119,3 +119,22 @@
     }
   }
 }
+
+.pokeapi-shoutout {
+  font-size: 0.95rem;
+  color: $text-muted;
+  margin-top: 1rem;
+  margin-bottom: 0;
+
+  a {
+    text-decoration: none;
+    font-weight: 600;
+    color: #ffcb05; /* Pokemon Yellow */
+    transition: color 0.2s ease, text-shadow 0.2s ease;
+    
+    &:hover {
+      color: #ffd733;
+      text-shadow: 0 0 8px rgba(255, 203, 5, 0.4);
+    }
+  }
+}

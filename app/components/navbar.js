@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
+import GlobalSearch from './global-search';
 
 const NAV_ITEMS = [
     { label: 'Pokedex', path: '/pokemons' },
@@ -29,7 +30,7 @@ export default function Navbar() {
     // Close menu on resize to desktop view
     useEffect(() => {
         const handleResize = () => {
-            if (window.innerWidth > 920) {
+            if (window.innerWidth > 960) {
                 closeMenu();
             }
         };
@@ -48,7 +49,7 @@ export default function Navbar() {
         <header className="pokedex-header">
             {/* Logo */}
             <Link href="/" id="nav-logo-link" onClick={closeMenu}>
-                <div className="pokedex-logo">POKEDEXTER</div>
+                <div className="pokedex-logo">PokeDexter</div>
             </Link>
 
             {/* Desktop Navigation */}
@@ -64,6 +65,10 @@ export default function Navbar() {
                     </Link>
                 ))}
             </nav>
+
+            <div className="header-search">
+                <GlobalSearch onNavigate={closeMenu} />
+            </div>
 
             {/* Hamburger Button */}
             <button

@@ -31,7 +31,7 @@ const mockVarietyList = [
 
 describe('PokemonDetailView Component', () => {
     test('renders pokemon information correctly', () => {
-        const { getByText, getByAltText } = render(
+        const { getByText, getByAltText, getAllByText } = render(
             <PokemonDetailView 
                 speciesInfo={mockSpeciesInfo} 
                 varietyList={mockVarietyList}
@@ -42,7 +42,7 @@ describe('PokemonDetailView Component', () => {
         );
 
         // Basic Info
-        expect(getByText('bulbasaur')).toBeInTheDocument();
+        expect(getAllByText('bulbasaur').length).toBeGreaterThan(0);
         expect(getByText('#0001')).toBeInTheDocument();
         expect(getByAltText('bulbasaur')).toBeInTheDocument();
         
@@ -54,8 +54,8 @@ describe('PokemonDetailView Component', () => {
         expect(getByText('overgrow')).toBeInTheDocument();
     });
 
-    test('toggles collapsed sections', () => {
-        const { getByText, queryByText } = render(
+    test('renders pokedex entry always visible (non-collapsible) and toggles titled sections', () => {
+        const { getByText } = render(
             <PokemonDetailView 
                 speciesInfo={mockSpeciesInfo} 
                 varietyList={mockVarietyList}
@@ -64,14 +64,48 @@ describe('PokemonDetailView Component', () => {
             />
         );
 
+        // Pokédex entry is always visible (no title = no collapse per AGENTS.md rule)
         expect(getByText('"Test entry."')).toBeInTheDocument();
         
-        // Click to collapse
-        fireEvent.click(getByText('Pokédex Entry'));
-        expect(queryByText('"Test entry."')).not.toBeInTheDocument();
+        // Base Stats panel has a title and is collapsible
+        expect(getByText('Base Stats')).toBeInTheDocument();
+        fireEvent.click(getByText('Base Stats'));
+        // Collapsed - stat content should be hidden but title remains
+        expect(getByText('Base Stats')).toBeInTheDocument();
         
         // Click to expand again
-        fireEvent.click(getByText('Pokédex Entry'));
-        expect(getByText('"Test entry."')).toBeInTheDocument();
+        fireEvent.click(getByText('Base Stats'));
+        expect(getByText('Base Stats')).toBeInTheDocument();
+    });
+
+    test('renders evolution chain correctly', () => {
+        const mockEvolutionChain = {
+            chain: {
+                species: { name: 'bulbasaur', url: 'https://pokeapi.co/api/v2/pokemon-species/1/' },
+                evolves_to: [
+                    {
+                        species: { name: 'ivysaur', url: 'https://pokeapi.co/api/v2/pokemon-species/2/' },
+                        evolution_details: [{ trigger: { name: 'level-up' }, min_level: 16 }],
+                        evolves_to: []
+                    }
+                ]
+            }
+        };
+
+        const { getByText, queryByText, getAllByText } = render(
+            <PokemonDetailView 
+                speciesInfo={mockSpeciesInfo} 
+                varietyList={mockVarietyList}
+                evolutionChainData={mockEvolutionChain}
+            />
+        );
+
+        expect(getByText('Evolution Chain')).toBeInTheDocument();
+        expect(getAllByText('bulbasaur').length).toBeGreaterThan(0);
+        expect(getByText('ivysaur')).toBeInTheDocument();
+
+        // Collapse chain
+        fireEvent.click(getByText('Evolution Chain'));
+        expect(queryByText('ivysaur')).not.toBeInTheDocument();
     });
 });

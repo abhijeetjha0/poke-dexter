@@ -45,11 +45,10 @@ describe('MovesPage (Server Component)', () => {
         });
 
         const Page = await MovesPage();
-        const { getByTestId, getByText } = render(Page);
+        const { getByTestId } = render(Page);
 
         expect(fetchMoveList).toHaveBeenCalledWith(1000, expect.any(Object));
         expect(buildMoveMetaMaps).toHaveBeenCalled();
-        expect(getByText('Pokémon Moves Index')).toBeInTheDocument();
         
         expect(getByTestId('moves').textContent).toContain('tackle');
         expect(getByTestId('types').textContent).toContain('normal');

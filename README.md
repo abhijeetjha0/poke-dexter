@@ -9,7 +9,7 @@
 [![Deploy Status](https://github.com/abhijeetjha0/poke-dexter/actions/workflows/deploy.yml/badge.svg)](https://github.com/abhijeetjha0/poke-dexter/actions/workflows/deploy.yml)
 [![Code Coverage](https://abhijeetjha0.github.io/poke-dexter/coverage/badge.svg)](https://abhijeetjha0.github.io/poke-dexter/coverage/)
 
-PokeDexter is a feature-rich, cross-platform Pokémon information application. It is built using **Next.js**, **React**, and **SCSS**, featuring a glassmorphic design, centralized API architecture, unit test coverage, and complete mobile responsiveness.
+PokeDexter is a feature-rich, cross-platform Pokémon information application. It is built using **Next.js**, **React**, and **SCSS**, featuring a glassmorphic design, centralized API architecture, unit test coverage, and complete mobile responsiveness. Special thanks and shout out to the amazing [PokéAPI](https://pokeapi.co/) for powering this app!
 
 > **Collaborators**: [Abhijit Kumar Jha](https://github.com/abhijeetjha0) and [Kanishk Tanwar](https://github.com/kanishktanwar).
 
@@ -47,16 +47,16 @@ PokeDexter is a feature-rich, cross-platform Pokémon information application. I
 
 The project utilizes the **Next.js App Router** with file-system-based routing. All route paths correspond directly to folders inside the `/app` directory:
 
-*   **API Layer (`app/api-requests`)**: [app/api-requests/index.js](file:///Users/abhijit/Documents/Projects/Learning/React/poke-dexter/app/api-requests/index.js) - Centralized PokéAPI network request module.
-*   **Home (`/`)**: [app/page.js](file:///Users/abhijit/Documents/Projects/Learning/React/poke-dexter/app/page.js) - Landing page introducing PokeDexter.
-*   **Directory (`/pokemons`)**: [app/pokemons/page.js](file:///Users/abhijit/Documents/Projects/Learning/React/poke-dexter/app/pokemons/page.js) - Paginated directory of all Pokémon.
-*   **Pokémon Details (`/pokemons/[name]`)**: [app/pokemons/[name]/page.js](file:///Users/abhijit/Documents/Projects/Learning/React/poke-dexter/app/pokemons/[name]/page.js) - Dynamic profile page for each Pokémon.
-*   **Abilities Directory (`/abilities`)**: [app/abilities/page.js](file:///Users/abhijit/Documents/Projects/Learning/React/poke-dexter/app/abilities/page.js) - Index list of abilities.
-*   **Ability Details (`/abilities/[name]`)**: [app/abilities/[name]/page.js](file:///Users/abhijit/Documents/Projects/Learning/React/poke-dexter/app/abilities/[name]/page.js) - Detailed view of Pokémon having a specific ability.
-*   **Moves Directory (`/moves`)**: [app/moves/page.js](file:///Users/abhijit/Documents/Projects/Learning/React/poke-dexter/app/moves/page.js) - Catalog of moves.
-*   **Move Details (`/moves/[name]`)**: [app/moves/[name]/page.js](file:///Users/abhijit/Documents/Projects/Learning/React/poke-dexter/app/moves/[name]/page.js) - List of Pokémon that can learn a specific move.
-*   **Generations Hub (`/generations`)**: [app/generations/page.js](file:///Users/abhijit/Documents/Projects/Learning/React/poke-dexter/app/generations/page.js) - Hub page for generation-specific Pokémon lists.
-*   **Types Hub (`/types`)**: [app/types/page.js](file:///Users/abhijit/Documents/Projects/Learning/React/poke-dexter/app/types/page.js) - Listing of Pokémon categorized by standard element types.
+*   **API Layer (`app/api-requests`)**: [app/api-requests/index.js](./app/api-requests/index.js) - Centralized PokéAPI network request module.
+*   **Home (`/`)**: [app/page.js](./app/page.js) - Landing page introducing PokeDexter.
+*   **Directory (`/pokemons`)**: [app/pokemons/page.js](./app/pokemons/page.js) - Paginated directory of all Pokémon.
+*   **Pokémon Details (`/pokemons/[name]`)**: [app/pokemons/[name]/page.js](./app/pokemons/%5Bname%5D/page.js) - Dynamic profile page for each Pokémon.
+*   **Abilities Directory (`/abilities`)**: [app/abilities/page.js](./app/abilities/page.js) - Index list of abilities.
+*   **Ability Details (`/abilities/[name]`)**: [app/abilities/[name]/page.js](./app/abilities/%5Bname%5D/page.js) - Detailed view of Pokémon having a specific ability.
+*   **Moves Directory (`/moves`)**: [app/moves/page.js](./app/moves/page.js) - Catalog of moves.
+*   **Move Details (`/moves/[name]`)**: [app/moves/[name]/page.js](./app/moves/%5Bname%5D/page.js) - List of Pokémon that can learn a specific move.
+*   **Generations Hub (`/generations`)**: [app/generations/page.js](./app/generations/page.js) - Hub page for generation-specific Pokémon lists.
+*   **Types Hub (`/types`)**: [app/types/page.js](./app/types/page.js) - Listing of Pokémon categorized by standard element types.
 
 ---
 

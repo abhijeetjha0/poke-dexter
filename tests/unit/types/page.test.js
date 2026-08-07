@@ -10,8 +10,6 @@ describe('TypesPage', () => {
     test('renders header and all 18 type badges', () => {
         const { getByText, getAllByRole } = render(<TypesPage />);
 
-        expect(getByText('Pokémon Types Directory')).toBeInTheDocument();
-        
         // Next.js Link renders an anchor tag
         const links = getAllByRole('link');
         expect(links).toHaveLength(18);

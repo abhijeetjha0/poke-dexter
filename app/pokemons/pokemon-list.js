@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useMemo, useEffect, useRef } from 'react';
+import { useState, useMemo, useEffect, useRef, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { fetchPokemonByIdOrName } from '../api-requests';
 import { limitConcurrency } from '../lib/promise-utils';
@@ -23,7 +23,23 @@ const INITIAL_LOAD_COUNT = 30;
 const LOAD_MORE_CHUNK = 30;
 
 export default function PokemonList(props) {
-    const { pokemonList, processedListProp, hideGenFilter } = props;
+    return (
+        <Suspense fallback={null}>
+            <PokemonListInner {...props} />
+        </Suspense>
+    );
+}
+
+function PokemonListInner(props) {
+    const { 
+        pokemonList, 
+        processedListProp, 
+        hideGenFilter, 
+        showAbilityType, 
+        hideSearch, 
+        sectionTitle, 
+        countBadge 
+    } = props;
     const router = useRouter();
     const searchParams = useSearchParams();
 
@@ -287,20 +303,18 @@ export default function PokemonList(props) {
         };
     }, [processedList]);
 
-    const renderSortHeader = (columnKey, label, width = null) => {
+    const renderSortHeader = (columnKey, label) => {
         const isActive = sortColumn === columnKey;
 
         return (
             <th 
                 onClick={() => handleSort(columnKey)} 
                 className={`sortable-header ${isActive ? 'active-sort' : ''}`}
-                // eslint-disable-next-line react/forbid-dom-props
-                style={width ? { width } : undefined}
             >
                 <div className="flex-center-gap-small">
                     {label}
-                    <span className="sort-icon">
-                        {isActive ? (sortDirection === 'asc' ? '▲' : '▼') : '⇅'}
+                    <span className="material-symbols-outlined sort-icon">
+                        {isActive ? (sortDirection === 'asc' ? 'arrow_drop_up' : 'arrow_drop_down') : 'unfold_more'}
                     </span>
                 </div>
             </th>
@@ -309,54 +323,96 @@ export default function PokemonList(props) {
 
     return (
         <div>
-            {/* Search Section */}
-            <div className="search-container">
-                <input
-                    type="text"
-                    className="search-input"
-                    placeholder="Search Pokemon by name or national ID..."
-                    value={searchTerm}
-                    onChange={(e) => setSearchTerm(e.target.value)}
-                    id="pokedex-search-bar"
-                />
-                <span className="search-icon">🔍</span>
-            </div>
-
-            {/* Generation Filters & View Toggle */}
-            <div className="filter-bar">
-                <div className="filter-tabs">
-                    {!hideGenFilter && GENERATIONS.map(gen => (
+            {/* Optional Section Title Header with View Toggle */}
+            {sectionTitle && (
+                <div className="flex-between-wrap mb-1">
+                    <h2 className="section-title">
+                        {sectionTitle}
+                        {countBadge !== undefined && <span className="catalog-count-badge">{countBadge}</span>}
+                    </h2>
+                    <div className="view-toggle-container">
                         <button
-                            key={gen.name}
-                            className={`tab-btn ${activeGen === gen.name ? 'active' : ''}`}
-                            onClick={() => handleGenChange(gen.name)}
+                            className={`view-toggle-btn ${viewMode === 'grid' ? 'active' : ''}`}
+                            onClick={() => handleViewModeChange('grid')}
+                            id="view-toggle-grid"
+                            title="Grid View"
+                            aria-label="Grid View"
                         >
-                            {gen.name}
+                            <span className="material-symbols-outlined toggle-icon">grid_view</span>
                         </button>
-                    ))}
+                        <button
+                            className={`view-toggle-btn ${viewMode === 'list' ? 'active' : ''}`}
+                            onClick={() => handleViewModeChange('list')}
+                            id="view-toggle-list"
+                            title="List View"
+                            aria-label="List View"
+                        >
+                            <span className="material-symbols-outlined toggle-icon">format_list_bulleted</span>
+                        </button>
+                    </div>
                 </div>
-                <div className="view-toggle-container">
-                    <button
-                        className={`view-toggle-btn ${viewMode === 'grid' ? 'active' : ''}`}
-                        onClick={() => handleViewModeChange('grid')}
-                        id="view-toggle-grid"
-                    >
-                        <span>田</span> Grid
-                    </button>
-                    <button
-                        className={`view-toggle-btn ${viewMode === 'list' ? 'active' : ''}`}
-                        onClick={() => handleViewModeChange('list')}
-                        id="view-toggle-list"
-                    >
-                        <span>☰</span> List
-                    </button>
+            )}
+
+            {/* Search Section & View Toggle (hidden if hideSearch is true) */}
+            {!hideSearch && (
+                <div className="search-bar-row">
+                    <div className="search-container">
+                        <input
+                            type="text"
+                            className="search-input"
+                            placeholder="Search Pokemon by name or national ID..."
+                            value={searchTerm}
+                            onChange={(e) => setSearchTerm(e.target.value)}
+                            id="pokedex-search-bar"
+                        />
+                        <span className="search-icon"><span className="material-symbols-outlined">search</span></span>
+                    </div>
+                    {!sectionTitle && (
+                        <div className="view-toggle-container">
+                            <button
+                                className={`view-toggle-btn ${viewMode === 'grid' ? 'active' : ''}`}
+                                onClick={() => handleViewModeChange('grid')}
+                                id="view-toggle-grid"
+                                title="Grid View"
+                                aria-label="Grid View"
+                            >
+                                <span className="material-symbols-outlined toggle-icon">grid_view</span>
+                            </button>
+                            <button
+                                className={`view-toggle-btn ${viewMode === 'list' ? 'active' : ''}`}
+                                onClick={() => handleViewModeChange('list')}
+                                id="view-toggle-list"
+                                title="List View"
+                                aria-label="List View"
+                            >
+                                <span className="material-symbols-outlined toggle-icon">format_list_bulleted</span>
+                            </button>
+                        </div>
+                    )}
                 </div>
-            </div>
+            )}
+
+            {/* Generation Filters */}
+            {!hideGenFilter && (
+                <div className="filter-bar">
+                    <div className="filter-tabs">
+                        {GENERATIONS.map(gen => (
+                            <button
+                                key={gen.name}
+                                className={`tab-btn ${activeGen === gen.name ? 'active' : ''}`}
+                                onClick={() => handleGenChange(gen.name)}
+                            >
+                                {gen.name}
+                            </button>
+                        ))}
+                    </div>
+                </div>
+            )}
 
             {/* Pokemon Grid or Tabular List */}
-            {visibleList.length > 0 ? (
+            {visibleList.length ? (
                 viewMode === 'grid' ? (
-                    <PokemonGrid pokemonList={visibleList} />
+                    <PokemonGrid pokemonList={visibleList} showAbilityType={showAbilityType} />
                 ) : (
                     <div className="pokedex-table-wrapper glass-panel">
                         <table className="pokedex-table">

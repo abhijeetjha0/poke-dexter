@@ -21,3 +21,6 @@ This document specifies rules and architecture for the main Pokédex features un
 
 3. **Shared UI Components**:
    - Always reuse common components to render views. Do not duplicate logic.
+
+4. **Flat Recursion for Evolution Trees**:
+   - When rendering recursive Pokémon evolution chains, iterate directly over `child.evolves_to` for child nodes rather than recursively invoking `renderEvolutionNode(child)` to avoid duplicate rendering of intermediate evolution nodes (e.g. Ivysaur).

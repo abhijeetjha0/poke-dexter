@@ -73,11 +73,11 @@ describe('MovesList Component', () => {
     });
 
     test('toggles view mode', () => {
-        const { getByText, container } = render(
+        const { container } = render(
             <MovesList initialMoves={mockMoves} moveTypeMap={{}} />
         );
 
-        const listBtn = getByText('List');
+        const listBtn = container.querySelector('#view-toggle-list');
         fireEvent.click(listBtn);
         
         // Ensure the list container has the list view class

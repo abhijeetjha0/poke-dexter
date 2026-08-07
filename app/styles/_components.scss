@@ -32,11 +32,11 @@
 }
 
 .btn-active {
-  background: var(--accent-cyan) !important;
-  color: #000 !important;
+  background: $accent-cyan !important;
+  color: #080a10 !important;
   font-weight: 800 !important;
-  border-color: var(--accent-cyan) !important;
-  min-width: 2.5rem;
+  border-color: $accent-cyan !important;
+  box-shadow: 0 0 10px rgba(6, 182, 212, 0.4) !important;
 }
 
 .btn-primary {
@@ -80,7 +80,7 @@
 }
 
 .badge-cyan {
-  background: var(--accent-cyan);
+  background: $accent-cyan;
   font-size: 0.8rem;
   padding: 0.2rem 0.8rem;
   border-radius: 15px;
@@ -145,6 +145,35 @@
 }
 
 /* Type Page Typography */
+.inline-type-header-badge {
+  margin-right: 0.5rem;
+  text-transform: capitalize;
+  font-size: 0.95rem;
+  padding: 0.25rem 0.75rem;
+}
+
+.type-detail-header-card {
+  padding: 0.75rem 1.25rem !important;
+  margin-bottom: 1.25rem !important;
+}
+
+.type-info-inline-text {
+  margin: 0;
+  font-size: 0.95rem;
+  line-height: 1.5;
+  color: $text-main;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.type-inline-title {
+  font-size: 1.1rem;
+  font-weight: 800;
+  text-transform: capitalize;
+  color: var(--accent-color, $accent-cyan);
+}
+
 .type-header-title {
   font-size: 2.5rem;
   font-weight: 800;
@@ -174,31 +203,51 @@
 .mt-2 { margin-top: 2rem !important; }
 
 /* Ability Page Styles */
-.ability-header-title {
-  font-size: 2.5rem;
-  font-weight: 800;
-  text-transform: capitalize;
-  margin-top: 0.5rem;
-  margin-bottom: 1rem;
+.ability-detail-header-card {
+  padding: 0.75rem 1.25rem !important;
+  margin-bottom: 1.25rem !important;
 }
 
-.ability-description-box {
+.ability-info-inline-text {
+  margin: 0;
+  font-size: 0.95rem;
+  line-height: 1.5;
+  color: $text-main;
+}
+
+.ability-inline-title {
   font-size: 1.1rem;
-  line-height: 1.6;
-  background: rgba(255, 255, 255, 0.02);
-  padding: 1rem;
-  border-radius: 8px;
-  border-left: 3px solid var(--accent-cyan);
+  font-weight: 800;
+  text-transform: capitalize;
+  color: $accent-cyan;
+  margin-right: 0.25rem;
 }
 
 .section-title {
-  font-size: 1.5rem;
+  font-size: 1.3rem;
   font-weight: 700;
+  display: flex;
+  align-items: center;
+}
+
+.catalog-count-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(6, 182, 212, 0.15);
+  color: var(--accent-cyan);
+  border: 1px solid rgba(6, 182, 212, 0.3);
+  font-size: 0.8rem;
+  font-weight: 700;
+  padding: 0.15rem 0.5rem;
+  border-radius: 6px;
+  margin-left: 0.5rem;
+  font-family: var(--font-digital);
 }
 
 .catalog-count-small {
   font-family: var(--font-digital);
-  font-size: 1.2rem;
+  font-size: 0.9rem;
   color: var(--accent-cyan);
 }
 
@@ -228,6 +277,46 @@
 }
 
 /* Move Page Styles */
+.move-detail-header-card {
+  padding: 0.75rem 1.25rem !important;
+  margin-bottom: 1.25rem !important;
+}
+
+.move-info-inline-container {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.5rem 0.65rem;
+  font-size: 0.95rem;
+  line-height: 1.5;
+  color: $text-main;
+}
+
+.move-inline-title {
+  font-size: 1.1rem;
+  font-weight: 800;
+  text-transform: capitalize;
+  color: var(--accent-color, $accent-cyan);
+}
+
+.move-inline-stat {
+  font-size: 0.85rem;
+  color: $text-muted;
+  background: rgba(255, 255, 255, 0.03);
+  padding: 0.15rem 0.5rem;
+  border-radius: 4px;
+  border: 1px solid rgba(255, 255, 255, 0.05);
+
+  strong {
+    color: $text-main;
+  }
+}
+
+.move-inline-desc {
+  font-size: 0.9rem;
+  color: $text-muted;
+}
+
 .move-header-title {
   font-size: 2.5rem;
   font-weight: 800;
@@ -325,7 +414,31 @@
 .filter-tabs {
   display: flex;
   flex-wrap: wrap;
-  gap: 0.5rem;
+  gap: 0.35rem;
+
+  .tab-btn {
+    padding: 0.3rem 0.65rem;
+    font-size: 0.8rem;
+    font-weight: 600;
+    border-radius: 6px;
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    color: $text-muted;
+    transition: all 0.2s ease;
+    cursor: pointer;
+
+    &:hover {
+      background: rgba(255, 255, 255, 0.08);
+      color: $text-main;
+    }
+
+    &.active {
+      background: rgba(6, 182, 212, 0.15);
+      border-color: $accent-cyan;
+      color: $accent-cyan;
+      font-weight: 700;
+    }
+  }
 }
 
 /* Common table / list utilities */
@@ -470,10 +583,27 @@
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
+  font-size: 1.1em;
+
+  &.damage-class-physical {
+    color: #e64a19;
+  }
+
+  &.damage-class-special {
+    color: #1565c0;
+  }
+
+  &.damage-class-status {
+    color: #9e9e9e;
+  }
 }
 
 .gap-15 {
   gap: 1.5rem !important;
+}
+
+.ml-auto {
+  margin-left: auto !important;
 }
 
 .text-muted-cap {
@@ -487,4 +617,163 @@
   text-transform: capitalize;
   font-size: 1.1rem;
   color: var(--text-main);
+}
+
+/* Global Search */
+.header-search {
+  display: flex;
+  align-items: center;
+  margin-left: auto;
+}
+
+.search-icon-btn {
+  background: transparent;
+  border: none;
+  font-size: 1.25rem;
+  color: var(--text-main);
+  cursor: pointer;
+  padding: 0.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform 0.2s ease, opacity 0.2s ease;
+  opacity: 0.8;
+
+  &:hover {
+    opacity: 1;
+    transform: scale(1.1);
+  }
+}
+
+.global-search-container {
+  position: relative;
+  z-index: 100;
+
+  &.expanded {
+    width: 300px;
+    
+    @media (max-width: 600px) {
+      width: 200px;
+    }
+    @media (max-width: 350px) {
+      width: 150px;
+    }
+  }
+}
+
+.global-search-input-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.search-icon {
+  position: absolute;
+  left: 0.75rem;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 2;
+  pointer-events: none;
+  color: rgba(255, 255, 255, 0.7);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.search-svg-icon {
+  width: 16px;
+  height: 16px;
+  stroke: currentColor;
+}
+
+.global-search-input {
+  width: 100%;
+  background: rgba(0, 0, 0, 0.25);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 20px;
+  padding: 0.5rem 1rem 0.5rem 2.25rem;
+  color: #fff;
+  font-family: inherit;
+  font-size: 0.9rem;
+  transition: all 0.2s ease;
+  backdrop-filter: blur(8px);
+
+  &:focus {
+    outline: none;
+    background: rgba(0, 0, 0, 0.4);
+    border-color: var(--accent-cyan);
+    box-shadow: 0 0 10px rgba(6, 182, 212, 0.3);
+  }
+
+  &::placeholder {
+    color: rgba(255, 255, 255, 0.4);
+  }
+}
+
+.global-search-dropdown {
+  position: absolute;
+  top: calc(100% + 0.5rem);
+  left: 0;
+  width: 100%;
+  min-width: 250px;
+  background: rgba(13, 17, 28, 0.95);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 8px;
+  backdrop-filter: blur(12px);
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
+  overflow: hidden;
+}
+
+.global-search-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.global-search-item {
+  padding: 0.75rem 1rem;
+  cursor: pointer;
+  transition: background 0.15s ease;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+
+  &:last-child {
+    border-bottom: none;
+  }
+
+  &:hover, &.selected {
+    background: rgba(255, 255, 255, 0.08);
+  }
+}
+
+.item-details {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.item-name {
+  font-weight: 600;
+  text-transform: capitalize;
+  color: #fff;
+  font-size: 0.9rem;
+}
+
+.item-badge {
+  font-size: 0.65rem;
+  text-transform: uppercase;
+  padding: 0.15rem 0.4rem;
+  border-radius: 4px;
+  font-weight: 700;
+
+  &.badge-pokemon { background: rgba(59, 130, 246, 0.2); color: #60a5fa; }
+  &.badge-ability { background: rgba(16, 185, 129, 0.2); color: #34d399; }
+  &.badge-move { background: rgba(239, 68, 68, 0.2); color: #f87171; }
+}
+
+.no-results {
+  padding: 1rem;
+  text-align: center;
+  color: var(--text-muted);
+  font-size: 0.9rem;
+  font-style: italic;
 }

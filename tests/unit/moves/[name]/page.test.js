@@ -8,9 +8,9 @@ jest.mock('../../../../app/api-requests', () => ({
     fetchMoveList: jest.fn()
 }));
 
-jest.mock('../../../../app/components/pokemon-grid', () => {
-    return function MockPokemonGrid({ pokemonList }) {
-        return <div data-testid="pokemon-grid">{pokemonList.length}</div>;
+jest.mock('../../../../app/pokemons/pokemon-list', () => {
+    return function MockPokemonList({ processedListProp }) {
+        return <div data-testid="pokemon-grid">{processedListProp.length}</div>;
     };
 });
 
@@ -40,8 +40,8 @@ describe('MoveDetailPage (Server Component)', () => {
         const { getByText, getByTestId } = render(Page);
 
         expect(fetchMoveByNameOrId).toHaveBeenCalledWith('tackle');
-        expect(getByText('tackle')).toBeInTheDocument();
-        expect(getByText('Damages target.')).toBeInTheDocument();
+        expect(getByText('tackle:')).toBeInTheDocument();
+        expect(getByText(/Damages target/)).toBeInTheDocument();
         expect(getByText('40')).toBeInTheDocument();
         expect(getByText('100%')).toBeInTheDocument();
         expect(getByTestId('pokemon-grid')).toHaveTextContent('1');

@@ -28,11 +28,18 @@ export default function AbilitiesList({ initialAbilities }) {
                     onChange={(e) => setSearchTerm(e.target.value)}
                     id="abilities-search-bar"
                 />
-                <span className="search-icon">🔍</span>
+                <span className="search-icon"><span className="material-symbols-outlined">search</span></span>
+            </div>
+
+            {/* Results Count */}
+            <div className="list-controls-bar">
+                <div className="list-stats">
+                    <span>{filteredAbilities.length} abilities found</span>
+                </div>
             </div>
 
             {/* List */}
-            {filteredAbilities.length > 0 ? (
+            {filteredAbilities.length ? (
                 <div className="abilities-grid">
                     {filteredAbilities.map(ability => (
                         <Link href={`/abilities/${ability.name}`} key={ability.name}>

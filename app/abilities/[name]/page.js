@@ -1,5 +1,5 @@
 import Link from 'next/link';
-import PokemonGrid from '../../components/pokemon-grid';
+import PokemonList from '../../pokemons/pokemon-list';
 import { fetchAbilityByNameOrId, fetchPokemonByUrl, fetchAbilityList } from '../../api-requests';
 import { generateCommonStaticParams } from '../../lib/static-params-util';
 import { limitConcurrency } from '../../lib/promise-utils';
@@ -10,6 +10,7 @@ export default async function AbilityDetailPage({ params }) {
 
     // Fetch ability details
     const response = await fetchAbilityByNameOrId(abilityName);
+
     if (!response.ok) {
         return (
             <div className="glass-panel text-center-padded">
@@ -41,6 +42,7 @@ export default async function AbilityDetailPage({ params }) {
         if (id >= 10000) {
             try {
                 const res = await fetchPokemonByUrl(pokemon.url);
+
                 if (res.ok) {
                     const pokemonData = await res.json();
                     speciesName = pokemonData.species.name;
@@ -65,42 +67,24 @@ export default async function AbilityDetailPage({ params }) {
 
     return (
         <div>
-            {/* Back Buttons */}
-            <div className="flex-gap-1 mb-1">
-                <Link href="/abilities" className="btn" id="ability-back-btn">
-                    ← Back to Abilities Index
-                </Link>
-                <Link href="/pokemons" className="btn" id="ability-home-btn">
-                    PokeDex Directory
-                </Link>
-            </div>
-
-            {/* Header / Info Panel */}
-            <div className="glass-panel mb-2" id="ability-info-panel">
-                <span className="type-badge badge-cyan">
-                    Ability Profile
-                </span>
-                <h1 className="ability-header-title">
-                    {abilityJSON.name.replace('-', ' ')}
-                </h1>
-                <p className="ability-description-box">
-                    {descriptionText}
+            {/* Header / Info Panel (Inline Compact) */}
+            <div className="glass-panel ability-detail-header-card mb-2" id="ability-info-panel">
+                <p className="ability-info-inline-text">
+                    <strong className="ability-inline-title">{abilityJSON.name.replace('-', ' ')}:</strong>{' '}
+                    <span>{descriptionText}</span>
                 </p>
             </div>
 
-            {/* Pokémon List Header */}
-            <div className="flex-between-wrap mb-1">
-                <h2 className="section-title">
-                    Pokémon with this Ability
-                </h2>
-                <div className="catalog-count-small">
-                    {processedPokemon.length} Species Found
-                </div>
-            </div>
-
-            {/* Pokémon Grid */}
-            {processedPokemon.length > 0 ? (
-                <PokemonGrid pokemonList={processedPokemon} showAbilityType={true} />
+            {/* Pokémon List with Section Header + Count Badge + Grid/List Switcher (No Search) */}
+            {processedPokemon.length ? (
+                <PokemonList
+                    processedListProp={processedPokemon}
+                    hideGenFilter={true}
+                    hideSearch={true}
+                    showAbilityType={true}
+                    sectionTitle="Pokémon with this Ability"
+                    countBadge={processedPokemon.length}
+                />
             ) : (
                 <div className="glass-panel no-results">
                     <h3>No Pokémon can learn this ability.</h3>

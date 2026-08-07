@@ -113,3 +113,12 @@ export async function fetchAbilityByNameOrId(abilityName, options) {
 export async function fetchAbilityList(limit = 500, options) {
     return fetch(`${BASE_URL}/ability?limit=${limit}`, options);
 }
+
+/**
+ * Fetches the evolution chain data using its exact URL.
+ * @param {string} url
+ * @param {RequestInit} [options]
+ */
+export async function fetchEvolutionChainByUrl(url, options) {
+    return fetch(url, options);
+}
