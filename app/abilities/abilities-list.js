@@ -2,58 +2,96 @@
 
 import { useState, useMemo } from 'react';
 import Link from 'next/link';
+import { Container, Row, Col, Form, InputGroup, Card, Alert } from 'react-bootstrap';
+import CountBadge from '../components/count-badge';
+import AppPagination from '../components/app-pagination';
+
+const ABILITIES_PER_PAGE = 50;
 
 export default function AbilitiesList({ initialAbilities }) {
     const [searchTerm, setSearchTerm] = useState('');
+    const [currentPage, setCurrentPage] = useState(1);
 
     const filteredAbilities = useMemo(() => {
         const lowerCaseSearchTerm = searchTerm.toLowerCase();
 
         return initialAbilities
-            .filter(ability => 
+            .filter((ability) =>
                 ability.name.toLowerCase().includes(lowerCaseSearchTerm)
             )
             .sort((abilityA, abilityB) => abilityA.name.localeCompare(abilityB.name));
     }, [initialAbilities, searchTerm]);
 
-    return (
-        <div>
-            {/* Search Input */}
-            <div className="search-container">
-                <input
-                    type="text"
-                    className="search-input"
-                    placeholder="Search abilities (e.g., Levitate, Intimidate)..."
-                    value={searchTerm}
-                    onChange={(e) => setSearchTerm(e.target.value)}
-                    id="abilities-search-bar"
-                />
-                <span className="search-icon"><span className="material-symbols-outlined">search</span></span>
-            </div>
+    const totalPages = Math.ceil(filteredAbilities.length / ABILITIES_PER_PAGE);
+    const safeCurrentPage = Math.min(currentPage, totalPages || 1);
+    const paginatedAbilities = filteredAbilities.slice(
+        (safeCurrentPage - 1) * ABILITIES_PER_PAGE,
+        safeCurrentPage * ABILITIES_PER_PAGE
+    );
 
-            {/* Results Count */}
-            <div className="list-controls-bar">
-                <div className="list-stats">
-                    <span>{filteredAbilities.length} abilities found</span>
-                </div>
-            </div>
+    const handleSearchChange = (e) => {
+        const { value } = e.target;
+        setSearchTerm(value);
+        setCurrentPage(1);
+    };
+
+    return (
+        <Container fluid className="p-0">
+            {/* Search Input & Results Count */}
+            <Row className="mb-4 align-items-center g-3">
+                <Col className="flex-grow-1">
+                    <InputGroup>
+                        <Form.Control
+                            type="text"
+                            placeholder="Search abilities (e.g., Levitate, Intimidate)..."
+                            value={searchTerm}
+                            onChange={handleSearchChange}
+                            id="abilities-search-bar"
+                            className="bg-dark text-light border-secondary shadow-none"
+                        />
+                        <InputGroup.Text className="bg-dark border-secondary text-light">
+                            <span className="material-symbols-outlined fs-5">search</span>
+                        </InputGroup.Text>
+                    </InputGroup>
+                </Col>
+                <Col xs="auto">
+                    <CountBadge count={filteredAbilities.length} className="fs-6 px-3 py-1" />
+                </Col>
+            </Row>
 
             {/* List */}
-            {filteredAbilities.length ? (
-                <div className="abilities-grid">
-                    {filteredAbilities.map(ability => (
-                        <Link href={`/abilities/${ability.name}`} key={ability.name}>
-                            <div className="glass-panel ability-link-card ability-card">
-                                {ability.name.replace('-', ' ')}
-                            </div>
-                        </Link>
+            {paginatedAbilities.length ? (
+                <Row className="g-3">
+                    {paginatedAbilities.map((ability) => (
+                        <Col xs={6} md={4} lg={3} xl={2} key={ability.name}>
+                            <Card
+                                as={Link}
+                                href={`/abilities/${ability.name}`}
+                                bg="dark"
+                                border="secondary"
+                                className="h-100 text-decoration-none hover-primary transition-all text-center cursor-pointer"
+                            >
+                                <Card.Body className="d-flex align-items-center justify-content-center p-3">
+                                    <h6 className="text-capitalize text-light mb-0 fw-bold">
+                                        {ability.name.replace(/-/g, ' ')}
+                                    </h6>
+                                </Card.Body>
+                            </Card>
+                        </Col>
                     ))}
-                </div>
+                </Row>
             ) : (
-                <div className="glass-panel no-results">
-                    <h3>No abilities found matching your search.</h3>
-                </div>
+                <Alert variant="secondary" className="text-center p-5 border-secondary bg-dark text-light">
+                    <h4 className="mb-0">No abilities found matching your search.</h4>
+                </Alert>
             )}
-        </div>
+
+            {/* Pagination Controls */}
+            <AppPagination
+                currentPage={safeCurrentPage}
+                totalPages={totalPages}
+                onPageChange={setCurrentPage}
+            />
+        </Container>
     );
 }

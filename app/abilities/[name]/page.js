@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import { Container } from 'react-bootstrap';
 import PokemonList from '../../pokemons/pokemon-list';
 import { fetchAbilityByNameOrId, fetchPokemonByUrl, fetchAbilityList } from '../../api-requests';
 import { generateCommonStaticParams } from '../../lib/static-params-util';
@@ -13,20 +14,22 @@ export default async function AbilityDetailPage({ params }) {
 
     if (!response.ok) {
         return (
-            <div className="glass-panel text-center-padded">
-                <h2>Ability "{abilityName}" not found.</h2>
-                <Link href="/abilities" className="btn mt-1">
-                    Back to Abilities Index
-                </Link>
-            </div>
+            <Container fluid className="py-5 text-center">
+                <div className="alert alert-secondary bg-dark text-light border-secondary">
+                    <h4 className="mb-3">Ability "{abilityName}" not found.</h4>
+                    <Link href="/abilities" className="btn btn-primary">
+                        Back to Abilities Index
+                    </Link>
+                </div>
+            </Container>
         );
     }
 
     const abilityJSON = await response.json();
-    
+
     // Find English description
     const effectEntry = abilityJSON.effect_entries?.find(entry => entry.language?.name === 'en') ||
-                        abilityJSON.flavor_text_entries?.find(entry => entry.language?.name === 'en');
+        abilityJSON.flavor_text_entries?.find(entry => entry.language?.name === 'en');
     const descriptionText = effectEntry ? (effectEntry.effect || effectEntry.flavor_text) : 'No description available in English.';
 
     const pokemonList = abilityJSON.pokemon || [];
@@ -35,10 +38,10 @@ export default async function AbilityDetailPage({ params }) {
     const processedPokemon = await limitConcurrency(pokemonList, 10, async ({ pokemon, is_hidden }) => {
         const parts = pokemon.url.split('/').filter(Boolean);
         const id = parseInt(parts[parts.length - 1], 10);
-        
+
         let speciesId = id;
         let speciesName = pokemon.name;
-        
+
         if (id >= 10000) {
             try {
                 const res = await fetchPokemonByUrl(pokemon.url);
@@ -66,13 +69,15 @@ export default async function AbilityDetailPage({ params }) {
     });
 
     return (
-        <div>
+        <Container fluid className="p-0">
             {/* Header / Info Panel (Inline Compact) */}
-            <div className="glass-panel ability-detail-header-card mb-2" id="ability-info-panel">
-                <p className="ability-info-inline-text">
-                    <strong className="ability-inline-title">{abilityJSON.name.replace('-', ' ')}:</strong>{' '}
-                    <span>{descriptionText}</span>
-                </p>
+            <div className="card bg-dark border-secondary mb-4 text-light">
+                <div className="card-body">
+                    <p className="mb-0 fs-5">
+                        <strong className="text-capitalize text-info">{abilityJSON.name.replace(/-/g, ' ')}:</strong>{' '}
+                        <span className="text-light">{descriptionText}</span>
+                    </p>
+                </div>
             </div>
 
             {/* Pokémon List with Section Header + Count Badge + Grid/List Switcher (No Search) */}
@@ -86,11 +91,11 @@ export default async function AbilityDetailPage({ params }) {
                     countBadge={processedPokemon.length}
                 />
             ) : (
-                <div className="glass-panel no-results">
-                    <h3>No Pokémon can learn this ability.</h3>
+                <div className="alert alert-secondary text-center p-5 bg-dark text-light border-secondary">
+                    <h4 className="mb-0">No Pokémon can learn this ability.</h4>
                 </div>
             )}
-        </div>
+        </Container>
     );
 }
 

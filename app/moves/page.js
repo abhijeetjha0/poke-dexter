@@ -23,7 +23,7 @@ export default async function MovesPage() {
     const moves = responseJSON.results || [];
 
     return (
-        <div className="moves-container">
+        <div>
             {/* List with client-side search and pagination */}
             <MovesList initialMoves={moves} moveTypeMap={moveTypeMap} moveDamageClassMap={moveDamageClassMap} />
         </div>

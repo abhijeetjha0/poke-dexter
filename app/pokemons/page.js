@@ -10,7 +10,7 @@ export default async function Page() {
     const responseJSON = await response.json();
 
     return (
-        <Suspense fallback={<div className="no-results"><h3>Loading PokeDex Directory...</h3></div>}>
+        <Suspense fallback={<div className="text-center p-5 text-muted"><h3>Loading PokeDex Directory...</h3></div>}>
             <PokemonList pokemonList={responseJSON.results}/>
         </Suspense>
     );

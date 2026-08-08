@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
+import { Container, Row, Col, Card, Button, ButtonGroup, ListGroup, Badge } from 'react-bootstrap';
 
 const GENERATIONS = [
     { id: 1, roman: 'Generation I', region: 'Kanto', range: '#0001 - #0151', count: 151, class: 'gen-1', mascotId: 6 }, // Charizard
@@ -33,86 +34,108 @@ export default function GenerationsClient() {
     };
 
     return (
-        <div className="generations-container">
-            <div className="flex-between-wrap gap-15 mb-15">
-                <div className="view-toggle-container ml-auto">
-                    <button
-                        className={`view-toggle-btn ${viewMode === 'grid' ? 'active' : ''}`}
+        <Container fluid className="p-0">
+            <div className="d-flex justify-content-end mb-4">
+                <ButtonGroup>
+                    <Button
+                        variant={viewMode === 'grid' ? 'secondary' : 'outline-secondary'}
                         onClick={() => handleViewModeChange('grid')}
                         id="view-toggle-grid"
                         title="Grid View"
                         aria-label="Grid View"
+                        className="d-flex align-items-center justify-content-center p-2"
                     >
-                        <span className="material-symbols-outlined toggle-icon">grid_view</span>
-                    </button>
-                    <button
-                        className={`view-toggle-btn ${viewMode === 'list' ? 'active' : ''}`}
+                        <span className="material-symbols-outlined fs-5">grid_view</span>
+                    </Button>
+                    <Button
+                        variant={viewMode === 'list' ? 'secondary' : 'outline-secondary'}
                         onClick={() => handleViewModeChange('list')}
                         id="view-toggle-list"
                         title="List View"
                         aria-label="List View"
+                        className="d-flex align-items-center justify-content-center p-2"
                     >
-                        <span className="material-symbols-outlined toggle-icon">format_list_bulleted</span>
-                    </button>
-                </div>
+                        <span className="material-symbols-outlined fs-5">format_list_bulleted</span>
+                    </Button>
+                </ButtonGroup>
             </div>
 
             {viewMode === 'grid' ? (
-                <div className="generations-grid">
+                <Row className="g-4">
                     {GENERATIONS.map(gen => (
-                        <Link href={`/pokemons?gen=${gen.id}`} key={gen.id} className="generation-card-link">
-                            <div className={`glass-panel generation-card ${gen.class}`}>
-                                <div className="generation-card-content">
-                                    <div className="gen-num">{gen.roman}</div>
-                                    <div className="gen-region">{gen.region}</div>
-                                    <div className="gen-info">
-                                        <span className="gen-range">{gen.range}</span>
-                                        <span className="gen-count">{gen.count} Pokémon</span>
+                        <Col xs={12} md={6} lg={4} key={gen.id}>
+                            <Card
+                                as={Link}
+                                href={`/pokemons?gen=${gen.id}`}
+                                bg="dark"
+                                border="secondary"
+                                className="h-100 text-decoration-none hover-primary transition-all overflow-hidden position-relative"
+                                style={{ cursor: 'pointer', minHeight: '160px' }}
+                            >
+                                <Card.Body className="d-flex justify-content-between p-4 z-1">
+                                    <div className="d-flex flex-column justify-content-between">
+                                        <div>
+                                            <h6 className="text-secondary fw-bold mb-1 text-uppercase">{gen.roman}</h6>
+                                            <h3 className="text-light fw-bold mb-0">{gen.region}</h3>
+                                        </div>
+                                        <div className="mt-4">
+                                            <Badge bg="secondary" className="me-2">{gen.range}</Badge>
+                                            <Badge bg="info" className="text-dark">{gen.count} Pokémon</Badge>
+                                        </div>
                                     </div>
-                                </div>
-                                <div className="generation-card-artwork">
-                                    <img 
-                                        src={`https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/${gen.mascotId}.png`} 
-                                        alt={`${gen.region} mascot`}
-                                        loading="lazy"
-                                    />
-                                </div>
-                            </div>
-                        </Link>
-                    ))}
-                </div>
-            ) : (
-                <div className="generations-list-view">
-                    {GENERATIONS.map(gen => (
-                        <Link href={`/pokemons?gen=${gen.id}`} key={gen.id} className="no-underline">
-                            <div className={`glass-panel generation-list-item ${gen.class}`}>
-                                <div className="flex-center-gap-large z-2">
-                                    <div className="mascot-container">
-                                        <img 
-                                            src={`https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/${gen.mascotId}.png`} 
+                                    <div
+                                        className="position-absolute end-0 bottom-0 opacity-75"
+                                        style={{ transform: 'translate(10%, 10%)' }}
+                                    >
+                                        <img
+                                            src={`https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/${gen.mascotId}.png`}
                                             alt={`${gen.region} mascot`}
-                                            width="44"
-                                            height="44"
                                             loading="lazy"
+                                            width="140"
+                                            height="140"
+                                            style={{ filter: 'drop-shadow(-5px -5px 10px rgba(0,0,0,0.5))' }}
                                         />
                                     </div>
-                                    <div>
-                                        <div className="flex-baseline-gap">
-                                            <span className="gen-region-lg">{gen.region}</span>
-                                            <span className="gen-roman-sm">{gen.roman}</span>
-                                        </div>
-                                        <div className="gen-stats-row">
-                                            <span className="gen-range-text">{gen.range}</span>
-                                            <span className="gen-count-text">{gen.count} Pokémon</span>
-                                        </div>
+                                </Card.Body>
+                            </Card>
+                        </Col>
+                    ))}
+                </Row>
+            ) : (
+                <ListGroup>
+                    {GENERATIONS.map(gen => (
+                        <ListGroup.Item
+                            key={gen.id}
+                            as={Link}
+                            href={`/pokemons?gen=${gen.id}`}
+                            className="bg-dark border-secondary p-3 text-decoration-none hover-primary transition-all d-flex justify-content-between align-items-center"
+                            style={{ cursor: 'pointer' }}
+                        >
+                            <div className="d-flex align-items-center gap-4">
+                                <img
+                                    src={`https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/${gen.mascotId}.png`}
+                                    alt={`${gen.region} mascot`}
+                                    width="60"
+                                    height="60"
+                                    loading="lazy"
+                                    style={{ filter: 'drop-shadow(0 4px 6px rgba(0,0,0,0.3))' }}
+                                />
+                                <div>
+                                    <div className="d-flex align-items-baseline gap-2 mb-1">
+                                        <h4 className="text-light mb-0 fw-bold">{gen.region}</h4>
+                                        <span className="text-secondary fw-bold">{gen.roman}</span>
+                                    </div>
+                                    <div className="d-flex gap-2">
+                                        <Badge bg="secondary" className="fw-normal">{gen.range}</Badge>
+                                        <Badge bg="info" className="text-dark fw-normal">{gen.count} Pokémon</Badge>
                                     </div>
                                 </div>
-                                <span className="arrow">→</span>
                             </div>
-                        </Link>
+                            <span className="material-symbols-outlined text-muted fs-4">arrow_forward</span>
+                        </ListGroup.Item>
                     ))}
-                </div>
+                </ListGroup>
             )}
-        </div>
+        </Container>
     );
 }

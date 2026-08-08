@@ -2,7 +2,11 @@
 
 import { useState, useMemo, useEffect } from 'react';
 import Link from 'next/link';
+import { Container, Row, Col, Form, InputGroup, Card, Button, ButtonGroup, Alert, ListGroup } from 'react-bootstrap';
 import DamageClassIcon from '../components/damage-class-icon';
+import TypeBadge from '../components/type-badge';
+import CountBadge from '../components/count-badge';
+import AppPagination from '../components/app-pagination';
 
 const MOVES_PER_PAGE = 50;
 
@@ -12,8 +16,10 @@ export default function MovesList({ initialMoves, moveTypeMap, moveDamageClassMa
 
     // View mode state with localStorage persistence (safe from SSR hydration mismatch)
     const [viewMode, setViewMode] = useState('grid');
+
     useEffect(() => {
         const savedMode = localStorage.getItem('viewMode');
+
         if (savedMode === 'grid' || savedMode === 'list') {
             setTimeout(() => {
                 setViewMode(savedMode);
@@ -30,7 +36,7 @@ export default function MovesList({ initialMoves, moveTypeMap, moveDamageClassMa
         const lowerCaseSearchTerm = searchTerm.toLowerCase();
 
         return initialMoves
-            .filter(move => 
+            .filter((move) =>
                 move.name.toLowerCase().includes(lowerCaseSearchTerm)
             )
             .sort((moveA, moveB) => moveA.name.localeCompare(moveB.name));
@@ -45,186 +51,131 @@ export default function MovesList({ initialMoves, moveTypeMap, moveDamageClassMa
     );
 
     const handleSearchChange = (e) => {
-        setSearchTerm(e.target.value);
+        const { value } = e.target;
+        setSearchTerm(value);
         setCurrentPage(1);
     };
 
-    const goToPage = (page) => {
-        setCurrentPage(page);
-        window.scrollTo({ top: 0, behavior: 'smooth' });
-    };
-
     return (
-        <div>
+        <Container fluid className="p-0">
             {/* Search Input & View Toggle */}
-            <div className="search-bar-row">
-                <div className="search-container">
-                    <input
-                        type="text"
-                        className="search-input"
-                        placeholder="Search moves (e.g., Thunderbolt, Tackle, Flamethrower)..."
-                        value={searchTerm}
-                        onChange={handleSearchChange}
-                        id="moves-search-bar"
-                    />
-                    <span className="search-icon"><span className="material-symbols-outlined">search</span></span>
-                </div>
-                <div className="view-toggle-container">
-                    <button
-                        className={`view-toggle-btn ${viewMode === 'grid' ? 'active' : ''}`}
-                        onClick={() => handleViewModeChange('grid')}
-                        id="view-toggle-grid"
-                        title="Grid View"
-                        aria-label="Grid View"
-                    >
-                        <span className="material-symbols-outlined toggle-icon">grid_view</span>
-                    </button>
-                    <button
-                        className={`view-toggle-btn ${viewMode === 'list' ? 'active' : ''}`}
-                        onClick={() => handleViewModeChange('list')}
-                        id="view-toggle-list"
-                        title="List View"
-                        aria-label="List View"
-                    >
-                        <span className="material-symbols-outlined toggle-icon">format_list_bulleted</span>
-                    </button>
-                </div>
-            </div>
+            <Row className="mb-3 align-items-center g-2 flex-nowrap">
+                <Col className="flex-grow-1">
+                    <InputGroup>
+                        <Form.Control
+                            type="text"
+                            placeholder="Search moves (e.g., Thunderbolt, Tackle, Flamethrower)..."
+                            value={searchTerm}
+                            onChange={handleSearchChange}
+                            id="moves-search-bar"
+                            className="bg-dark text-light border-secondary shadow-none"
+                        />
+                        <InputGroup.Text className="bg-dark border-secondary text-light">
+                            <span className="material-symbols-outlined fs-5">search</span>
+                        </InputGroup.Text>
+                    </InputGroup>
+                </Col>
+                <Col xs="auto">
+                    <ButtonGroup>
+                        <Button
+                            id="view-toggle-grid"
+                            variant={viewMode === 'grid' ? 'secondary' : 'outline-secondary'}
+                            onClick={() => handleViewModeChange('grid')}
+                            title="Grid View"
+                            className="d-flex align-items-center"
+                        >
+                            <span className="material-symbols-outlined">grid_view</span>
+                        </Button>
+                        <Button
+                            id="view-toggle-list"
+                            variant={viewMode === 'list' ? 'secondary' : 'outline-secondary'}
+                            onClick={() => handleViewModeChange('list')}
+                            title="List View"
+                            className="d-flex align-items-center"
+                        >
+                            <span className="material-symbols-outlined">format_list_bulleted</span>
+                        </Button>
+                    </ButtonGroup>
+                </Col>
+            </Row>
 
             {/* Results Count & Pagination Info */}
-            <div className="list-controls-bar flex-between-wrap mb-1">
-                <span className="text-muted">{filteredMoves.length} moves found</span>
+            <div className="d-flex justify-content-between align-items-center mb-4 text-muted small">
+                <CountBadge count={filteredMoves.length} className="fs-6" />
                 {totalPages > 1 && (
-                    <span className="text-muted">Page {safeCurrentPage} of {totalPages}</span>
+                    <span>Page {safeCurrentPage} of {totalPages}</span>
                 )}
             </div>
 
             {/* Moves Grid or List */}
             {paginatedMoves.length ? (
                 viewMode === 'grid' ? (
-                    <div className="moves-grid">
-                        {paginatedMoves.map(move => {
+                    <Row className="g-3">
+                        {paginatedMoves.map((move) => {
                             const moveType = moveTypeMap[move.name] || 'normal';
                             const damageClass = moveDamageClassMap[move.name] || null;
 
                             return (
-                                <Link href={`/moves/${move.name}`} key={move.name}>
-                                    <div className="glass-panel ability-link-card move-grid-card">
-                                        <span className="move-card-title">
-                                            {move.name.replace('-', ' ')}
-                                        </span>
-                                        <div className="flex-center-gap">
-                                            <span className={`type-badge type-${moveType} badge-small`}>
-                                                {moveType}
-                                            </span>
-                                            {damageClass && <DamageClassIcon damageClass={damageClass} />}
-                                        </div>
-                                    </div>
-                                </Link>
+                                <Col xs={6} md={4} lg={3} xl={2} key={move.name}>
+                                    <Card
+                                        as={Link}
+                                        href={`/moves/${move.name}`}
+                                        bg="dark"
+                                        border="secondary"
+                                        className="h-100 text-decoration-none hover-primary transition-all text-center cursor-pointer"
+                                    >
+                                        <Card.Body className="d-flex flex-column align-items-center justify-content-center p-3 gap-2">
+                                            <h6 className="text-capitalize text-light mb-1 fw-bold">
+                                                {move.name.replace(/-/g, ' ')}
+                                            </h6>
+                                            <div className="d-flex align-items-center justify-content-center gap-2 flex-wrap">
+                                                <TypeBadge type={moveType} asLink={false} />
+                                                {damageClass && <DamageClassIcon damageClass={damageClass} />}
+                                            </div>
+                                        </Card.Body>
+                                    </Card>
+                                </Col>
                             );
                         })}
-                    </div>
+                    </Row>
                 ) : (
-                    <div className="moves-list-view mt-1">
-                        {paginatedMoves.map(move => {
+                    <ListGroup className="mt-3">
+                        {paginatedMoves.map((move) => {
                             const moveType = moveTypeMap[move.name] || 'normal';
                             const damageClass = moveDamageClassMap[move.name] || null;
 
                             return (
-                                <Link href={`/moves/${move.name}`} key={move.name}>
-                                    <div className="glass-panel move-list-item">
-                                        <span className="move-list-item-title">
-                                            {move.name.replace('-', ' ')}
-                                        </span>
-                                        <div className="flex-center-gap-large">
-                                            <span className={`type-badge type-${moveType}`}>
-                                                {moveType}
-                                            </span>
-                                            {damageClass && (
-                                                <div className="flex-center-gap">
-                                                    <DamageClassIcon damageClass={damageClass} />
-                                                    <span className="text-muted-cap">{damageClass}</span>
-                                                </div>
-                                            )}
-                                            <span className="material-symbols-outlined arrow">arrow_forward</span>
-                                        </div>
+                                <ListGroup.Item
+                                    key={move.name}
+                                    as={Link}
+                                    href={`/moves/${move.name}`}
+                                    className="bg-dark border-secondary text-light d-flex justify-content-between align-items-center p-3 text-decoration-none hover-primary transition-all cursor-pointer"
+                                >
+                                    <h6 className="text-capitalize mb-0 fw-bold">
+                                        {move.name.replace(/-/g, ' ')}
+                                    </h6>
+                                    <div className="d-flex align-items-center gap-3">
+                                        <TypeBadge type={moveType} asLink={false} />
+                                        {damageClass && <DamageClassIcon damageClass={damageClass} showLabel={true} />}
+                                        <span className="material-symbols-outlined text-muted fs-5">arrow_forward</span>
                                     </div>
-                                </Link>
+                                </ListGroup.Item>
                             );
                         })}
-                    </div>
+                    </ListGroup>
                 )
             ) : (
-                <div className="glass-panel no-results">
-                    <h3>No moves found matching your search.</h3>
-                </div>
+                <Alert variant="secondary" className="text-center p-5 border-secondary bg-dark text-light">
+                    <h4 className="mb-0">No moves found matching your search.</h4>
+                </Alert>
             )}
 
             {/* Pagination Controls */}
-            {totalPages > 1 && (
-                <div className="pagination-container">
-                    <button
-                        className="btn pagination-first-btn"
-                        onClick={() => goToPage(1)}
-                        disabled={safeCurrentPage === 1}
-                    >
-                        <span className="nav-label">« First</span>
-                        <span className="nav-icon">«</span>
-                    </button>
-                    <button
-                        className="btn"
-                        onClick={() => goToPage(safeCurrentPage - 1)}
-                        disabled={safeCurrentPage === 1}
-                    >
-                        <span className="nav-label">‹ Prev</span>
-                        <span className="nav-icon">‹</span>
-                    </button>
-
-                    {/* Page number buttons */}
-                    {(() => {
-                        const pages = [];
-                        let start = Math.max(1, safeCurrentPage - 2);
-                        let end = Math.min(totalPages, safeCurrentPage + 2);
-                        
-                        // Ensure we always show 5 buttons when possible
-                        if (end - start < 4) {
-                            if (start === 1) end = Math.min(totalPages, start + 4);
-                            else start = Math.max(1, end - 4);
-                        }
-
-                        for (let i = start; i <= end; i++) {
-                            pages.push(
-                                <button
-                                    key={i}
-                                    className={`btn pagination-num-btn ${i === safeCurrentPage ? 'btn-active' : ''}`}
-                                    onClick={() => goToPage(i)}
-                                >
-                                    {i}
-                                </button>
-                            );
-                        }
-
-                        return pages;
-                    })()}
-
-                    <button
-                        className="btn"
-                        onClick={() => goToPage(safeCurrentPage + 1)}
-                        disabled={safeCurrentPage === totalPages}
-                    >
-                        <span className="nav-label">Next ›</span>
-                        <span className="nav-icon">›</span>
-                    </button>
-                    <button
-                        className="btn pagination-last-btn"
-                        onClick={() => goToPage(totalPages)}
-                        disabled={safeCurrentPage === totalPages}
-                    >
-                        <span className="nav-label">Last »</span>
-                        <span className="nav-icon">»</span>
-                    </button>
-                </div>
-            )}
-        </div>
+            <AppPagination
+                currentPage={safeCurrentPage}
+                totalPages={totalPages}
+                onPageChange={setCurrentPage}
+            />
+        </Container>
     );
 }

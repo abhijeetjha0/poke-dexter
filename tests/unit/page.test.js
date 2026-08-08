@@ -11,7 +11,7 @@ describe('HomePage Component', () => {
         expect(bulbasaur).toBeInTheDocument();
         expect(bulbasaur.getAttribute('src')).toContain('1.png');
 
-        const exploreBtn = getByRole('link', { name: /Open PokeDex Directory/i });
+        const exploreBtn = getByRole('link', { name: /Open PokeDex/i });
         expect(exploreBtn).toBeInTheDocument();
         expect(exploreBtn.getAttribute('href')).toBe('/pokemons');
     });

@@ -22,13 +22,16 @@ describe('PokemonGrid Component', () => {
         },
     ];
 
-    test('renders list of pokemon cards with links and species details', () => {
+    test('renders list of pokemon cards with links, species details, and type badges', () => {
         render(<PokemonGrid pokemonList={mockPokemonList} />);
 
         expect(screen.getByText('bulbasaur')).toBeInTheDocument();
         expect(screen.getByText('charmander')).toBeInTheDocument();
         expect(screen.getByText('#0001')).toBeInTheDocument();
         expect(screen.getByText('#0004')).toBeInTheDocument();
+        expect(screen.getByText('grass')).toBeInTheDocument();
+        expect(screen.getByText('poison')).toBeInTheDocument();
+        expect(screen.getByText('fire')).toBeInTheDocument();
 
         const links = screen.getAllByRole('link');
         expect(links.length).toBeGreaterThan(0);
@@ -43,7 +46,7 @@ describe('PokemonGrid Component', () => {
     test('renders grid container when list is empty', () => {
         const { container } = render(<PokemonGrid pokemonList={[]} />);
 
-        const gridElement = container.querySelector('.pokemon-grid');
+        const gridElement = container.querySelector('.row');
         expect(gridElement).not.toBeNull();
         expect(gridElement.children.length).toBe(0);
     });

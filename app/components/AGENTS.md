@@ -7,7 +7,7 @@ This document specifies rules and standards for AI Coding Assistants creating or
 ## 🧩 Component Guidelines
 
 1. **Separation of Concerns**:
-   - UI components (`navbar.js`, `pokemon-grid.js`, `damage-class-icon.js`) must focus on UI presentation and user interactions.
+   - UI components (`navbar.js`, `pokemon-grid.js`, `damage-class-icon.js`, `base-stats-card.js`, `type-badge.js`, `count-badge.js`, `app-pagination.js`) must focus on UI presentation and user interactions.
    - Place data transformations, type effectiveness calculations, and PokéAPI formatting helpers inside `app/lib/`.
 
 2. **Performance & Key Stability**:
@@ -29,12 +29,3 @@ This document specifies rules and standards for AI Coding Assistants creating or
 
 7. **No Style Rules in Configuration Objects**:
    - Component configuration objects or maps (e.g. `DAMAGE_CLASS_CONFIG`) must NOT store inline CSS rules, style properties, or hardcoded hex color strings. All visual styling, colors, and sizing MUST be maintained strictly in SCSS stylesheets (`app/styles/`).
-
-8. **Single-Line Simple Callbacks**:
-   - Simple single-statement callbacks or cleanup functions (such as `useEffect` unmount cleanup `return () => { isMounted = false; };`) MUST be written concisely on a single line instead of multi-line blocks.
-
-9. **Property Destructuring for Repeated Access**:
-   - When accessing an object property or event field (e.g. `event.key`, `pokemon.name`) multiple times within a function or callback, destructure it upfront (e.g. `const { key } = event;`) to avoid redundant property lookups and improve code readability.
-
-10. **Single-Line Unwrapped Concise JSX**:
-   - When rendering a single concise JSX element (such as in conditional branches, logical AND expressions `{condition && <Element />}`), write it directly on a single line without wrapping parentheses `(...)`.

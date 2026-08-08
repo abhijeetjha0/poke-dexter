@@ -3,6 +3,7 @@
 import { useState, useEffect, useRef, useMemo } from 'react';
 import { useRouter } from 'next/navigation';
 import { fetchPokemonSpeciesList, fetchAbilityList, fetchMoveList } from '../api-requests';
+import { Button, Form, InputGroup, ListGroup, Badge } from 'react-bootstrap';
 
 // Cache to prevent multiple fetches across instances or remounts
 let globalSearchDataCache = null;
@@ -31,7 +32,9 @@ export default function GlobalSearch({ onNavigate = () => { } }) {
 
     // Fetch data when expanded (lazy load)
     useEffect(() => {
-        if (!isExpanded || data.length > 0) return;
+        if (!isExpanded || data.length > 0) {
+            return;
+        }
 
         let isMounted = true;
 
@@ -46,7 +49,7 @@ export default function GlobalSearch({ onNavigate = () => { } }) {
                 const [pokemonRes, abilityRes, moveRes] = await Promise.all([
                     fetchPokemonSpeciesList(2000),
                     fetchAbilityList(500),
-                    fetchMoveList(1000)
+                    fetchMoveList(1000),
                 ]);
 
                 if (!isMounted) {
@@ -85,7 +88,7 @@ export default function GlobalSearch({ onNavigate = () => { } }) {
                 globalSearchDataCache = combined;
                 setData(combined);
             } catch (error) {
-                console.error("Error loading search data:", error);
+                console.error('Error loading search data:', error);
             }
         };
 
@@ -108,7 +111,7 @@ export default function GlobalSearch({ onNavigate = () => { } }) {
 
         document.addEventListener('mousedown', handleClickOutside);
 
-        return () => document.removeEventListener('mousedown', handleClickOutside);
+        return () => { document.removeEventListener('mousedown', handleClickOutside); };
     }, [searchTerm]);
 
     // Filter suggestions when search term changes
@@ -138,6 +141,14 @@ export default function GlobalSearch({ onNavigate = () => { } }) {
 
         return [...exactMatches, ...startsWithMatches, ...includesMatches].slice(0, 5);
     }, [searchTerm, data]);
+
+    const handleSelect = (item) => {
+        setSearchTerm('');
+        setIsFocused(false);
+        setIsExpanded(false);
+        onNavigate();
+        router.push(item.url);
+    };
 
     const handleKeyDown = (event) => {
         if (!isFocused) {
@@ -169,65 +180,75 @@ export default function GlobalSearch({ onNavigate = () => { } }) {
         }
     };
 
-    const handleSelect = (item) => {
-        setSearchTerm('');
-        setIsFocused(false);
-        setIsExpanded(false);
-        onNavigate();
-        router.push(item.url);
-    };
-
     return (
-        <div className={`global-search-container ${isExpanded ? 'expanded' : ''}`} ref={containerRef}>
+        <div className={`position-relative global-search-container ${isExpanded ? 'is-expanded' : ''}`.trim()} ref={containerRef}>
             {!isExpanded ? (
-                <button
-                    className="search-icon-btn"
+                <Button
+                    variant="outline-secondary"
+                    className="rounded-circle d-flex align-items-center justify-content-center p-2"
                     onClick={() => setIsExpanded(true)}
                     aria-label="Open search"
                 >
-                    <span className="material-symbols-outlined">search</span>
-                </button>
+                    <span className="material-symbols-outlined fs-5">search</span>
+                </Button>
             ) : (
-                <div className="global-search-input-wrapper">
-                    <span className="search-icon"><span className="material-symbols-outlined">search</span></span>
-                    <input
-                        ref={inputRef}
-                        type="text"
-                        className="global-search-input"
-                        placeholder="Search..."
-                        value={searchTerm}
-                        onChange={(e) => {
-                            setSearchTerm(e.target.value);
-                            setSelectedIndex(-1);
-                        }}
-                        onFocus={() => setIsFocused(true)}
-                        onKeyDown={handleKeyDown}
-                        aria-label="Global search"
-                        role="searchbox"
-                    />
-                </div>
+                <Form.Group className="mb-0">
+                    <InputGroup>
+                        <InputGroup.Text className="bg-transparent border-end-0">
+                            <span className="material-symbols-outlined fs-6">search</span>
+                        </InputGroup.Text>
+                        <Form.Control
+                            ref={inputRef}
+                            type="text"
+                            className="border-start-0 shadow-none bg-transparent focus-ring-0"
+                            placeholder="Search..."
+                            value={searchTerm}
+                            onChange={(e) => {
+                                const { value } = e.target;
+                                setSearchTerm(value);
+                                setSelectedIndex(-1);
+                            }}
+                            onFocus={() => setIsFocused(true)}
+                            onKeyDown={handleKeyDown}
+                            aria-label="Global search"
+                            role="searchbox"
+                        />
+                    </InputGroup>
+                </Form.Group>
             )}
 
             {isExpanded && isFocused && searchTerm.trim() !== '' && (
-                <div className="global-search-dropdown">
+                <div className="position-absolute w-100 mt-1 shadow rounded z-3 bg-dark border border-secondary">
                     {suggestions.length > 0 ? (
-                        <ul role="listbox" className="global-search-list">
-                            {suggestions.map((item, index) => (
-                                <li
-                                    key={`${item.type}-${item.name}`}
-                                    role="option"
-                                    aria-selected={index === selectedIndex}
-                                    className={`global-search-item ${index === selectedIndex ? 'selected' : ''}`}
-                                    onClick={() => handleSelect(item)}
-                                >
-                                    <div className="item-details">
-                                        <span className="item-name">{item.label}</span>
-                                        <span className={`item-badge badge-${item.type}`}>{item.type}</span>
-                                    </div>
-                                </li>
-                            ))}
-                        </ul>
-                    ) : <div className="no-results">No matches found for &quot;{searchTerm}&quot;</div>}
+                        <ListGroup variant="flush">
+                            {suggestions.map((item, index) => {
+                                const isSelected = index === selectedIndex;
+
+                                return (
+                                    <ListGroup.Item
+                                        key={`${item.type}-${item.name}`}
+                                        action
+                                        active={isSelected}
+                                        onClick={() => handleSelect(item)}
+                                        onMouseEnter={() => setSelectedIndex(index)}
+                                        className={`d-flex justify-content-between align-items-center border-secondary ${isSelected ? 'bg-secondary text-light' : 'bg-dark text-light'}`}
+                                    >
+                                        <span className="text-capitalize">{item.label}</span>
+                                        <Badge bg={
+                                            item.type === 'pokemon' ? 'primary' :
+                                            item.type === 'ability' ? 'success' : 'info'
+                                        } pill className="text-uppercase">
+                                            {item.type}
+                                        </Badge>
+                                    </ListGroup.Item>
+                                );
+                            })}
+                        </ListGroup>
+                    ) : (
+                        <div className="p-3 text-muted text-center border-secondary rounded">
+                            No matches found for &quot;{searchTerm}&quot;
+                        </div>
+                    )}
                 </div>
             )}
         </div>

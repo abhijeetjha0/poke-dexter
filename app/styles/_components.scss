@@ -1,12 +1,25 @@
 @use 'variables' as *;
 
-/* Buttons */
+/* ─── Global Search: single focus ring on the outer InputGroup ───── */
+
+/* Strip all focus styling from the inner elements */
+.input-group > .form-control:focus,
+.input-group > .form-control:focus-visible,
+.input-group > .input-group-text:focus-within {
+  outline: none !important;
+  box-shadow: none !important;
+  border-color: var(--bs-border-color) !important;
+  z-index: auto;
+}
+
+/* Single unified focus ring on the outer group */
+.input-group:focus-within {
+  border-radius: var(--bs-border-radius);
+  box-shadow: 0 0 0 3px rgba(108, 117, 125, 0.4);
+}
+
+
 .btn {
-  background: $panel-bg;
-  border: 1px solid $panel-border;
-  color: $text-main;
-  padding: 0.75rem 1.5rem;
-  border-radius: 8px;
   font-family: $font-sans;
   font-weight: 600;
   cursor: pointer;
@@ -14,14 +27,6 @@
   align-items: center;
   gap: 0.5rem;
   transition: all 0.2s ease;
-  backdrop-filter: blur(8px);
-
-  &:hover {
-    background: rgba(6, 182, 212, 0.15);
-    border-color: $accent-cyan;
-    box-shadow: 0 0 15px rgba(6, 182, 212, 0.3);
-    transform: translateY(-2px);
-  }
 
   &[disabled] {
     opacity: 0.4;
@@ -37,16 +42,6 @@
   font-weight: 800 !important;
   border-color: $accent-cyan !important;
   box-shadow: 0 0 10px rgba(6, 182, 212, 0.4) !important;
-}
-
-.btn-primary {
-  background: linear-gradient(135deg, rgba(6, 182, 212, 0.4) 0%, rgba(59, 130, 246, 0.4) 100%);
-  border-color: rgba(6, 182, 212, 0.5);
-
-  &:hover {
-    background: linear-gradient(135deg, rgba(6, 182, 212, 0.6) 0%, rgba(59, 130, 246, 0.6) 100%);
-    border-color: $accent-cyan;
-  }
 }
 
 /* Like Button styles */
@@ -88,24 +83,40 @@
   color: #111;
 }
 
-.type-normal { background-color: $type-normal; }
-.type-fire { background-color: $type-fire; box-shadow: 0 0 10px rgba(238, 129, 48, 0.4); }
-.type-water { background-color: $type-water; box-shadow: 0 0 10px rgba(99, 144, 240, 0.4); }
-.type-electric { background-color: $type-electric; color: #111; text-shadow: none; box-shadow: 0 0 10px rgba(247, 208, 44, 0.4); }
-.type-grass { background-color: $type-grass; box-shadow: 0 0 10px rgba(122, 199, 76, 0.4); }
-.type-ice { background-color: $type-ice; color: #111; text-shadow: none; box-shadow: 0 0 10px rgba(150, 217, 214, 0.4); }
-.type-fighting { background-color: $type-fighting; box-shadow: 0 0 10px rgba(194, 46, 40, 0.4); }
-.type-poison { background-color: $type-poison; box-shadow: 0 0 10px rgba(163, 62, 161, 0.4); }
-.type-ground { background-color: $type-ground; box-shadow: 0 0 10px rgba(226, 191, 101, 0.4); }
-.type-flying { background-color: $type-flying; box-shadow: 0 0 10px rgba(169, 143, 243, 0.4); }
-.type-psychic { background-color: $type-psychic; box-shadow: 0 0 10px rgba(249, 85, 135, 0.4); }
-.type-bug { background-color: $type-bug; box-shadow: 0 0 10px rgba(166, 185, 26, 0.4); }
-.type-rock { background-color: $type-rock; box-shadow: 0 0 10px rgba(182, 161, 54, 0.4); }
-.type-ghost { background-color: $type-ghost; box-shadow: 0 0 10px rgba(112, 87, 70, 0.4); }
-.type-dragon { background-color: $type-dragon; box-shadow: 0 0 10px rgba(111, 53, 252, 0.4); }
-.type-dark { background-color: $type-dark; box-shadow: 0 0 10px rgba(112, 87, 70, 0.4); }
-.type-steel { background-color: $type-steel; box-shadow: 0 0 10px rgba(183, 183, 206, 0.4); }
-.type-fairy { background-color: $type-fairy; box-shadow: 0 0 10px rgba(214, 133, 173, 0.4); }
+.type-normal { background-color: $type-normal !important; }
+.type-fire { background-color: $type-fire !important; }
+.type-water { background-color: $type-water !important; }
+.type-electric { background-color: $type-electric !important; color: #111 !important; text-shadow: none !important; }
+.type-grass { background-color: $type-grass !important; }
+.type-ice { background-color: $type-ice !important; color: #111 !important; text-shadow: none !important; }
+.type-fighting { background-color: $type-fighting !important; }
+.type-poison { background-color: $type-poison !important; }
+.type-ground { background-color: $type-ground !important; }
+.type-flying { background-color: $type-flying !important; }
+.type-psychic { background-color: $type-psychic !important; }
+.type-bug { background-color: $type-bug !important; }
+.type-rock { background-color: $type-rock !important; }
+.type-ghost { background-color: $type-ghost !important; }
+.type-dragon { background-color: $type-dragon !important; }
+.type-dark { background-color: $type-dark !important; }
+.type-steel { background-color: $type-steel !important; }
+.type-fairy { background-color: $type-fairy !important; }
+
+/* Global Focus Ring Customization */
+:focus-visible,
+.form-control:focus,
+.btn:focus,
+.nav-link:focus,
+.input-group:focus-within {
+  border-color: #6c757d !important;
+  box-shadow: 0 0 0 0.25rem rgba(108, 117, 125, 0.3) !important;
+  border-radius: var(--bs-border-radius);
+
+  .input-group-text,
+  .form-control {
+    border-color: #6c757d !important;
+  }
+}
 
 /* Page Headers */
 .page-header {
@@ -142,6 +153,41 @@
 .text-center-padded {
   text-align: center;
   padding: 3rem;
+}
+
+.pokemon-detail-hero-img {
+  max-height: 220px;
+  filter: drop-shadow(0 10px 15px rgba(0, 0, 0, 0.5));
+}
+
+.stat-label-col {
+  width: 70px;
+}
+
+.stat-label-xs {
+  font-size: 0.65rem;
+}
+
+.stat-value-col {
+  width: 35px;
+  text-align: right;
+}
+
+.stat-progress-bar {
+  height: 8px;
+}
+
+.matrix-badge {
+  min-width: 28px;
+}
+
+.matrix-table-compact {
+  font-size: 0.8rem;
+
+  th,
+  td {
+    padding: 0.35rem 0.25rem !important;
+  }
 }
 
 /* Type Page Typography */
@@ -647,15 +693,19 @@
 
 .global-search-container {
   position: relative;
+  min-width: auto;
   z-index: 100;
 
+  &.is-expanded,
   &.expanded {
+    min-width: 250px;
     width: 300px;
     
-    @media (max-width: 600px) {
+    @media (width <= 600px) {
       width: 200px;
     }
-    @media (max-width: 350px) {
+
+    @media (width <= 350px) {
       width: 150px;
     }
   }
@@ -683,7 +733,7 @@
 .search-svg-icon {
   width: 16px;
   height: 16px;
-  stroke: currentColor;
+  stroke: currentcolor;
 }
 
 .global-search-input {
@@ -777,3 +827,210 @@
   font-size: 0.9rem;
   font-style: italic;
 }
+
+
+/* ─── Evolution Chain ──────────────────────────────────────────────── */
+
+/*
+ * Layout model (horizontal tree):
+ *
+ *  evolution-chain-container
+ *    evolution-node-group
+ *      evolution-branch  ← flex-row: [card] + [evolution-children]
+ *        evolution-link-card   (the Pokémon, left side)
+ *        evolution-children    (all children stacked vertically, right side)
+ *          evolution-child-wrapper  ← flex-row: [arrow-container] + [evolution-branch]
+ *            evolution-arrow-container  (icon + method text)
+ *            evolution-branch           (child card + its own children recursively)
+ */
+
+.evolution-chain-container {
+  overflow-x: auto;
+  padding-bottom: 0.25rem;
+}
+
+.evolution-node-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  min-width: fit-content;
+}
+
+/* Horizontal: card on left, children column on right */
+.evolution-branch {
+  display: flex;
+  flex-direction: row;
+  align-items: flex-start;
+  gap: 0;
+}
+
+/* The clickable Pokémon card */
+.evolution-link-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.25rem;
+  padding: 0.5rem;
+  border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: rgba(255, 255, 255, 0.04);
+  text-decoration: none;
+  color: inherit;
+  transition: background 0.18s ease, border-color 0.18s ease, transform 0.15s ease;
+  cursor: pointer;
+  width: 96px;
+  height: 96px;
+  text-align: center;
+  flex-shrink: 0;
+
+  img {
+    image-rendering: pixelated;
+    width: 48px;
+    height: 48px;
+    flex-shrink: 0;
+  }
+
+  .name {
+    font-weight: 600;
+    font-size: 0.75rem;
+    text-transform: capitalize;
+    color: #e2e8f0;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 100%;
+  }
+
+  &:hover {
+    background: rgba(255, 255, 255, 0.09);
+    border-color: rgba(255, 255, 255, 0.25);
+    transform: translateY(-2px);
+    text-decoration: none;
+    color: inherit;
+  }
+
+  &.active-node {
+    border-color: #4ade80;
+    background: rgba(74, 222, 128, 0.08);
+
+    .name { color: #4ade80; }
+  }
+}
+
+/* Each child: [arrow+method] then [child branch] horizontally */
+.evolution-child-wrapper {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 0;
+}
+
+/* Children of a node: stacked vertically, all centered beside the parent */
+.evolution-children {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  align-items: flex-start;
+  justify-content: center;
+}
+
+/* Arrow icon + method text, between parent and child */
+.evolution-arrow-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  text-align: center;
+  padding: 0.5rem 0.4rem 0;
+  flex-shrink: 0;
+  width: 76px;
+  gap: 0.15rem;
+}
+
+.evolution-arrow {
+  color: rgba(255, 255, 255, 0.3);
+  line-height: 1;
+
+  .material-symbols-outlined {
+    font-size: 1.25rem;
+    display: block;
+  }
+}
+
+.evolution-method {
+  font-size: 0.62rem;
+  color: rgba(255, 255, 255, 0.42);
+  line-height: 1.25;
+  max-width: 64px;
+  word-break: break-word;
+  white-space: normal;
+}
+
+.pokemon-sprite-wrapper {
+  width: 64px;
+  height: 64px;
+}
+
+.pokemon-sprite-img {
+  width: 64px;
+  height: 64px;
+  object-fit: contain;
+}
+
+.pokemon-table-sprite-img {
+  object-fit: contain;
+}
+
+.team-member-artwork-wrapper {
+  height: 120px;
+}
+
+.team-member-artwork-img {
+  width: 120px;
+  height: 120px;
+  object-fit: contain;
+}
+
+.team-member-no-image {
+  width: 120px;
+}
+
+/* Custom App Pagination */
+.pokedex-pagination {
+  .page-link {
+    background-color: #212529;
+    border-color: #495057;
+    color: #f3f4f6;
+    transition: all 0.2s ease;
+
+    &:hover {
+      background-color: #343a40;
+      border-color: #6c757d;
+      color: $accent-cyan;
+    }
+
+    &:focus {
+      box-shadow: 0 0 0 0.25rem rgba(6, 182, 212, 0.25);
+    }
+  }
+
+  .page-item.active .page-link {
+    background-color: $accent-cyan;
+    border-color: $accent-cyan;
+    color: #080a10;
+    font-weight: 700;
+    box-shadow: 0 0 10px rgba(6, 182, 212, 0.4);
+  }
+
+  .page-item.disabled .page-link {
+    background-color: #1a1d20;
+    border-color: #343a40;
+    color: #6c757d;
+  }
+}
+
+
+
+
+

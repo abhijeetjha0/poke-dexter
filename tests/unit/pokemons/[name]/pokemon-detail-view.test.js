@@ -106,6 +106,8 @@ describe('PokemonDetailView Component', () => {
 
         // Collapse chain
         fireEvent.click(getByText('Evolution Chain'));
-        expect(queryByText('ivysaur')).not.toBeInTheDocument();
+        const card = getByText('Evolution Chain').closest('.card');
+        const collapseContainer = card.querySelector('.collapse, .collapsing');
+        expect(collapseContainer).not.toHaveClass('show');
     });
 });

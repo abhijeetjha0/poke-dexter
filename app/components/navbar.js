@@ -1,12 +1,14 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import GlobalSearch from './global-search';
+import { Navbar as BootstrapNavbar, Container, Nav } from 'react-bootstrap';
 
 const NAV_ITEMS = [
     { label: 'Pokedex', path: '/pokemons' },
+    { label: 'Team Builder', path: '/team-builder' },
     { label: 'Abilities', path: '/abilities' },
     { label: 'Moves', path: '/moves' },
     { label: 'Types', path: '/types' },
@@ -14,87 +16,51 @@ const NAV_ITEMS = [
 ];
 
 export default function Navbar() {
-    const [isOpen, setIsOpen] = useState(false);
+    const [expanded, setExpanded] = useState(false);
     const pathname = usePathname();
-    const [prevPathname, setPrevPathname] = useState(pathname);
-
-    // Close menu when route changes
-    if (pathname !== prevPathname) {
-        setPrevPathname(pathname);
-        setIsOpen(false);
-    }
-
-    const toggleMenu = () => setIsOpen(!isOpen);
-    const closeMenu = () => setIsOpen(false);
-
-    // Close menu on resize to desktop view
-    useEffect(() => {
-        const handleResize = () => {
-            if (window.innerWidth > 960) {
-                closeMenu();
-            }
-        };
-        window.addEventListener('resize', handleResize);
-
-        return () => window.removeEventListener('resize', handleResize);
-    }, []);
 
     const isActive = (path) => {
-        if (path === '/') return pathname === '/';
+        if (path === '/') {
+            return pathname === '/';
+        }
 
         return pathname === path || pathname.startsWith(path + '/');
     };
 
+    const handleClose = () => setExpanded(false);
+
     return (
-        <header className="pokedex-header">
-            {/* Logo */}
-            <Link href="/" id="nav-logo-link" onClick={closeMenu}>
-                <div className="pokedex-logo">PokeDexter</div>
-            </Link>
+        <BootstrapNavbar expanded={expanded} expand="lg" bg="dark" variant="dark" collapseOnSelect className="mb-3 border border-secondary rounded">
+            <Container fluid>
+                <BootstrapNavbar.Brand as={Link} href="/" onClick={handleClose} className="fw-bold text-info">
+                    PokeDexter
+                </BootstrapNavbar.Brand>
 
-            {/* Desktop Navigation */}
-            <nav className="pokedex-nav">
-                {NAV_ITEMS.map((item) => (
-                    <Link
-                        key={item.path}
-                        href={item.path}
-                        className={`pokedex-nav-link ${isActive(item.path) ? 'active' : ''}`}
-                        id={`nav-${item.label.toLowerCase()}-link`}
-                    >
-                        {item.label}
-                    </Link>
-                ))}
-            </nav>
+                <BootstrapNavbar.Toggle
+                    aria-controls="basic-navbar-nav"
+                    aria-label="Toggle navigation menu"
+                    onClick={() => setExpanded(expanded ? false : "expanded")}
+                />
 
-            <div className="header-search">
-                <GlobalSearch onNavigate={closeMenu} />
-            </div>
-
-            {/* Hamburger Button */}
-            <button
-                className={`hamburger-btn ${isOpen ? 'open' : ''}`}
-                onClick={toggleMenu}
-                aria-label="Toggle navigation menu"
-                aria-expanded={isOpen}
-            >
-                <span></span>
-                <span></span>
-                <span></span>
-            </button>
-
-            {/* Mobile Navigation Dropdown */}
-            <nav className={`pokedex-mobile-nav ${isOpen ? 'open' : ''}`}>
-                {NAV_ITEMS.map((item) => (
-                    <Link
-                        key={item.path}
-                        href={item.path}
-                        className={`pokedex-nav-link ${isActive(item.path) ? 'active' : ''}`}
-                        onClick={closeMenu}
-                    >
-                        {item.label}
-                    </Link>
-                ))}
-            </nav>
-        </header>
+                <BootstrapNavbar.Collapse id="basic-navbar-nav">
+                    <Nav className="me-auto">
+                        {NAV_ITEMS.map((item) => (
+                            <Nav.Link
+                                key={item.path}
+                                as={Link}
+                                href={item.path}
+                                active={isActive(item.path)}
+                                onClick={handleClose}
+                            >
+                                {item.label}
+                            </Nav.Link>
+                        ))}
+                    </Nav>
+                    <div className="d-flex justify-content-end justify-content-lg-start mt-lg-0 ms-lg-3">
+                        <GlobalSearch onNavigate={handleClose} />
+                    </div>
+                </BootstrapNavbar.Collapse>
+            </Container>
+        </BootstrapNavbar>
     );
 }

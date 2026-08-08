@@ -1,3 +1,4 @@
+import 'bootstrap/dist/css/bootstrap.min.css';
 import './global.scss';
 import Navbar from './components/navbar';
 
@@ -8,7 +9,7 @@ export const metadata = {
 
 export default function RootLayout({ children }) {
     return (
-        <html lang="en">
+        <html lang="en" data-bs-theme="dark" data-scroll-behavior="smooth">
             <body>
                 <div className="app-container">
                     <Navbar />
