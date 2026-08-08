@@ -48,12 +48,12 @@ describe('MovesList Component', () => {
 
         expect(getByText('ember')).toBeInTheDocument();
         expect(queryByText('tackle')).not.toBeInTheDocument();
-        expect(getByText('1 moves found')).toBeInTheDocument();
+        expect(getByText('1')).toBeInTheDocument();
     });
 
     test('handles pagination correctly', () => {
         const moves60 = generateMoves(60);
-        const { getByText, queryByText } = render(
+        const { getByText, queryByText, getByRole } = render(
             <MovesList initialMoves={moves60} moveTypeMap={{}} />
         );
 
@@ -63,7 +63,7 @@ describe('MovesList Component', () => {
         expect(queryByText('move 51')).not.toBeInTheDocument();
 
         // Click next
-        const nextBtn = getByText('Next ›');
+        const nextBtn = getByRole('button', { name: /Next/i });
         fireEvent.click(nextBtn);
 
         // Page 2 should show move-51 to move-60
@@ -81,7 +81,7 @@ describe('MovesList Component', () => {
         fireEvent.click(listBtn);
         
         // Ensure the list container has the list view class
-        const listContainer = container.querySelector('.moves-list-view');
+        const listContainer = container.querySelector('.list-group');
         expect(listContainer).toBeInTheDocument();
         expect(localStorage.getItem('viewMode')).toBe('list');
     });

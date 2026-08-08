@@ -5,6 +5,9 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import { fetchPokemonByIdOrName } from '../api-requests';
 import { limitConcurrency } from '../lib/promise-utils';
 import PokemonGrid from '../components/pokemon-grid';
+import TypeBadge from '../components/type-badge';
+import CountBadge from '../components/count-badge';
+import { Form, InputGroup, Button, ButtonGroup, Table, Nav, Container, Row, Col, Alert } from 'react-bootstrap';
 
 const GENERATIONS = [
     { name: 'All', start: 1, end: 9999 },
@@ -51,8 +54,10 @@ function PokemonListInner(props) {
     
     // View mode state with localStorage persistence (safe from SSR hydration mismatch)
     const [viewMode, setViewMode] = useState('grid');
+
     useEffect(() => {
         const savedMode = localStorage.getItem('viewMode');
+
         if (savedMode === 'grid' || savedMode === 'list') {
             setTimeout(() => {
                 setViewMode(savedMode);
@@ -83,24 +88,29 @@ function PokemonListInner(props) {
             setSortDirection(prev => prev === 'asc' ? 'desc' : 'asc');
         } else {
             setSortColumn(column);
-            setSortDirection(column === 'id' || column === 'name' ? 'asc' : 'desc');
+
+            if (column === 'id' || column === 'name') {
+                setSortDirection('asc');
+            } else {
+                setSortDirection('desc');
+            }
         }
     };
 
     const handleGenChange = (genName) => {
-        const params = new URLSearchParams(searchParams.toString());
         if (genName === 'All') {
-            params.delete('gen');
+            router.push('/pokemons', { scroll: false });
         } else {
             const genNum = genName.replace('Gen ', '');
-            params.set('gen', genNum);
+            router.push(`/pokemons?gen=${genNum}`, { scroll: false });
         }
-        router.push(`/pokemons?${params.toString()}`);
     };
 
     // Extract ID and filter Pokémon list
     const processedList = useMemo(() => {
-        if (processedListProp) return processedListProp;
+        if (processedListProp) {
+            return processedListProp;
+        }
 
         return pokemonList
             .map(pokemon => {
@@ -143,37 +153,44 @@ function PokemonListInner(props) {
 
     // Sort the entire filtered database list
     const sortedList = useMemo(() => {
-        if (!sortColumn) return filteredList;
+        if (!sortColumn) {
+            return filteredList;
+        }
 
         return [...filteredList].sort((pokemonA, pokemonB) => {
-            if (sortColumn === 'id') {
-                return sortDirection === 'asc' ? pokemonA.id - pokemonB.id : pokemonB.id - pokemonA.id;
-            }
-            if (sortColumn === 'name') {
-                return sortDirection === 'asc' 
-                    ? pokemonA.name.localeCompare(pokemonB.name) 
-                    : pokemonB.name.localeCompare(pokemonA.name);
-            }
-
-            // Stats sorting
             const statsA = pokemonDetails[pokemonA.id]?.stats;
             const statsB = pokemonDetails[pokemonB.id]?.stats;
 
-            let valA = 0;
-            let valB = 0;
-
-            if (sortColumn === 'total') {
-                valA = statsA ? Object.values(statsA).reduce((sum, statVal) => sum + statVal, 0) : 0;
-                valB = statsB ? Object.values(statsB).reduce((sum, statVal) => sum + statVal, 0) : 0;
-            } else {
-                valA = statsA ? (statsA[sortColumn] || 0) : 0;
-                valB = statsB ? (statsB[sortColumn] || 0) : 0;
+            if (sortColumn === 'id') {
+                return sortDirection === 'asc' ? pokemonA.id - pokemonB.id : pokemonB.id - pokemonA.id;
             }
 
+            if (sortColumn === 'name') {
+                return sortDirection === 'asc' ? pokemonA.name.localeCompare(pokemonB.name) : pokemonB.name.localeCompare(pokemonA.name);
+            }
+
+            if (sortColumn === 'total') {
+                const totalA = statsA ? Object.values(statsA).reduce((sum, val) => sum + val, 0) : -1;
+                const totalB = statsB ? Object.values(statsB).reduce((sum, val) => sum + val, 0) : -1;
+
+                return sortDirection === 'asc' ? totalA - totalB : totalB - totalA;
+            }
+
+            const valA = statsA ? (statsA[sortColumn] || 0) : 0;
+            const valB = statsB ? (statsB[sortColumn] || 0) : 0;
+
             // Push items without loaded stats to the bottom
-            if (!statsA && !statsB) return pokemonA.id - pokemonB.id; 
-            if (!statsA) return 1;  
-            if (!statsB) return -1; 
+            if (!statsA && !statsB) {
+                return pokemonA.id - pokemonB.id;
+            }
+
+            if (!statsA) {
+                return 1;
+            }
+
+            if (!statsB) {
+                return -1;
+            }
 
             return sortDirection === 'asc' ? valA - valB : valB - valA;
         });
@@ -191,21 +208,26 @@ function PokemonListInner(props) {
                 setVisibleCount(prev => Math.min(prev + LOAD_MORE_CHUNK, filteredList.length));
             }
         };
+
         window.addEventListener('scroll', handleScroll);
 
-        return () => window.removeEventListener('scroll', handleScroll);
+        return () => { window.removeEventListener('scroll', handleScroll); };
     }, [filteredList.length]);
 
     // Fetch details dynamically for visible list items
     useEffect(() => {
-        if (visibleList.length === 0) return;
+        if (visibleList.length === 0) {
+            return;
+        }
 
         // Find which pokemon IDs in the active page don't have cached details
         const idsToFetch = visibleList
             .map(pokemon => pokemon.id)
             .filter(id => !pokemonDetails[id]);
 
-        if (idsToFetch.length === 0) return;
+        if (idsToFetch.length === 0) {
+            return;
+        }
 
         let active = true;
 
@@ -214,6 +236,7 @@ function PokemonListInner(props) {
                 const results = await limitConcurrency(idsToFetch, 10, id =>
                     fetchPokemonByIdOrName(id).then(res => res.json())
                 );
+
                 if (active) {
                     setPokemonDetails(prev => {
                         const next = { ...prev };
@@ -245,7 +268,9 @@ function PokemonListInner(props) {
 
     // Background prefetcher to fetch all stats asynchronously in chunks of 50
     useEffect(() => {
-        if (processedList.length === 0) return;
+        if (processedList.length === 0) {
+            return;
+        }
 
         let active = true;
         const CHUNK_SIZE = 50;
@@ -257,7 +282,9 @@ function PokemonListInner(props) {
             const allIds = processedList.map(pokemon => pokemon.id);
 
             for (let i = 0; i < allIds.length; i += CHUNK_SIZE) {
-                if (!active) break;
+                if (!active) {
+                    break;
+                }
 
                 const chunk = allIds.slice(i, i + CHUNK_SIZE);
                 // Filter out IDs that are already cached using the hot Ref cache
@@ -268,6 +295,7 @@ function PokemonListInner(props) {
                         const results = await limitConcurrency(missingIds, 10, id =>
                             fetchPokemonByIdOrName(id).then(res => res.json())
                         );
+
                         if (active) {
                             setPokemonDetails(prev => {
                                 const next = { ...prev };
@@ -290,6 +318,7 @@ function PokemonListInner(props) {
                     } catch (err) {
                         console.error("Background prefetch error:", err);
                     }
+
                     // Small delay to prevent API rate limiting
                     await new Promise(resolve => setTimeout(resolve, 300));
                 }
@@ -309,11 +338,11 @@ function PokemonListInner(props) {
         return (
             <th 
                 onClick={() => handleSort(columnKey)} 
-                className={`sortable-header ${isActive ? 'active-sort' : ''}`}
+                className={`cursor-pointer user-select-none ${isActive ? 'bg-secondary bg-opacity-25' : ''}`}
             >
-                <div className="flex-center-gap-small">
-                    {label}
-                    <span className="material-symbols-outlined sort-icon">
+                <div className="d-flex align-items-center justify-content-between">
+                    <span>{label}</span>
+                    <span className="material-symbols-outlined fs-6 text-muted">
                         {isActive ? (sortDirection === 'asc' ? 'arrow_drop_up' : 'arrow_drop_down') : 'unfold_more'}
                     </span>
                 </div>
@@ -322,115 +351,121 @@ function PokemonListInner(props) {
     };
 
     return (
-        <div>
+        <Container fluid className="p-0">
             {/* Optional Section Title Header with View Toggle */}
             {sectionTitle && (
-                <div className="flex-between-wrap mb-1">
-                    <h2 className="section-title">
+                <div className="d-flex justify-content-between align-items-center flex-wrap gap-3 mb-3">
+                    <div className="d-flex align-items-center flex-wrap gap-2 fs-4 fs-md-3 mb-0 fw-bold">
                         {sectionTitle}
-                        {countBadge !== undefined && <span className="catalog-count-badge">{countBadge}</span>}
-                    </h2>
-                    <div className="view-toggle-container">
-                        <button
-                            className={`view-toggle-btn ${viewMode === 'grid' ? 'active' : ''}`}
-                            onClick={() => handleViewModeChange('grid')}
-                            id="view-toggle-grid"
-                            title="Grid View"
-                            aria-label="Grid View"
-                        >
-                            <span className="material-symbols-outlined toggle-icon">grid_view</span>
-                        </button>
-                        <button
-                            className={`view-toggle-btn ${viewMode === 'list' ? 'active' : ''}`}
-                            onClick={() => handleViewModeChange('list')}
-                            id="view-toggle-list"
-                            title="List View"
-                            aria-label="List View"
-                        >
-                            <span className="material-symbols-outlined toggle-icon">format_list_bulleted</span>
-                        </button>
+                        <CountBadge count={countBadge} className="fs-6" />
                     </div>
+                    <ButtonGroup className="ms-auto">
+                        <Button
+                            variant={viewMode === 'grid' ? 'secondary' : 'outline-secondary'}
+                            onClick={() => handleViewModeChange('grid')}
+                            title="Grid View"
+                            className="d-flex align-items-center"
+                        >
+                            <span className="material-symbols-outlined">grid_view</span>
+                        </Button>
+                        <Button
+                            variant={viewMode === 'list' ? 'secondary' : 'outline-secondary'}
+                            onClick={() => handleViewModeChange('list')}
+                            title="List View"
+                            className="d-flex align-items-center"
+                        >
+                            <span className="material-symbols-outlined">format_list_bulleted</span>
+                        </Button>
+                    </ButtonGroup>
                 </div>
             )}
 
             {/* Search Section & View Toggle (hidden if hideSearch is true) */}
             {!hideSearch && (
-                <div className="search-bar-row">
-                    <div className="search-container">
-                        <input
-                            type="text"
-                            className="search-input"
-                            placeholder="Search Pokemon by name or national ID..."
-                            value={searchTerm}
-                            onChange={(e) => setSearchTerm(e.target.value)}
-                            id="pokedex-search-bar"
-                        />
-                        <span className="search-icon"><span className="material-symbols-outlined">search</span></span>
-                    </div>
+                <Row className="mb-4 align-items-center g-2 flex-nowrap">
+                    <Col className="flex-grow-1">
+                        <InputGroup>
+                            <Form.Control
+                                type="text"
+                                placeholder="Search Pokemon by name or national ID..."
+                                value={searchTerm}
+                                onChange={(e) => setSearchTerm(e.target.value)}
+                                className="bg-dark text-light border-secondary shadow-none"
+                            />
+                            <InputGroup.Text className="bg-dark border-secondary text-light">
+                                <span className="material-symbols-outlined fs-5">search</span>
+                            </InputGroup.Text>
+                        </InputGroup>
+                    </Col>
                     {!sectionTitle && (
-                        <div className="view-toggle-container">
-                            <button
-                                className={`view-toggle-btn ${viewMode === 'grid' ? 'active' : ''}`}
-                                onClick={() => handleViewModeChange('grid')}
-                                id="view-toggle-grid"
-                                title="Grid View"
-                                aria-label="Grid View"
-                            >
-                                <span className="material-symbols-outlined toggle-icon">grid_view</span>
-                            </button>
-                            <button
-                                className={`view-toggle-btn ${viewMode === 'list' ? 'active' : ''}`}
-                                onClick={() => handleViewModeChange('list')}
-                                id="view-toggle-list"
-                                title="List View"
-                                aria-label="List View"
-                            >
-                                <span className="material-symbols-outlined toggle-icon">format_list_bulleted</span>
-                            </button>
-                        </div>
+                        <Col xs="auto">
+                            <ButtonGroup>
+                                <Button
+                                    variant={viewMode === 'grid' ? 'secondary' : 'outline-secondary'}
+                                    onClick={() => handleViewModeChange('grid')}
+                                    title="Grid View"
+                                    className="d-flex align-items-center"
+                                >
+                                    <span className="material-symbols-outlined">grid_view</span>
+                                </Button>
+                                <Button
+                                    variant={viewMode === 'list' ? 'secondary' : 'outline-secondary'}
+                                    onClick={() => handleViewModeChange('list')}
+                                    title="List View"
+                                    className="d-flex align-items-center"
+                                >
+                                    <span className="material-symbols-outlined">format_list_bulleted</span>
+                                </Button>
+                            </ButtonGroup>
+                        </Col>
                     )}
-                </div>
+                </Row>
             )}
 
             {/* Generation Filters */}
             {!hideGenFilter && (
-                <div className="filter-bar">
-                    <div className="filter-tabs">
-                        {GENERATIONS.map(gen => (
-                            <button
-                                key={gen.name}
-                                className={`tab-btn ${activeGen === gen.name ? 'active' : ''}`}
+                <Nav variant="pills" className="mb-4 flex-nowrap overflow-x-auto gap-2 py-1" style={{ whiteSpace: 'nowrap' }}>
+                    {GENERATIONS.map(gen => (
+                        <Nav.Item key={gen.name}>
+                            <Nav.Link 
+                                active={activeGen === gen.name}
                                 onClick={() => handleGenChange(gen.name)}
+                                className={`text-light ${activeGen === gen.name ? 'bg-secondary text-white fw-bold' : 'bg-dark text-light border border-secondary'}`}
+                                style={{ cursor: 'pointer' }}
                             >
                                 {gen.name}
-                            </button>
-                        ))}
-                    </div>
-                </div>
+                            </Nav.Link>
+                        </Nav.Item>
+                    ))}
+                </Nav>
             )}
 
             {/* Pokemon Grid or Tabular List */}
             {visibleList.length ? (
                 viewMode === 'grid' ? (
-                    <PokemonGrid pokemonList={visibleList} showAbilityType={showAbilityType} />
+                    <PokemonGrid
+                        pokemonList={visibleList}
+                        pokemonDetails={pokemonDetails}
+                        showAbilityType={showAbilityType}
+                    />
                 ) : (
-                    <div className="pokedex-table-wrapper glass-panel">
-                        <table className="pokedex-table">
-                            <thead>
+                    <div className="table-responsive bg-dark rounded border border-secondary">
+                        <Table variant="dark" hover className="mb-0 align-middle text-nowrap">
+                            <thead className="border-secondary">
                                 <tr>
-                                    {renderSortHeader('id', '#', '100px')}
+                                    {renderSortHeader('id', '#')}
                                     {renderSortHeader('name', 'Name')}
-                                    <th className="text-nowrap">Type</th>
-                                    {renderSortHeader('total', 'Total', '80px')}
-                                    {renderSortHeader('hp', 'HP', '60px')}
-                                    {renderSortHeader('attack', 'Attack', '60px')}
-                                    {renderSortHeader('defense', 'Defense', '60px')}
-                                    {renderSortHeader('special-attack', 'Sp. Atk', '60px')}
-                                    {renderSortHeader('special-defense', 'Sp. Def', '60px')}
-                                    {renderSortHeader('speed', 'Speed', '60px')}
+                                    <th>Type</th>
+                                    {renderSortHeader('total', 'Total')}
+                                    {renderSortHeader('hp', 'HP')}
+                                    {renderSortHeader('attack', 'Attack')}
+                                    {renderSortHeader('defense', 'Defense')}
+                                    {renderSortHeader('special-attack', 'Sp. Atk')}
+                                    {renderSortHeader('special-defense', 'Sp. Def')}
+                                    {renderSortHeader('speed', 'Speed')}
                                 </tr>
                             </thead>
-                            <tbody>
+                            <tbody className="border-secondary">
                                 {visibleList.map((pokemon) => {
                                     const details = pokemonDetails[pokemon.id];
                                     const totalStats = details 
@@ -443,68 +478,63 @@ function PokemonListInner(props) {
                                             onClick={() => {
                                                 const speciesName = pokemon.speciesName || pokemon.name;
                                                 const hasVariety = pokemon.id >= 10000;
-                                                router.push(`/pokemons/${speciesName}${hasVariety ? `?form=${pokemon.name}` : ''}`);
+                                                const queryString = hasVariety ? '?form=' + pokemon.name : '';
+
+                                                router.push(`/pokemons/${speciesName}${queryString}`);
                                             }}
-                                            className="pokedex-row"
-                                            id={`pokemon-row-${pokemon.id}`}
+                                            className="cursor-pointer"
                                         >
-                                            <td className={sortColumn === 'id' ? 'active-sort-cell' : ''}>
-                                                <div className="flex-center-gap">
-                                                    <div className="table-sprite-container">
-                                                        <img
-                                                            src={pokemon.imageUrl}
-                                                            alt={pokemon.name}
-                                                            width="40"
-                                                            height="40"
-                                                            loading="lazy"
-                                                            onError={(e) => {
-                                                                e.target.src = `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${pokemon.id}.png`;
-                                                            }}
-                                                        />
-                                                    </div>
-                                                    <span className="pokedex-id-txt">{pokemon.paddedId}</span>
+                                            <td className={sortColumn === 'id' ? 'bg-secondary bg-opacity-10' : ''}>
+                                                <div className="d-flex align-items-center gap-2">
+                                                    <img
+                                                        src={pokemon.imageUrl}
+                                                        alt={pokemon.name}
+                                                        width="40"
+                                                        height="40"
+                                                        loading="lazy"
+                                                        className="pokemon-table-sprite-img"
+                                                        onError={(e) => {
+                                                            e.target.src = "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/" + pokemon.id + ".png";
+                                                        }}
+                                                    />
+                                                    <span className="text-muted small fw-bold">{pokemon.paddedId}</span>
                                                 </div>
                                             </td>
-                                            <td className={`pokedex-name-txt ${sortColumn === 'name' ? 'active-sort-cell' : ''}`}>
-                                                {pokemon.name.replace('-', ' ')}
+                                            <td className={`text-capitalize fw-bold ${sortColumn === 'name' ? 'bg-secondary bg-opacity-10' : ''}`}>
+                                                {pokemon.name.replace(/-/g, ' ')}
                                             </td>
                                             <td>
                                                 {details ? (
-                                                    <div className="flex-gap-075-wrap">
+                                                    <div className="d-flex gap-1">
                                                         {details.types.map(typeStr => (
-                                                            <span 
-                                                                key={typeStr} 
-                                                                className={`type-badge type-${typeStr} type-badge-sm`}
-                                                            >
-                                                                {typeStr}
-                                                            </span>
+                                                            <TypeBadge key={typeStr} type={typeStr} />
                                                         ))}
                                                     </div>
                                                 ) : (
-                                                    <span className="loading-text">Loading...</span>
+                                                    <span className="text-muted small">Loading...</span>
                                                 )}
                                             </td>
-                                            <td className={`pokedex-stat-txt total-stat ${sortColumn === 'total' ? 'active-sort-cell' : ''}`}>
+                                            <td className={`fw-bold text-info ${sortColumn === 'total' ? 'bg-secondary bg-opacity-10' : ''}`}>
                                                 {totalStats !== null ? totalStats : '...'}
                                             </td>
-                                            <td className={`pokedex-stat-txt ${sortColumn === 'hp' ? 'active-sort-cell' : ''}`}>{details ? details.stats.hp : '...'}</td>
-                                            <td className={`pokedex-stat-txt ${sortColumn === 'attack' ? 'active-sort-cell' : ''}`}>{details ? details.stats.attack : '...'}</td>
-                                            <td className={`pokedex-stat-txt ${sortColumn === 'defense' ? 'active-sort-cell' : ''}`}>{details ? details.stats.defense : '...'}</td>
-                                            <td className={`pokedex-stat-txt ${sortColumn === 'special-attack' ? 'active-sort-cell' : ''}`}>{details ? details.stats['special-attack'] : '...'}</td>
-                                            <td className={`pokedex-stat-txt ${sortColumn === 'special-defense' ? 'active-sort-cell' : ''}`}>{details ? details.stats['special-defense'] : '...'}</td>
-                                            <td className={`pokedex-stat-txt ${sortColumn === 'speed' ? 'active-sort-cell' : ''}`}>{details ? details.stats.speed : '...'}</td>
+                                            <td className={sortColumn === 'hp' ? 'bg-secondary bg-opacity-10' : ''}>{details ? details.stats.hp : '...'}</td>
+                                            <td className={sortColumn === 'attack' ? 'bg-secondary bg-opacity-10' : ''}>{details ? details.stats.attack : '...'}</td>
+                                            <td className={sortColumn === 'defense' ? 'bg-secondary bg-opacity-10' : ''}>{details ? details.stats.defense : '...'}</td>
+                                            <td className={sortColumn === 'special-attack' ? 'bg-secondary bg-opacity-10' : ''}>{details ? details.stats['special-attack'] : '...'}</td>
+                                            <td className={sortColumn === 'special-defense' ? 'bg-secondary bg-opacity-10' : ''}>{details ? details.stats['special-defense'] : '...'}</td>
+                                            <td className={sortColumn === 'speed' ? 'bg-secondary bg-opacity-10' : ''}>{details ? details.stats.speed : '...'}</td>
                                         </tr>
                                     );
                                 })}
                             </tbody>
-                        </table>
+                        </Table>
                     </div>
                 )
             ) : (
-                <div className="glass-panel no-results">
-                    <h3>No Pokemon found matching your criteria.</h3>
-                </div>
+                <Alert variant="secondary" className="text-center p-5">
+                    <h4 className="mb-0">No Pokemon found matching your criteria.</h4>
+                </Alert>
             )}
-        </div>
+        </Container>
     );
 }

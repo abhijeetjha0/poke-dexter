@@ -25,8 +25,10 @@ describe('MoveDetailPage (Server Component)', () => {
             power: 40,
             accuracy: 100,
             pp: 35,
+            priority: 1,
             type: { name: 'normal' },
             damage_class: { name: 'physical' },
+            target: { name: 'selected-pokemon' },
             effect_entries: [{ language: { name: 'en' }, effect: 'Damages target.' }],
             learned_by_pokemon: [{ name: 'rattata', url: 'https://pokeapi.co/api/v2/pokemon/19/' }]
         };
@@ -44,6 +46,8 @@ describe('MoveDetailPage (Server Component)', () => {
         expect(getByText(/Damages target/)).toBeInTheDocument();
         expect(getByText('40')).toBeInTheDocument();
         expect(getByText('100%')).toBeInTheDocument();
+        expect(getByText('+1')).toBeInTheDocument();
+        expect(getByText('selected pokemon')).toBeInTheDocument();
         expect(getByTestId('pokemon-grid')).toHaveTextContent('1');
     });
 

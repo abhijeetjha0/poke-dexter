@@ -1,6 +1,8 @@
 import Link from 'next/link';
+import { Container } from 'react-bootstrap';
 import PokemonList from '../../pokemons/pokemon-list';
 import DamageClassIcon from '../../components/damage-class-icon';
+import TypeBadge from '../../components/type-badge';
 import { fetchMoveByNameOrId, fetchPokemonByUrl, fetchMoveList } from '../../api-requests';
 import { generateCommonStaticParams } from '../../lib/static-params-util';
 import { limitConcurrency } from '../../lib/promise-utils';
@@ -14,20 +16,22 @@ export default async function MoveDetailPage({ params }) {
 
     if (!response.ok) {
         return (
-            <div className="glass-panel text-center-padded">
-                <h2>Move "{moveName}" not found.</h2>
-                <Link href="/moves" className="btn mt-1">
-                    Back to Moves Index
-                </Link>
-            </div>
+            <Container fluid className="py-5 text-center">
+                <div className="alert alert-secondary bg-dark text-light border-secondary">
+                    <h4 className="mb-3">Move "{moveName}" not found.</h4>
+                    <Link href="/moves" className="btn btn-primary">
+                        Back to Moves Index
+                    </Link>
+                </div>
+            </Container>
         );
     }
 
     const moveJSON = await response.json();
-    
+
     // Find English description
     const effectEntry = moveJSON.effect_entries?.find(entry => entry.language?.name === 'en') ||
-                        moveJSON.flavor_text_entries?.find(entry => entry.language?.name === 'en');
+        moveJSON.flavor_text_entries?.find(entry => entry.language?.name === 'en');
     const descriptionText = effectEntry ? (effectEntry.effect || effectEntry.flavor_text) : 'No description available in English.';
 
     const pokemonList = moveJSON.learned_by_pokemon || [];
@@ -36,10 +40,10 @@ export default async function MoveDetailPage({ params }) {
     const processedPokemon = await limitConcurrency(pokemonList, 10, async (pokemon) => {
         const parts = pokemon.url.split('/').filter(Boolean);
         const id = parseInt(parts[parts.length - 1], 10);
-        
+
         let speciesId = id;
         let speciesName = pokemon.name;
-        
+
         if (id >= 10000) {
             try {
                 const res = await fetchPokemonByUrl(pokemon.url);
@@ -67,24 +71,38 @@ export default async function MoveDetailPage({ params }) {
 
     const moveType = moveJSON.type?.name || 'normal';
     const moveClass = moveJSON.damage_class?.name || 'physical';
+    const moveTarget = moveJSON.target?.name ? moveJSON.target.name.replace(/-/g, ' ') : null;
+    const priorityVal = moveJSON.priority !== undefined && moveJSON.priority !== null ? moveJSON.priority : 0;
+    const priorityText = priorityVal > 0 ? `+${priorityVal}` : `${priorityVal}`;
 
     return (
-        <div>
+        <Container fluid className="p-0">
             {/* Header / Info Panel (Inline Compact) */}
-            <div className="glass-panel move-detail-header-card mb-2" id="move-info-panel">
-                <div className="move-info-inline-container">
-                    <strong className="move-inline-title">{moveJSON.name.replace('-', ' ')}:</strong>
-                    <span className={`type-badge type-${moveType}`}>
-                        {moveType}
-                    </span>
-                    <span className="type-badge badge-secondary">
-                        <DamageClassIcon damageClass={moveClass} size="1em" />
-                        {moveClass}
-                    </span>
-                    <span className="move-inline-stat">Power: <strong>{moveJSON.power !== null ? moveJSON.power : '—'}</strong></span>
-                    <span className="move-inline-stat">Acc: <strong>{moveJSON.accuracy !== null ? `${moveJSON.accuracy}%` : '—'}</strong></span>
-                    <span className="move-inline-stat">PP: <strong>{moveJSON.pp !== null ? moveJSON.pp : '—'}</strong></span>
-                    <span className="move-inline-desc">— {descriptionText.replace('$effect_chance', moveJSON.effect_chance)}</span>
+            <div className="card bg-dark border-secondary mb-4 text-light">
+                <div className="card-body">
+                    <div className="d-flex flex-wrap align-items-center gap-3 mb-3">
+                        <strong className="text-capitalize text-info fs-5">{moveJSON.name.replace(/-/g, ' ')}:</strong>
+                        <TypeBadge type={moveType} />
+                        <DamageClassIcon damageClass={moveClass} showLabel={true} />
+                        <span className="text-muted ms-md-auto">
+                            Power: <strong className="text-light">{moveJSON.power !== null ? moveJSON.power : '—'}</strong>
+                        </span>
+                        <span className="text-muted">
+                            Acc: <strong className="text-light">{moveJSON.accuracy !== null ? `${moveJSON.accuracy}%` : '—'}</strong>
+                        </span>
+                        <span className="text-muted">
+                            PP: <strong className="text-light">{moveJSON.pp !== null ? moveJSON.pp : '—'}</strong>
+                        </span>
+                        <span className="text-muted">
+                            Priority: <strong className="text-light">{priorityText}</strong>
+                        </span>
+                        {moveTarget && (
+                            <span className="text-muted">
+                                Target: <strong className="text-light text-capitalize">{moveTarget}</strong>
+                            </span>
+                        )}
+                    </div>
+                    <p className="mb-0 text-light">— {descriptionText.replace('$effect_chance', moveJSON.effect_chance)}</p>
                 </div>
             </div>
 
@@ -98,11 +116,11 @@ export default async function MoveDetailPage({ params }) {
                     countBadge={processedPokemon.length}
                 />
             ) : (
-                <div className="glass-panel no-results">
-                    <h3>No Pokémon can learn this move.</h3>
+                <div className="alert alert-secondary text-center p-5 bg-dark text-light border-secondary">
+                    <h4 className="mb-0">No Pokémon can learn this move.</h4>
                 </div>
             )}
-        </div>
+        </Container>
     );
 }
 

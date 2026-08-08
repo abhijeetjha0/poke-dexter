@@ -1,10 +1,10 @@
 @use 'variables' as *;
-@import url('https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200');
-@import url('https://fonts.googleapis.com/icon?family=Material+Icons');
-@import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Outfit:wght@300;400;600;700&display=swap');
+@import 'https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200';
+@import 'https://fonts.googleapis.com/icon?family=Material+Icons';
+@import 'https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Outfit:wght@300;400;600;700&display=swap';
 
 .material-symbols-outlined {
-  font-family: 'Material Symbols Outlined', 'Material Icons';
+  font-family: 'Material Symbols Outlined', 'Material Icons', sans-serif;
   font-weight: normal;
   font-style: normal;
   font-size: 1.25rem;
@@ -29,7 +29,7 @@
 }
 
 body {
-  background: radial-gradient(circle at 50% 0%, #1a2236 0%, $bg-gradient-start 70%), $bg-gradient-start;
+  background: $bg-gradient-start;
   color: $text-main;
   font-family: $font-sans;
   min-height: 100vh;
@@ -61,54 +61,14 @@ a {
   }
 }
 
-/* Container & Header layout */
+/* Container layout */
 .app-container {
   max-width: 1200px;
   margin: 0 auto;
   padding: 1.5rem;
 }
 
-.pokedex-header {
-  position: relative;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  gap: 1.5rem;
-  margin-bottom: 2rem;
-  border-bottom: 1px solid $panel-border;
-  padding-bottom: 1rem;
-}
-
-.pokedex-logo {
-  font-family: $font-digital;
-  font-size: 1.8rem;
-  font-weight: 900;
-  letter-spacing: 2px;
-  background: linear-gradient(135deg, #00f2fe 0%, #4facfe 100%);
-  background-clip: text;
-  -webkit-text-fill-color: transparent;
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  white-space: nowrap;
-
-  @media (width <= 1024px) {
-    font-size: 1.5rem;
-  }
-}
-
-/* Glassmorphism Panel styles */
-.glass-panel {
-  background: $panel-bg;
-  border: 1px solid $panel-border;
-  border-radius: 16px;
-  backdrop-filter: blur(16px);
-  padding: 1.5rem;
-  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-
-  &:hover {
-    background: $panel-hover-bg;
-    border-color: $panel-hover-border;
-  }
+/* Utility */
+.cursor-pointer {
+  cursor: pointer;
 }

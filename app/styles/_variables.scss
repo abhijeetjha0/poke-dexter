@@ -12,7 +12,7 @@ $type-flying: #A98FF3;
 $type-psychic: #F95587;
 $type-bug: #A6B91A;
 $type-rock: #B6A136;
-$type-ghost: #705746;
+$type-ghost: #735797;
 $type-dragon: #6F35FC;
 $type-dark: #705746;
 $type-steel: #B7B7CE;
@@ -29,7 +29,7 @@ $species-purple: #6a3a7a;
 $species-red: #8e1c19;
 $species-white: #7f8c8d;
 $species-yellow: #a8942b;
-$bg-gradient-start: #080a10;
+$bg-gradient-start: #212529;
 $bg-gradient-end: #121622;
 $panel-bg: rgba(255, 255, 255, 0.04);
 $panel-border: rgba(255, 255, 255, 0.08);
@@ -42,3 +42,9 @@ $accent-blue: #3b82f6;
 $accent-red: #ef4444;
 $font-sans: 'Outfit', sans-serif;
 $font-digital: 'Orbitron', monospace;
+
+/* Border Radius Tokens */
+$radius-sm: 4px;
+$radius-md: 8px;
+$radius-lg: 12px;
+$radius-xl: 16px;

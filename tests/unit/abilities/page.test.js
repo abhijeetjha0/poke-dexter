@@ -32,7 +32,7 @@ describe('AbilitiesPage (Server Component)', () => {
         const Page = await AbilitiesPage();
         const { getByTestId } = render(Page);
 
-        expect(fetchAbilityList).toHaveBeenCalledWith(500);
+        expect(fetchAbilityList).toHaveBeenCalledWith(1000);
         
         const listContainer = getByTestId('abilities-list');
         expect(listContainer).toBeInTheDocument();

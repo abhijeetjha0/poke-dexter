@@ -14,25 +14,25 @@ export default function HomePage() {
                     Special thanks and shout out to <a href="https://pokeapi.co/" target="_blank" rel="noopener noreferrer">PokéAPI</a> for powering this app!
                 </p>
                 <div className="hero-buttons-container">
-                    <Link href="/pokemons" className="btn btn-primary btn-explore" id="home-explore-btn">
-                        Open PokeDex Directory
+                    <Link href="/pokemons" className="btn btn-success btn-explore" id="home-explore-btn">
+                        Open PokeDex
                     </Link>
                 </div>
             </div>
             <div className="hero-artwork">
-                <img 
+                <img
                     className="mascot-img-bulba"
-                    src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/1.png" 
-                    alt="Bulbasaur Mascot" 
-                    width="150" 
+                    src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/1.png"
+                    alt="Bulbasaur Mascot"
+                    width="150"
                     height="150"
                     id="mascot-img-bulba"
                 />
-                <img 
+                <img
                     className="mascot-img-chari"
-                    src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/6.png" 
-                    alt="Charizard Mascot" 
-                    width="220" 
+                    src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/6.png"
+                    alt="Charizard Mascot"
+                    width="220"
                     height="220"
                     id="mascot-img-chari"
                 />

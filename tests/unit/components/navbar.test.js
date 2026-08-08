@@ -16,6 +16,7 @@ describe('Navbar Component', () => {
 
         expect(screen.getByText('PokeDexter')).toBeInTheDocument();
         expect(screen.getAllByText('Pokedex').length).toBeGreaterThan(0);
+        expect(screen.getAllByText('Team Builder').length).toBeGreaterThan(0);
         expect(screen.getAllByText('Abilities').length).toBeGreaterThan(0);
         expect(screen.getAllByText('Moves').length).toBeGreaterThan(0);
         expect(screen.getAllByText('Types').length).toBeGreaterThan(0);
@@ -25,10 +26,10 @@ describe('Navbar Component', () => {
     test('toggles mobile menu when hamburger button is clicked', () => {
         render(<Navbar />);
 
-        const hamburgerBtn = screen.getByRole('button', { name: /Toggle navigation menu/i });
-        expect(hamburgerBtn.getAttribute('aria-expanded')).toBe('false');
+        const hamburgerBtn = screen.getByRole('button', { name: /Toggle navigation/i });
+        expect(hamburgerBtn).toHaveClass('collapsed');
 
         fireEvent.click(hamburgerBtn);
-        expect(hamburgerBtn.getAttribute('aria-expanded')).toBe('true');
+        expect(hamburgerBtn).not.toHaveClass('collapsed');
     });
 });

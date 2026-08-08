@@ -3,7 +3,12 @@
 import { useState, Suspense } from 'react';
 import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
+import { Container, Row, Col, Card, Badge, Button, ListGroup, Collapse, Nav, Alert, ProgressBar } from 'react-bootstrap';
 import DamageClassIcon from '../../components/damage-class-icon';
+import TypeDefenseGrid from '../../components/type-defense-grid';
+import BaseStatsCard from '../../components/base-stats-card';
+import TypeBadge from '../../components/type-badge';
+import CountBadge from '../../components/count-badge';
 
 const ALL_TYPES = [
     'normal', 'fighting', 'flying', 'poison', 'ground', 'rock',
@@ -32,27 +37,9 @@ const VERSION_NAMES = {
     'scarlet': 'Scarlet', 'violet': 'Violet',
 };
 
-function getMultiplierLabel(value) {
-    if (value === 0) return '0×';
-    if (value === 0.25) return '¼×';
-    if (value === 0.5) return '½×';
-    if (value === 1) return '1×';
-    if (value === 2) return '2×';
-    if (value === 4) return '4×';
 
-    return `${value}×`;
-}
 
-function getMultiplierClass(value) {
-    if (value === 0) return 'defense-immune';
-    if (value === 0.25) return 'defense-quarter';
-    if (value === 0.5) return 'defense-half';
-    if (value === 1) return 'defense-neutral';
-    if (value === 2) return 'defense-double';
-    if (value === 4) return 'defense-quad';
 
-    return 'defense-neutral';
-}
 
 export default function PokemonDetailView(props) {
     return (
@@ -94,6 +81,10 @@ function PokemonDetailViewInner({
         defenses: false,
         moves: false,
         locations: false,
+        movePhysical: false,
+        moveSpecial: false,
+        moveStatus: false,
+        moveUnknown: false,
     });
 
     const toggleCollapse = (key) => {
@@ -119,7 +110,7 @@ function PokemonDetailViewInner({
             setActiveVarietyIndex(0);
         }
     }
-    
+
     const activeVariety = varietyList[activeVarietyIndex] || varietyList[0];
     const {
         name,
@@ -151,16 +142,16 @@ function PokemonDetailViewInner({
     // Extract ID of a species for rendering image
     const getSpeciesIdFromUrl = (url) => {
         if (!url) return null;
-        
+
         const parts = url.split('/').filter(Boolean);
-        
+
         return parseInt(parts[parts.length - 1], 10);
     };
 
     // Helper to capitalize words separated by hyphens
     const capitalizeWords = (str) => {
         if (!str) return '';
-        
+
         return str.split('-').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ');
     };
 
@@ -191,7 +182,7 @@ function PokemonDetailViewInner({
             if (details.relative_physical_stats === 0) conditions.push('Atk = Def');
             if (details.needs_overworld_rain) conditions.push('In Rain');
             if (details.turn_upside_down) conditions.push('Upside down');
-            
+
             if (conditions.length === 0) return 'Level Up';
         } else if (trigger === 'use-item') {
             if (details.item) conditions.push(`${capitalizeWords(details.item.name)}`);
@@ -304,7 +295,7 @@ function PokemonDetailViewInner({
         const baseId = getSpeciesIdFromUrl(childSpeciesUrl);
         const defaultVariant = {
             name: childSpeciesName,
-            displayName: childSpeciesName.replace('-', ' '),
+            displayName: childSpeciesName.replace(/-/g, ' '),
             id: baseId,
             urlName: childSpeciesName,
             href: `/pokemons/${childSpeciesName}`
@@ -403,7 +394,7 @@ function PokemonDetailViewInner({
         const baseId = getSpeciesIdFromUrl(node.species.url);
         const baseVariant = {
             name: baseName,
-            displayName: baseName.replace('-', ' '),
+            displayName: baseName.replace(/-/g, ' '),
             id: baseId,
             urlName: baseName,
             href: `/pokemons/${baseName}`
@@ -447,26 +438,15 @@ function PokemonDetailViewInner({
                                             height="56"
                                         />
                                     )}
-                                    <div>
-                                        <div className="name">
-                                            {v.displayName}
-                                        </div>
-                                        {isActive ? (
-                                            <div className="subtext subtext-active">
-                                                Current
-                                            </div>
-                                        ) : (
-                                            <div className="subtext">
-                                                Click to view
-                                            </div>
-                                        )}
+                                    <div className="name">
+                                        {v.displayName}
                                     </div>
                                 </div>
                             </Link>
                             {node.evolves_to && node.evolves_to.length > 0 && (
                                 <div className="evolution-children">
                                     {node.evolves_to.flatMap((child) => {
-                                        const detailsArray = 
+                                        const detailsArray =
                                             (child.evolution_details && child.evolution_details.length > 0)
                                                 ? child.evolution_details
                                                 : [null];
@@ -477,8 +457,8 @@ function PokemonDetailViewInner({
                                         detailsArray.forEach((detail) => {
                                             const methodText = parseSingleEvolutionDetail(detail);
                                             const variant = resolveEvolutionChildVariant(
-                                                child.species.name, 
-                                                child.species.url, 
+                                                child.species.name,
+                                                child.species.url,
                                                 detail
                                             );
                                             const key = variant.urlName;
@@ -497,142 +477,120 @@ function PokemonDetailViewInner({
                                         return Array.from(grouped.values()).map(
                                             ({ variant: childVariant, methods }) => {
                                                 const isChildActive = isCurrentForm(childVariant);
-                                            const combinedMethod = methods.join(' / ');
+                                                const combinedMethod = methods.join(' / ');
 
-                                            return (
-                                                <div className="evolution-child-wrapper" key={`${child.species.name}-${childVariant.urlName}`}>
-                                                    <div className="evolution-arrow-container">
-                                                        <div className="evolution-arrow"><span className="material-symbols-outlined">subdirectory_arrow_right</span></div>
-                                                        <div className="evolution-method">
-                                                            {combinedMethod}
+                                                return (
+                                                    <div className="evolution-child-wrapper" key={`${child.species.name}-${childVariant.urlName}`}>
+                                                        <div className="evolution-arrow-container">
+                                                            <div className="evolution-arrow"><span className="material-symbols-outlined">subdirectory_arrow_right</span></div>
+                                                            <div className="evolution-method">
+                                                                {combinedMethod}
+                                                            </div>
                                                         </div>
-                                                    </div>
-                                                    <div className="evolution-branch">
-                                                        <Link href={childVariant.href}>
-                                                            <div className={`evolution-link-card ${isChildActive ? 'active-node' : ''}`}>
-                                                                {childVariant.id && (
-                                                                    <img
-                                                                        src={`https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${childVariant.id}.png`}
-                                                                        alt={childVariant.displayName}
-                                                                        width="56"
-                                                                        height="56"
-                                                                    />
-                                                                )}
-                                                                <div>
+                                                        <div className="evolution-branch">
+                                                            <Link href={childVariant.href}>
+                                                                <div className={`evolution-link-card ${isChildActive ? 'active-node' : ''}`}>
+                                                                    {childVariant.id && (
+                                                                        <img
+                                                                            src={`https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${childVariant.id}.png`}
+                                                                            alt={childVariant.displayName}
+                                                                            width="56"
+                                                                            height="56"
+                                                                        />
+                                                                    )}
                                                                     <div className="name">
                                                                         {childVariant.displayName}
                                                                     </div>
-                                                                    {isChildActive ? (
-                                                                        <div className="subtext subtext-active">
-                                                                            Current
-                                                                        </div>
-                                                                    ) : (
-                                                                        <div className="subtext">
-                                                                            Click to view
-                                                                        </div>
-                                                                    )}
                                                                 </div>
-                                                            </div>
-                                                        </Link>
-                                                        {child.evolves_to && child.evolves_to.length > 0 && (
-                                                            <div className="evolution-children">
-                                                                {child.evolves_to.flatMap((grandchild) => {
-                                                                    const gcEv = grandchild.evolution_details;
-                                                                    const gcDetailsArray = (gcEv && gcEv.length)
-                                                                        ? gcEv
-                                                                        : [null];
+                                                            </Link>
+                                                            {child.evolves_to && child.evolves_to.length > 0 && (
+                                                                <div className="evolution-children">
+                                                                    {child.evolves_to.flatMap((grandchild) => {
+                                                                        const gcEv = grandchild.evolution_details;
+                                                                        const gcDetailsArray = (gcEv && gcEv.length)
+                                                                            ? gcEv
+                                                                            : [null];
 
-                                                                    const gcGrouped = new Map();
+                                                                        const gcGrouped = new Map();
 
-                                                                    gcDetailsArray.forEach((gcDetail) => {
-                                                                        const gcMethodText = parseSingleEvolutionDetail(
-                                                                            gcDetail
-                                                                        );
-                                                                        const gcVariant = resolveEvolutionChildVariant(
-                                                                            grandchild.species.name, 
-                                                                            grandchild.species.url, 
-                                                                            gcDetail
-                                                                        );
-                                                                        const gcKey = gcVariant.urlName;
-
-                                                                        if (gcGrouped.has(gcKey)) {
-                                                                            const gcEntry = gcGrouped.get(gcKey);
-
-                                                                            const entryMethods = gcEntry.methods;
-                                                                            if (!entryMethods.includes(gcMethodText)) {
-                                                                                entryMethods.push(gcMethodText);
-                                                                            }
-                                                                        } else {
-                                                                            gcGrouped.set(
-                                                                                gcKey, 
-                                                                                { 
-                                                                                    variant: gcVariant, 
-                                                                                    methods: [gcMethodText] 
-                                                                                }
+                                                                        gcDetailsArray.forEach((gcDetail) => {
+                                                                            const gcMethodText = parseSingleEvolutionDetail(
+                                                                                gcDetail
                                                                             );
-                                                                        }
-                                                                    });
+                                                                            const gcVariant = resolveEvolutionChildVariant(
+                                                                                grandchild.species.name,
+                                                                                grandchild.species.url,
+                                                                                gcDetail
+                                                                            );
+                                                                            const gcKey = gcVariant.urlName;
 
-                                                                    const gcList = Array.from(gcGrouped.values());
+                                                                            if (gcGrouped.has(gcKey)) {
+                                                                                const gcEntry = gcGrouped.get(gcKey);
 
-                                                                    return gcList.map((gcItem) => {
-                                                                        const gcVar = gcItem.variant;
-                                                                        const isGcAct = isCurrentForm(gcVar);
-                                                                        const gcMethodText = gcItem.methods.join(' / ');
-                                                                        const spriteBase = 
-                                                                            'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon';
-                                                                        const gcSpriteUrl = `${spriteBase}/${gcVar.id}.png`;
-                                                                        const gcKey = `${grandchild.species.name}-${gcVar.urlName}`;
-                                                                        const linkClass = 
-                                                                            `evolution-link-card ${isGcAct ? 'active-node' : ''}`;
-                                                                        const gcName = gcVar.displayName;
+                                                                                const entryMethods = gcEntry.methods;
+                                                                                if (!entryMethods.includes(gcMethodText)) {
+                                                                                    entryMethods.push(gcMethodText);
+                                                                                }
+                                                                            } else {
+                                                                                gcGrouped.set(
+                                                                                    gcKey,
+                                                                                    {
+                                                                                        variant: gcVariant,
+                                                                                        methods: [gcMethodText]
+                                                                                    }
+                                                                                );
+                                                                            }
+                                                                        });
 
-                                                                        return (
-                                                                            <div className="evolution-child-wrapper" key={gcKey}>
-                                                                                <div className="evolution-arrow-container">
-                                                                                    <div className="evolution-arrow">
-                                                                                        <span className="material-symbols-outlined">
-                                                                                            subdirectory_arrow_right
-                                                                                        </span>
-                                                                                    </div>
-                                                                                    <div className="evolution-method">{gcMethodText}</div>
-                                                                                </div>
-                                                                                <div className="evolution-branch">
-                                                                                    <Link href={gcVar.href}>
-                                                                                        <div className={linkClass}>
-                                                                                            {gcVar.id && (
-                                                                                                <img
-                                                                                                    src={gcSpriteUrl}
-                                                                                                    alt={gcName}
-                                                                                                    width="56"
-                                                                                                    height="56"
-                                                                                                />
-                                                                                            )}
-                                                                                            <div>
-                                                                                                <div className="name">{gcName}</div>
-                                                                                                {isGcAct ? (
-                                                                                                    <div className="subtext subtext-active">
-                                                                                                        Current
-                                                                                                    </div>
-                                                                                                ) : (
-                                                                                                    <div className="subtext">
-                                                                                                        Click to view
-                                                                                                    </div>
-                                                                                                )}
-                                                                                            </div>
+                                                                        const gcList = Array.from(gcGrouped.values());
+
+                                                                        return gcList.map((gcItem) => {
+                                                                            const gcVar = gcItem.variant;
+                                                                            const isGcAct = isCurrentForm(gcVar);
+                                                                            const gcMethodText = gcItem.methods.join(' / ');
+                                                                            const spriteBase =
+                                                                                'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon';
+                                                                            const gcSpriteUrl = `${spriteBase}/${gcVar.id}.png`;
+                                                                            const gcKey = `${grandchild.species.name}-${gcVar.urlName}`;
+                                                                            const linkClass =
+                                                                                `evolution-link-card ${isGcAct ? 'active-node' : ''}`;
+                                                                            const gcName = gcVar.displayName;
+
+                                                                            return (
+                                                                                <div className="evolution-child-wrapper" key={gcKey}>
+                                                                                    <div className="evolution-arrow-container">
+                                                                                        <div className="evolution-arrow">
+                                                                                            <span className="material-symbols-outlined">
+                                                                                                subdirectory_arrow_right
+                                                                                            </span>
                                                                                         </div>
-                                                                                    </Link>
+                                                                                        <div className="evolution-method">{gcMethodText}</div>
+                                                                                    </div>
+                                                                                    <div className="evolution-branch">
+                                                                                        <Link href={gcVar.href}>
+                                                                                            <div className={linkClass}>
+                                                                                                {gcVar.id && (
+                                                                                                    <img
+                                                                                                        src={gcSpriteUrl}
+                                                                                                        alt={gcName}
+                                                                                                        width="56"
+                                                                                                        height="56"
+                                                                                                    />
+                                                                                                )}
+                                                                                                <div className="name">{gcName}</div>
+                                                                                            </div>
+                                                                                        </Link>
+                                                                                    </div>
                                                                                 </div>
-                                                                            </div>
-                                                                        );
-                                                                    });
-                                                                })}
-                                                            </div>
-                                                        )}
+                                                                            );
+                                                                        });
+                                                                    })}
+                                                                </div>
+                                                            )}
+                                                        </div>
                                                     </div>
-                                                </div>
-                                            );
-                                        });
+                                                );
+                                            });
                                     })}
                                 </div>
                             )}
@@ -662,373 +620,349 @@ function PokemonDetailViewInner({
     });
 
     return (
-        <div>
-            <div className="detail-layout">
+        <Container fluid className="p-0">
+            <Row className="g-4">
                 {/* Sidebar */}
-                <div className="pokemon-sidebar">
-                    <div className="glass-panel pokemon-hero-panel" id="detail-hero-panel">
-                        <div className="hero-left">
-                            <img
-                                className="pokemon-hero-artwork"
-                                src={sprites.other?.['official-artwork']?.front_default || sprites.front_default}
-                                alt={name}
-                                id="detail-main-image"
-                                onError={(e) => {
-                                    e.target.src = sprites.front_default;
-                                }}
-                            />
-                        </div>
-                        <div className="hero-right-info">
-                            <div className="hero-number-row">
-                                <span className="pokemon-details-number">#{String(speciesId).padStart(4, '0')}</span>
+                <Col xs={12} lg={4}>
+                    <Card bg="dark" border="secondary" className="mb-4">
+                        <Card.Body className="p-3">
+                            <div className="d-flex justify-content-between align-items-center mb-1">
+                                <h5 className="text-muted mb-0 fw-bold fs-6">#{String(speciesId).padStart(4, '0')}</h5>
                                 {cries?.latest && (
-                                    <button
-                                        className="hero-cry-btn"
+                                    <Button
+                                        variant="outline-secondary"
+                                        size="sm"
+                                        className="rounded-circle d-flex align-items-center justify-content-center p-2"
                                         onClick={playCry}
                                         title="Play Audio Cry"
-                                        id="detail-play-cry-btn"
+                                        aria-label="Play audio cry"
                                     >
-                                        <span className="material-symbols-outlined">volume_up</span>
-                                    </button>
+                                        <span className="material-symbols-outlined fs-6">volume_up</span>
+                                    </Button>
                                 )}
                             </div>
-                            <h1 className="pokemon-details-name">{activeVariety.name.replace('-', ' ')}</h1>
-                            <div className="pokemon-type-row">
-                                {types.map(({ type }) => (
-                                    <Link key={type.name} href={`/types/${type.name}`} className={`type-badge type-${type.name}`}>
-                                        {type.name}
-                                    </Link>
-                                ))}
+                            <div className="text-center">
+                                <img
+                                    src={sprites.other?.['official-artwork']?.front_default || sprites.front_default}
+                                    alt={name}
+                                    className="img-fluid pokemon-detail-hero-img"
+                                    onError={(e) => {
+                                        e.target.src = sprites.front_default;
+                                    }}
+                                />
                             </div>
-                        </div>
-                    </div>
+                            <div className="d-flex justify-content-between align-items-center mt-1 gap-2 flex-wrap">
+                                <h3 className="text-capitalize mb-0 fw-bold fs-4 me-auto">
+                                    {activeVariety.name.replace(/-/g, ' ')}
+                                </h3>
+                                <div className="d-flex align-items-center gap-1">
+                                    {types.map(({ type }) => (
+                                        <TypeBadge key={type.name} type={type.name} />
+                                    ))}
+                                </div>
+                            </div>
+                        </Card.Body>
+                    </Card>
 
                     {/* Pokédex Entry + Specs Combined */}
-                    <div className="glass-panel pokedex-entry-panel" id="detail-pokedex-entry">
-                        {pokedexEntry && (
-                            <div className="pokedex-entry-section">
-                                <p className="pokedex-entry-text">
-                                    "{pokedexEntry.text}"
-                                </p>
-                                <span className="pokedex-entry-version">
-                                    — Pokémon {VERSION_NAMES[pokedexEntry.version] || pokedexEntry.version}
-                                </span>
-                            </div>
-                        )}
-                        <div className="info-list">
-                            <div className="info-list-row">
-                                <span className="info-list-label">Height</span>
-                                <span className="info-list-value">{height / 10} m</span>
-                            </div>
-                            <div className="info-list-row">
-                                <span className="info-list-label">Weight</span>
-                                <span className="info-list-value">{weight / 10} kg</span>
-                            </div>
-                            <div className="info-list-row">
-                                <span className="info-list-label">Capture Rate</span>
-                                <span className="info-list-value">{capture_rate} / 255</span>
-                            </div>
-                            <div className="info-list-row">
-                                <span className="info-list-label">Growth Rate</span>
-                                <span className="info-list-value text-capitalize">
-                                    {growth_rate?.name?.replace('-', ' ')}
-                                </span>
-                            </div>
-                        </div>
-                    </div>
+                    <Card bg="dark" border="secondary" className="mb-4">
+                        <Card.Body>
+                            {pokedexEntry && (
+                                <>
+                                    <div className="text-center">
+                                        <p className="fst-italic text-light">"{pokedexEntry.text}"</p>
+                                        <small className="text-muted fw-bold text-uppercase">
+                                            — Pokémon {VERSION_NAMES[pokedexEntry.version] || pokedexEntry.version}
+                                        </small>
+                                    </div>
+                                    <hr className="border-secondary my-3" />
+                                </>
+                            )}
+                            <ListGroup variant="flush" className="bg-transparent">
+                                <ListGroup.Item className="bg-transparent text-light border-0 d-flex justify-content-between py-0">
+                                    <span className="text-muted fw-bold">Height</span>
+                                    <span>{height / 10} m</span>
+                                </ListGroup.Item>
+                                <ListGroup.Item className="bg-transparent text-light border-0 d-flex justify-content-between py-0">
+                                    <span className="text-muted fw-bold">Weight</span>
+                                    <span>{weight / 10} kg</span>
+                                </ListGroup.Item>
+                                <ListGroup.Item className="bg-transparent text-light border-0 d-flex justify-content-between py-0">
+                                    <span className="text-muted fw-bold">Capture Rate</span>
+                                    <span>{capture_rate} / 255</span>
+                                </ListGroup.Item>
+                                <ListGroup.Item className="bg-transparent text-light border-0 d-flex justify-content-between py-0">
+                                    <span className="text-muted fw-bold">Growth Rate</span>
+                                    <span className="text-capitalize">{growth_rate?.name?.replace(/-/g, ' ')}</span>
+                                </ListGroup.Item>
+                            </ListGroup>
+                        </Card.Body>
+                    </Card>
 
                     {/* Stats Panel */}
                     {stats && (
-                        <div className={`glass-panel ${collapsed.stats ? 'collapsed' : ''}`} id="detail-stats-panel">
-                            <div className="panel-header" onClick={() => toggleCollapse('stats')}>
-                                <h3>Base Stats</h3>
-                                <span className={`material-symbols-outlined collapse-chevron ${collapsed.stats ? '' : 'expanded'}`}>expand_more</span>
-                            </div>
-                            {!collapsed.stats && (
-                                <div className="mt-1">
-                                    {stats.map(statObj => {
-                                        // Map percentage relative to max base stat (approx 200)
-                                        const percent = Math.min((statObj.base_stat / 200) * 100, 100);
-
-                                        return (
-                                            <div className="stat-row" key={statObj.stat.name}>
-                                                <div className="stat-header">
-                                                    <span className="stat-label">{statObj.stat.name.replace('-', ' ')}</span>
-                                                    <span className="stat-value">{statObj.base_stat}</span>
-                                                </div>
-                                                <div className="stat-bar-container">
-                                                    <div 
-                                                        className={`stat-bar stat-bar-p${Math.round(percent)}`} 
-                                                    />
-                                                </div>
-                                            </div>
-                                        );
-                                    })}
-                                    <div className="stat-row total-stat-row">
-                                        <div className="stat-header">
-                                            <span className="stat-label">Total</span>
-                                            <span className="stat-value">
-                                                {stats.reduce((sum, statObj) => sum + statObj.base_stat, 0)}
-                                            </span>
-                                        </div>
-                                    </div>
-                                </div>
-                            )}
-                        </div>
+                        <BaseStatsCard
+                            stats={stats}
+                            title="Base Stats"
+                            totalLabel="Total"
+                            isCollapsed={collapsed.stats}
+                            onToggleCollapse={() => toggleCollapse('stats')}
+                            className={Object.keys(typeDefenses).length > 0 ? 'mb-4' : 'mb-lg-4 mb-0'}
+                        />
                     )}
 
                     {/* Type Defenses */}
                     {Object.keys(typeDefenses).length > 0 && (
-                        <div className={`glass-panel ${collapsed.defenses ? 'collapsed' : ''}`} id="detail-type-defenses">
-                            <div className="panel-header" onClick={() => toggleCollapse('defenses')}>
-                                <h3>Type Defenses</h3>
-                                <span className={`material-symbols-outlined collapse-chevron ${collapsed.defenses ? '' : 'expanded'}`}>expand_more</span>
-                            </div>
-                            {!collapsed.defenses && (
-                                <div className="mt-1">
-                                    <p className="text-muted-sm">
-                                        Damage multipliers when this Pokémon is attacked by each type.
-                                    </p>
-                                    <div className="type-defense-grid">
-                                        {ALL_TYPES.map(attackType => {
-                                            const multiplier = typeDefenses[attackType] ?? 1;
-
-                                            return (
-                                                <div key={attackType} className={`type-defense-cell ${getMultiplierClass(multiplier)}`}>
-                                                    <Link href={`/types/${attackType}`} className={`type-badge type-${attackType} type-badge-sm`}>
-                                                        {attackType}
-                                                    </Link>
-                                                    <span className="defense-multiplier-value">
-                                                        {getMultiplierLabel(multiplier)}
-                                                    </span>
-                                                </div>
-                                            );
-                                        })}
-                                    </div>
+                        <Card bg="dark" border="secondary" className="mb-lg-4 mb-0">
+                            <Card.Header
+                                className="d-flex justify-content-between align-items-center border-secondary cursor-pointer py-2"
+                                onClick={() => toggleCollapse('defenses')}
+                                style={{ cursor: 'pointer' }}
+                            >
+                                <h6 className="text-muted fw-bold text-uppercase mb-0">Type Defenses</h6>
+                                <span className={`material-symbols-outlined transition-transform ${collapsed.defenses ? '' : 'rotate-180'}`}>expand_more</span>
+                            </Card.Header>
+                            <Collapse in={!collapsed.defenses}>
+                                <div>
+                                    <Card.Body>
+                                        <p className="text-muted small mb-3">
+                                            Damage multipliers when this Pokémon is attacked by each type.
+                                        </p>
+                                        <TypeDefenseGrid typeDefensesProp={typeDefenses} />
+                                    </Card.Body>
                                 </div>
-                            )}
-                        </div>
+                            </Collapse>
+                        </Card>
                     )}
-                </div>
+                </Col>
 
                 {/* Main Content Area */}
-                <div className="detail-main-content">
+                <Col xs={12} lg={8}>
                     {/* Varieties Tabs */}
                     {varietyList.length > 1 && (
-                        <div className="glass-panel pills-panel" id="detail-varieties-tabs">
-                            <span className="pills-panel-label">Forms</span>
-                            <div className="pills-panel-row">
-                                {varietyList.map((variety, index) => (
-                                    <button
-                                        key={variety.name}
-                                        className={`form-pill-btn ${activeVarietyIndex === index ? 'active' : ''}`}
-                                        onClick={() => setActiveVarietyIndex(index)}
-                                    >
-                                        {index === 0 ? 'Standard' : variety.name.replace(name + '-', '').replace('-', ' ')}
-                                    </button>
-                                ))}
-                            </div>
-                        </div>
+                        <Card bg="dark" border="secondary" className="mb-4">
+                            <Card.Body>
+                                <h6 className="text-muted fw-bold text-uppercase mb-3">Forms</h6>
+                                <div className="d-flex flex-wrap gap-2">
+                                    {varietyList.map((variety, index) => (
+                                        <Button
+                                            key={variety.name}
+                                            variant={activeVarietyIndex === index ? 'secondary' : 'outline-secondary'}
+                                            onClick={() => setActiveVarietyIndex(index)}
+                                            className="text-capitalize fw-bold rounded-pill px-3 py-1 fs-7"
+                                        >
+                                            {index === 0 ? 'Standard' : variety.name.replace(name + '-', '').replace(/-/g, ' ')}
+                                        </Button>
+                                    ))}
+                                </div>
+                            </Card.Body>
+                        </Card>
                     )}
 
                     {/* Evolution Chain Form */}
                     {Boolean(evolutionChainData?.chain?.evolves_to?.length > 0) && (
-                        <div className={`glass-panel ${collapsed.chain ? 'collapsed' : ''}`} id="detail-evolution-panel">
-                            <div className="panel-header" onClick={() => toggleCollapse('chain')}>
-                                <h3 className="panel-heading-lg">Evolution Chain</h3>
-                                <span className={`material-symbols-outlined collapse-chevron ${collapsed.chain ? '' : 'expanded'}`}>expand_more</span>
-                            </div>
-                            {!collapsed.chain && (
-                                <div className="mt-1 evolution-chain-container">
-                                    {renderEvolutionNode(evolutionChainData.chain)}
+                        <Card bg="dark" border="secondary" className="mb-4">
+                            <Card.Header
+                                className="d-flex justify-content-between align-items-center border-secondary cursor-pointer py-2"
+                                onClick={() => toggleCollapse('chain')}
+                                style={{ cursor: 'pointer' }}
+                            >
+                                <h6 className="text-muted fw-bold text-uppercase mb-0">Evolution Chain</h6>
+                                <span className={`material-symbols-outlined transition-transform fs-4 ${collapsed.chain ? '' : 'rotate-180'}`}>expand_more</span>
+                            </Card.Header>
+                            <Collapse in={!collapsed.chain}>
+                                <div>
+                                    <Card.Body className="overflow-auto">
+                                        <div className="evolution-chain-container py-2 px-1">
+                                            {renderEvolutionNode(evolutionChainData.chain)}
+                                        </div>
+                                    </Card.Body>
                                 </div>
-                            )}
-                        </div>
+                            </Collapse>
+                        </Card>
                     )}
 
                     {/* Abilities (non-collapsible pill card) */}
-                    <div className="glass-panel pills-panel" id="detail-abilities-panel">
-                        <span className="pills-panel-label">Abilities</span>
-                        <div className="pills-panel-row">
-                            {abilities.map(({ ability, is_hidden }) => (
-                                <Link
-                                    key={ability.name}
-                                    href={`/abilities/${ability.name}`}
-                                    className={`form-pill-btn ${is_hidden ? 'hidden-ability-pill' : ''}`}
-                                    id={`detail-ability-link-${ability.name}`}
-                                >
-                                    {ability.name.replace('-', ' ')}
-                                    {is_hidden && ' (H)'}
-                                </Link>
-                            ))}
-                        </div>
-                    </div>
+                    <Card bg="dark" border="secondary" className="mb-4">
+                        <Card.Body>
+                            <h6 className="text-muted fw-bold text-uppercase mb-3">Abilities</h6>
+                            <div className="d-flex flex-wrap gap-2">
+                                {abilities.map(({ ability, is_hidden }) => (
+                                    <Button
+                                        key={ability.name}
+                                        as={Link}
+                                        href={`/abilities/${ability.name}`}
+                                        variant={is_hidden ? 'outline-info' : 'secondary'}
+                                        className="text-capitalize fw-bold rounded-pill px-4 text-decoration-none"
+                                        id={`detail-ability-link-${ability.name}`}
+                                    >
+                                        {ability.name.replace(/-/g, ' ')}
+                                        {is_hidden && ' (H)'}
+                                    </Button>
+                                ))}
+                            </div>
+                        </Card.Body>
+                    </Card>
 
                     {/* Moves */}
-                    <div className={`glass-panel ${collapsed.moves ? 'collapsed' : ''}`} id="detail-moves-panel">
-                        <div className="panel-header" onClick={() => toggleCollapse('moves')}>
-                            <h3 className="panel-heading-lg">Moves</h3>
-                            <span className={`material-symbols-outlined collapse-chevron ${collapsed.moves ? '' : 'expanded'}`}>expand_more</span>
-                        </div>
-                        {!collapsed.moves && (
-                            <div className="mt-15">
-                                {(() => {
-                                    // Group moves by damage class
-                                    const grouped = { physical: [], special: [], status: [], unknown: [] };
-                                    moves.forEach(({ move }) => {
-                                        const detail = moveDetailsMap[move.name] || {};
-                                        const dc = detail.damage_class || 'unknown';
-                                        (grouped[dc] || grouped.unknown).push(move);
-                                    });
+                    <Card bg="dark" border="secondary" className="mb-4">
+                        <Card.Header
+                            className="d-flex justify-content-between align-items-center border-secondary cursor-pointer py-2"
+                            onClick={() => toggleCollapse('moves')}
+                            style={{ cursor: 'pointer' }}
+                        >
+                            <h6 className="text-muted fw-bold text-uppercase mb-0">Moves</h6>
+                            <span className={`material-symbols-outlined transition-transform fs-4 ${collapsed.moves ? '' : 'rotate-180'}`}>expand_more</span>
+                        </Card.Header>
+                        <Collapse in={!collapsed.moves}>
+                            <div>
+                                <Card.Body className="p-0">
+                                    {(() => {
+                                        // Group moves by damage class
+                                        const grouped = { physical: [], special: [], status: [], unknown: [] };
+                                        moves.forEach(({ move }) => {
+                                            const detail = moveDetailsMap[move.name] || {};
+                                            const dc = detail.damage_class || 'unknown';
+                                            (grouped[dc] || grouped.unknown).push(move);
+                                        });
 
-                                    const categories = [
-                                        { key: 'physical', label: 'Physical' },
-                                        { key: 'special', label: 'Special' },
-                                        { key: 'status', label: 'Status' },
-                                    ];
-                                    // Include "unknown" only if there are uncategorized moves
-                                    if (grouped.unknown.length > 0) {
-                                        categories.push({ key: 'unknown', label: 'Other' });
-                                    }
+                                        const categories = [
+                                            { key: 'physical', label: 'Physical' },
+                                            { key: 'special', label: 'Special' },
+                                            { key: 'status', label: 'Status' },
+                                        ];
+                                        // Include "unknown" only if there are uncategorized moves
+                                        if (grouped.unknown.length > 0) {
+                                            categories.push({ key: 'unknown', label: 'Other' });
+                                        }
 
-                                    return categories
-                                        .filter(cat => grouped[cat.key].length > 0)
-                                        .map(cat => (
-                                            <div key={cat.key} className="moves-category-section">
-                                                <div className="moves-category-header">
-                                                    {cat.key !== 'unknown' && <DamageClassIcon damageClass={cat.key} size="1.1em" />}
-                                                    <span>{cat.label}</span>
-                                                    <span className="moves-category-count">{grouped[cat.key].length}</span>
-                                                </div>
-                                                <div className="moves-table-wrapper">
-                                                    <table className="moves-table">
-                                                        <thead>
-                                                            <tr>
-                                                                <th>Move Name</th>
-                                                                <th>Type</th>
-                                                                <th>Power</th>
-                                                                <th>Accuracy</th>
-                                                                <th>PP</th>
-                                                            </tr>
-                                                        </thead>
-                                                        <tbody>
-                                                            {grouped[cat.key].map(move => {
-                                                                const detail = moveDetailsMap[move.name] || {};
-                                                                const moveType = detail.type || 'normal';
-                                                                const power = detail.power !== null && detail.power !== undefined ? detail.power : '—';
-                                                                const accuracy = detail.accuracy !== null && detail.accuracy !== undefined ? `${detail.accuracy}%` : '—';
-                                                                const pp = detail.pp !== null && detail.pp !== undefined ? detail.pp : '—';
+                                        return categories
+                                            .filter(cat => grouped[cat.key].length > 0)
+                                            .map((cat, idx) => {
+                                                const collapseKey = 'move' + cat.key.charAt(0).toUpperCase() + cat.key.slice(1);
+                                                const isCatCollapsed = collapsed[collapseKey];
 
-                                                                return (
-                                                                    <tr key={move.name}>
-                                                                        <td className="move-name-cell">
-                                                                            <Link href={`/moves/${move.name}`} className="move-link">
-                                                                                {move.name.replace('-', ' ')}
+                                                return (
+                                                    <div key={cat.key} className={idx !== 0 ? 'border-top border-secondary' : ''}>
+                                                        <div
+                                                            className="bg-secondary bg-opacity-25 px-4 py-2 d-flex align-items-center gap-2 cursor-pointer"
+                                                            onClick={() => toggleCollapse(collapseKey)}
+                                                        >
+                                                            {cat.key !== 'unknown' && <DamageClassIcon damageClass={cat.key} size="1.2em" />}
+                                                            <h6 className="mb-0 fw-bold flex-grow-1">{cat.label}</h6>
+                                                            <CountBadge count={grouped[cat.key].length} />
+                                                            <span className={`material-symbols-outlined transition-transform ms-1 ${isCatCollapsed ? '' : 'rotate-180'}`}>expand_more</span>
+                                                        </div>
+                                                        <Collapse in={!isCatCollapsed}>
+                                                            <div>
+                                                                {grouped[cat.key].map((move, moveIdx) => {
+                                                                    const detail = moveDetailsMap[move.name] || {};
+                                                                    const moveType = detail.type || 'normal';
+                                                                    const power = detail.power !== null && detail.power !== undefined ? detail.power : '—';
+                                                                    const accuracy = detail.accuracy !== null && detail.accuracy !== undefined ? `${detail.accuracy}%` : '—';
+                                                                    const pp = detail.pp !== null && detail.pp !== undefined ? detail.pp : '—';
+
+                                                                    return (
+                                                                        <div
+                                                                            key={move.name}
+                                                                            className={`px-4 py-2 d-flex align-items-center gap-3${moveIdx !== 0 ? ' border-top border-secondary border-opacity-25' : ''}`}
+                                                                        >
+                                                                            <Link href={`/moves/${move.name}`} className="text-light text-decoration-none text-capitalize hover-primary fw-bold flex-grow-1">
+                                                                                {move.name.replace(/-/g, ' ')}
                                                                             </Link>
-                                                                        </td>
-                                                                        <td className="move-type-cell">
-                                                                            <span className={`type-badge type-${moveType}`}>
-                                                                                {moveType}
-                                                                            </span>
-                                                                        </td>
-                                                                        <td className="move-stat-cell power-val">{power}</td>
-                                                                        <td className="move-stat-cell accuracy-val">{accuracy}</td>
-                                                                        <td className="move-stat-cell pp-val">{pp}</td>
-                                                                    </tr>
-                                                                );
-                                                            })}
-                                                        </tbody>
-                                                    </table>
-                                                </div>
-                                            </div>
-                                        ));
-                                })()}
+                                                                            <TypeBadge type={moveType} />
+                                                                            <span className="text-muted small text-nowrap">PWR <span className="text-light fw-bold">{power}</span></span>
+                                                                            <span className="text-muted small text-nowrap">ACC <span className="text-light fw-bold">{accuracy}</span></span>
+                                                                            <span className="text-muted small text-nowrap">PP <span className="text-light fw-bold">{pp}</span></span>
+                                                                        </div>
+                                                                    );
+                                                                })}
+                                                            </div>
+                                                        </Collapse>
+                                                    </div>
+                                                );
+                                            });
+                                    })()}
+                                </Card.Body>
                             </div>
-                        )}
-                    </div>
+                        </Collapse>
+                    </Card>
 
                     {/* Game Locations */}
-                    <div className={`glass-panel ${collapsed.locations ? 'collapsed' : ''}`} id="detail-game-locations">
-                        <div className="panel-header" onClick={() => toggleCollapse('locations')}>
-                            <h3 className="panel-heading-lg">Game Locations</h3>
-                            <span className={`material-symbols-outlined collapse-chevron ${collapsed.locations ? '' : 'expanded'}`}>expand_more</span>
-                        </div>
-                        {!collapsed.locations && (
-                            <div className="mt-1">
-                                <p className="text-muted-sm">
-                                    Where to find {name.replace('-', ' ')} in each main series game.
-                                </p>
-
-                                {sortedVersions.length > 0 ? (
-                                    <div className="game-locations-list">
-                                        {sortedVersions.map(version => {
+                    <Card bg="dark" border="secondary" className="mb-4">
+                        <Card.Header
+                            className="d-flex justify-content-between align-items-center border-secondary cursor-pointer py-2"
+                            onClick={() => toggleCollapse('locations')}
+                            style={{ cursor: 'pointer' }}
+                        >
+                            <h6 className="text-muted fw-bold text-uppercase mb-0">Game Locations</h6>
+                            <span className={`material-symbols-outlined transition-transform fs-4 ${collapsed.locations ? '' : 'rotate-180'}`}>expand_more</span>
+                        </Card.Header>
+                        <Collapse in={!collapsed.locations}>
+                            <div>
+                                <Card.Body className="p-0">
+                                    {sortedVersions.length > 0 ? (
+                                        sortedVersions.map((version, idx) => {
                                             const locations = encountersByVersion[version];
                                             const isExpanded = expandedVersions[version];
                                             const prettyName = VERSION_NAMES[version] || version.replace(/-/g, ' ');
 
                                             return (
-                                                <div key={version} className="game-version-row">
-                                                    <button
-                                                        className="game-version-header"
+                                                <div key={version} className={idx !== 0 ? 'border-top border-secondary' : ''}>
+                                                    <div
+                                                        className="bg-secondary bg-opacity-25 px-4 py-2 d-flex align-items-center gap-2 cursor-pointer"
                                                         onClick={() => toggleVersion(version)}
                                                     >
-                                                        <span className="game-version-name">{prettyName}</span>
-                                                        <span className="game-version-count">{locations.length} location{locations.length !== 1 ? 's' : ''}</span>
-                                                        <span className={`material-symbols-outlined game-version-chevron ${isExpanded ? 'expanded' : ''}`}>expand_more</span>
-                                                    </button>
-                                                    {isExpanded && (
-                                                        <div className="game-version-locations">
+                                                        <h6 className="mb-0 fw-bold flex-grow-1 text-capitalize">{prettyName}</h6>
+                                                        <CountBadge count={locations.length} />
+                                                        <span className={`material-symbols-outlined transition-transform ${isExpanded ? 'rotate-180' : ''}`}>expand_more</span>
+                                                    </div>
+                                                    <Collapse in={isExpanded}>
+                                                        <div>
                                                             {locations.map((locationObj, locIndex) => (
-                                                                <div key={locIndex} className="location-entry">
-                                                                    <div className="location-name">
-                                                                        <span className="material-symbols-outlined location-icon">
-                                                                            location_on
-                                                                        </span> {locationObj.location}
+                                                                <div key={locIndex} className={`px-4 py-2${locIndex !== 0 ? ' border-top border-secondary border-opacity-25' : ''}`}>
+                                                                    <div className="d-flex align-items-center gap-2 mb-1 text-info fw-bold small">
+                                                                        <span className="material-symbols-outlined fs-6">location_on</span>
+                                                                        <span>{locationObj.location}</span>
                                                                     </div>
-                                                                    <div className="location-details">
+                                                                    <div className="d-flex flex-wrap gap-2 ps-4">
                                                                         {locationObj.methods.map((methodObj, mIdx) => {
-                                                                            const minL = methodObj.minLevel;
-                                                                            const maxL = methodObj.maxLevel;
+                                                                            const { minLevel: minL, maxLevel: maxL } = methodObj;
                                                                             const hasL = minL && maxL;
-                                                                            const minEq = minL === maxL;
-                                                                            const lvlRange = minEq 
-                                                                                ? minL 
-                                                                                : `${minL}–${maxL}`;
+                                                                            const lvlRange = minL === maxL ? minL : `${minL}–${maxL}`;
 
                                                                             return (
-                                                                                <span key={mIdx} className="encounter-method">
-                                                                                    {methodObj.method}
-                                                                                    {hasL && (
-                                                                                        <span className="encounter-level">
-                                                                                            Lv. {lvlRange}
-                                                                                        </span>
-                                                                                    )}
-                                                                                </span>
+                                                                                <Badge key={mIdx} bg="dark" className="border border-secondary fw-normal px-3 py-1 d-flex align-items-center gap-2">
+                                                                                    <span>{methodObj.method}</span>
+                                                                                    {hasL && <span className="text-warning fw-bold">Lv. {lvlRange}</span>}
+                                                                                </Badge>
                                                                             );
                                                                         })}
                                                                     </div>
                                                                 </div>
                                                             ))}
                                                         </div>
-                                                    )}
+                                                    </Collapse>
                                                 </div>
                                             );
-                                        })}
-                                    </div>
-                                ) : (
-                                    <div className="no-encounters-message">
-                                        <span className="material-symbols-outlined gift-icon">card_giftcard</span>
-                                         <p>
-                                             This Pokémon is not found in the wild — it must be obtained 
-                                             as a starter, gift, trade, or special event.
-                                         </p>
-                                    </div>
-                                )}
+                                        })
+                                    ) : (
+                                        <div className="px-4 py-3">
+                                            <Alert variant="secondary" className="d-flex align-items-center gap-3 bg-secondary bg-opacity-10 border-secondary text-light mb-0">
+                                                <span className="material-symbols-outlined fs-2 text-warning">card_giftcard</span>
+                                                <p className="mb-0">
+                                                    This Pokémon is not found in the wild — it must be obtained as a starter, gift, trade, or special event.
+                                                </p>
+                                            </Alert>
+                                        </div>
+                                    )}
+                                </Card.Body>
                             </div>
-                        )}
-                    </div>
-                </div>
-            </div>
-        </div>
+
+                        </Collapse>
+                    </Card>
+                </Col>
+            </Row>
+        </Container>
     );
 }

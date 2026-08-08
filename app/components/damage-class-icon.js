@@ -6,7 +6,7 @@
 const DAMAGE_CLASS_CONFIG = {
     physical: {
         label: 'Physical',
-        iconName: 'flare',
+        iconName: 'sports_mma',
     },
     special: {
         label: 'Special',
@@ -18,20 +18,38 @@ const DAMAGE_CLASS_CONFIG = {
     },
 };
 
-/**
- * Renders a small damage-class icon with tooltip.
- * @param {{ damageClass: 'physical' | 'special' | 'status', size?: string }} props
- */
-export default function DamageClassIcon({ damageClass }) {
+import { OverlayTrigger, Tooltip, Badge } from 'react-bootstrap';
+
+export default function DamageClassIcon({ damageClass, showLabel = false, className = '' }) {
     const config = DAMAGE_CLASS_CONFIG[damageClass];
-    if (!config) return null;
+
+    if (!config) {
+        return null;
+    }
+
+    const bgMap = {
+        physical: 'danger',
+        special: 'primary',
+        status: 'secondary',
+    };
+
+    const badgeContent = (
+        <Badge
+            bg={bgMap[damageClass]}
+            className={`d-inline-flex align-items-center justify-content-center p-1 rounded gap-1 ${className}`.trim()}
+        >
+            <span className="material-symbols-outlined fs-6 lh-1">{config.iconName}</span>
+            {showLabel && <span className="text-capitalize small fw-semibold px-1">{config.label}</span>}
+        </Badge>
+    );
+
+    if (showLabel) {
+        return badgeContent;
+    }
 
     return (
-        <span
-            className={`damage-class-icon damage-class-${damageClass} damage-class-icon-base`}
-            title={config.label}
-        >
-            <span className="material-symbols-outlined">{config.iconName}</span>
-        </span>
+        <OverlayTrigger placement="top" overlay={<Tooltip>{config.label}</Tooltip>}>
+            {badgeContent}
+        </OverlayTrigger>
     );
 }

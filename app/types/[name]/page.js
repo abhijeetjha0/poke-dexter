@@ -1,5 +1,7 @@
 import { Suspense } from 'react';
+import { Container } from 'react-bootstrap';
 import PokemonList from '../../pokemons/pokemon-list';
+import TypeBadge from '../../components/type-badge';
 import { fetchTypeByNameOrId, fetchPokemonByUrl, fetchTypeList } from '../../api-requests';
 import { generateCommonStaticParams } from '../../lib/static-params-util';
 import { limitConcurrency } from '../../lib/promise-utils';
@@ -10,11 +12,14 @@ export default async function TypePage({ params }) {
 
     // Fetch type data
     const response = await fetchTypeByNameOrId(typeName);
+
     if (!response.ok) {
         return (
-            <div className="glass-panel text-center-padded">
-                <h2>Type "{typeName}" not found.</h2>
-            </div>
+            <Container fluid className="py-5 text-center">
+                <div className="alert alert-secondary bg-dark text-light border-secondary">
+                    <h4 className="mb-0">Type "{typeName}" not found.</h4>
+                </div>
+            </Container>
         );
     }
 
@@ -25,13 +30,14 @@ export default async function TypePage({ params }) {
     const processedPokemon = await limitConcurrency(pokemonList, 10, async ({ pokemon }) => {
         const parts = pokemon.url.split('/').filter(Boolean);
         const id = parseInt(parts[parts.length - 1], 10);
-        
+
         let speciesId = id;
         let speciesName = pokemon.name;
-        
+
         if (id >= 10000) {
             try {
                 const res = await fetchPokemonByUrl(pokemon.url);
+
                 if (res.ok) {
                     const pokemonData = await res.json();
                     speciesName = pokemonData.species.name;
@@ -54,29 +60,30 @@ export default async function TypePage({ params }) {
     });
 
     return (
-        <div>
+        <Container fluid className="p-0">
             {/* Pokémon Grid or List with Section Header (Type Badge + Title) */}
             {/* + Count Badge + Grid/List Switcher (No Search) */}
             {processedPokemon.length ? (
-                <Suspense fallback={<div className="glass-panel no-results"><h3>Loading Pokémon...</h3></div>}>
+                <Suspense fallback={<div className="alert alert-secondary text-center p-5 bg-dark text-light border-secondary"><h4 className="mb-0">Loading Pokémon...</h4></div>}>
                     <PokemonList
                         processedListProp={processedPokemon}
                         hideGenFilter={true}
                         hideSearch={true}
                         sectionTitle={
-                            <>
-                                <span className={`type-badge type-${typeName} inline-type-header-badge`}>{typeName}</span> Type Pokémon
-                            </>
+                            <div key="type-title-header" className="d-flex align-items-center gap-2">
+                                <TypeBadge type={typeName} asLink={false} />
+                                <span className="text-capitalize">Type Pokémon</span>
+                            </div>
                         }
                         countBadge={processedPokemon.length}
                     />
                 </Suspense>
             ) : (
-                <div className="glass-panel no-results">
-                    <h3>No Pokémon found for this type.</h3>
+                <div className="alert alert-secondary text-center p-5 bg-dark text-light border-secondary">
+                    <h4 className="mb-0">No Pokémon found for this type.</h4>
                 </div>
             )}
-        </div>
+        </Container>
     );
 }
 

@@ -13,7 +13,7 @@ describe('GenerationsClient Component', () => {
         expect(getByText('Generation I')).toBeInTheDocument();
         expect(getByText('Paldea')).toBeInTheDocument();
         
-        const grid = container.querySelector('.generations-grid');
+        const grid = container.querySelector('.row');
         expect(grid).toBeInTheDocument();
     });
 
@@ -23,7 +23,7 @@ describe('GenerationsClient Component', () => {
         const listBtn = container.querySelector('#view-toggle-list');
         fireEvent.click(listBtn);
         
-        const listContainer = container.querySelector('.generations-list-view');
+        const listContainer = container.querySelector('.list-group');
         expect(listContainer).toBeInTheDocument();
         expect(localStorage.getItem('viewMode')).toBe('list');
     });
