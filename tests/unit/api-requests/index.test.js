@@ -11,6 +11,10 @@ import {
     fetchMoveDamageClass,
     fetchAbilityByNameOrId,
     fetchAbilityList,
+    fetchItemList,
+    fetchItemByNameOrId,
+    fetchItemCategoryList,
+    fetchItemCategoryByNameOrId
 } from '../../../app/api-requests';
 
 describe('Centralized PokeAPI Requests Module', () => {
@@ -125,5 +129,41 @@ describe('Centralized PokeAPI Requests Module', () => {
 
         expect(fetch).toHaveBeenCalledWith('https://pokeapi.co/api/v2/ability?limit=500', undefined);
         expect(data.results[0].name).toBe('blaze');
+    });
+
+    test('fetchItemList calls items directory endpoint', async () => {
+        fetch.mockResponseOnce(JSON.stringify({ results: [{ name: 'potion' }] }));
+        const res = await fetchItemList(100);
+        const data = await res.json();
+
+        expect(fetch).toHaveBeenCalledWith('https://pokeapi.co/api/v2/item?limit=100', undefined);
+        expect(data.results[0].name).toBe('potion');
+    });
+
+    test('fetchItemByNameOrId calls item endpoint', async () => {
+        fetch.mockResponseOnce(JSON.stringify({ name: 'master-ball' }));
+        const res = await fetchItemByNameOrId('master-ball');
+        const data = await res.json();
+
+        expect(fetch).toHaveBeenCalledWith('https://pokeapi.co/api/v2/item/master-ball', undefined);
+        expect(data.name).toBe('master-ball');
+    });
+
+    test('fetchItemCategoryList calls item-category directory endpoint', async () => {
+        fetch.mockResponseOnce(JSON.stringify({ results: [{ name: 'healing' }] }));
+        const res = await fetchItemCategoryList(50);
+        const data = await res.json();
+
+        expect(fetch).toHaveBeenCalledWith('https://pokeapi.co/api/v2/item-category?limit=50', undefined);
+        expect(data.results[0].name).toBe('healing');
+    });
+
+    test('fetchItemCategoryByNameOrId calls item-category endpoint', async () => {
+        fetch.mockResponseOnce(JSON.stringify({ name: 'standard-balls' }));
+        const res = await fetchItemCategoryByNameOrId('standard-balls');
+        const data = await res.json();
+
+        expect(fetch).toHaveBeenCalledWith('https://pokeapi.co/api/v2/item-category/standard-balls', undefined);
+        expect(data.name).toBe('standard-balls');
     });
 });

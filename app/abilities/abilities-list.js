@@ -5,6 +5,8 @@ import Link from 'next/link';
 import { Container, Row, Col, Form, InputGroup, Card, Alert } from 'react-bootstrap';
 import CountBadge from '../components/count-badge';
 import AppPagination from '../components/app-pagination';
+import MaterialIcon from '../components/material-icon';
+import { formatDisplayName } from '../lib/pokemon-utils';
 
 const ABILITIES_PER_PAGE = 50;
 
@@ -39,6 +41,9 @@ export default function AbilitiesList({ initialAbilities }) {
         <Container fluid className="p-0">
             {/* Search Input & Results Count */}
             <Row className="mb-4 align-items-center g-3">
+                <Col xs="auto">
+                    <CountBadge count={filteredAbilities.length} className="fs-6 px-3 py-1" />
+                </Col>
                 <Col className="flex-grow-1">
                     <InputGroup>
                         <Form.Control
@@ -50,12 +55,9 @@ export default function AbilitiesList({ initialAbilities }) {
                             className="bg-dark text-light border-secondary shadow-none"
                         />
                         <InputGroup.Text className="bg-dark border-secondary text-light">
-                            <span className="material-symbols-outlined fs-5">search</span>
+                            <MaterialIcon icon="search" className="fs-5" />
                         </InputGroup.Text>
                     </InputGroup>
-                </Col>
-                <Col xs="auto">
-                    <CountBadge count={filteredAbilities.length} className="fs-6 px-3 py-1" />
                 </Col>
             </Row>
 
@@ -73,7 +75,7 @@ export default function AbilitiesList({ initialAbilities }) {
                             >
                                 <Card.Body className="d-flex align-items-center justify-content-center p-3">
                                     <h6 className="text-capitalize text-light mb-0 fw-bold">
-                                        {ability.name.replace(/-/g, ' ')}
+                                        {formatDisplayName(ability.name)}
                                     </h6>
                                 </Card.Body>
                             </Card>

@@ -8,9 +8,11 @@ describe('move-type-utils helper module', () => {
     test('buildMoveTypeMap constructs move-to-type mapping dictionary', async () => {
         fetch.mockResponse(req => {
             const url = req.url;
+
             if (url.includes('/type/fire')) {
                 return Promise.resolve(JSON.stringify({ moves: [{ name: 'flamethrower' }, { name: 'fire-blast' }] }));
             }
+
             if (url.includes('/type/water')) {
                 return Promise.resolve(JSON.stringify({ moves: [{ name: 'surf' }, { name: 'hydro-pump' }] }));
             }
@@ -26,12 +28,15 @@ describe('move-type-utils helper module', () => {
     test('buildMoveDamageClassMap constructs move-to-damage-class mapping dictionary', async () => {
         fetch.mockResponse(req => {
             const url = req.url;
+
             if (url.includes('/move-damage-class/physical')) {
                 return Promise.resolve(JSON.stringify({ moves: [{ name: 'tackle' }] }));
             }
+
             if (url.includes('/move-damage-class/special')) {
                 return Promise.resolve(JSON.stringify({ moves: [{ name: 'thunderbolt' }] }));
             }
+
             if (url.includes('/move-damage-class/status')) {
                 return Promise.resolve(JSON.stringify({ moves: [{ name: 'growl' }] }));
             }

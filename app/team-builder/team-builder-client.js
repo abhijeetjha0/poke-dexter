@@ -7,10 +7,13 @@ import {
     calculateTeamAverageStats,
     ALL_TYPES,
 } from '../lib/type-effectiveness-utils';
+import MaterialIcon from '../components/material-icon';
+import { formatDisplayName } from '../lib/pokemon-utils';
 import { Container, Row, Col, Card, Button, Badge, Modal, Form, Table, Alert, OverlayTrigger, Tooltip, ListGroup, Collapse } from 'react-bootstrap';
 import BaseStatsCard from '../components/base-stats-card';
 import TypeBadge from '../components/type-badge';
 import CountBadge from '../components/count-badge';
+import PokemonCard from '../components/pokemon-card';
 
 export default function TeamBuilderClient(props) {
     const { initialSpeciesList = [] } = props;
@@ -208,19 +211,19 @@ export default function TeamBuilderClient(props) {
                 </div>
                 <div className="d-flex gap-2">
                     <Button variant="outline-info" onClick={handleRandomizeTeam}>
-                        <span className="material-symbols-outlined align-middle fs-6 me-1">casino</span> Randomize
+                        <MaterialIcon icon="casino" className="align-middle fs-6 me-1" /> Randomize
                     </Button>
                     <Button variant="outline-danger" onClick={handleClearTeam}>
-                        <span className="material-symbols-outlined align-middle fs-6 me-1">delete</span> Clear Team
+                        <MaterialIcon icon="delete" className="align-middle fs-6 me-1" /> Clear Team
                     </Button>
                 </div>
             </div>
 
             {/* Critical Weaknesses Warning Banner */}
-            {teamAnalysis.criticalWeaknesses.length > 0 && (
+            {teamAnalysis.criticalWeaknesses.length && (
                 <Alert variant="danger" className="d-flex align-items-center flex-wrap gap-2 mb-3">
-                    <span className="material-symbols-outlined fs-4 me-1">warning</span>
-                    <span className="fw-bold">Team Defense Alert: 3 or more Pokémon are weak to:</span>
+                    <MaterialIcon icon="warning" className="fs-4 me-1" />
+                    <span className="fw-bold">3 or more Pokémon are weak to:</span>
                     {teamAnalysis.criticalWeaknesses.map((type) => (
                         <TypeBadge key={type} type={type} />
                     ))}
@@ -228,79 +231,83 @@ export default function TeamBuilderClient(props) {
             )}
 
             {/* 6-Slot Grid */}
-            <Row xs={1} md={2} xl={3} className="g-4 mb-5">
-                {team.map((member, index) => (
-                    <Col key={`slot-${index}`}>
-                        <Card className="h-100 bg-dark text-light border-secondary">
-                            {Boolean(loadingSlots[index]) ? (
-                                <Card.Body className="d-flex flex-column align-items-center justify-content-center text-muted" style={{ minHeight: '280px' }}>
-                                    <span className="material-symbols-outlined fs-1 spin-icon mb-2">sync</span>
-                                    <span>Loading...</span>
-                                </Card.Body>
-                            ) : member ? (
-                                <Card.Body className="d-flex flex-column align-items-center position-relative">
-                                    <Button
-                                        variant="outline-danger"
-                                        size="sm"
-                                        className="position-absolute top-0 end-0 m-2 rounded-circle p-1 lh-1"
-                                        onClick={() => handleRemoveSlot(index)}
-                                        aria-label={`Remove ${member.name} from slot ${index + 1}`}
-                                    >
-                                        <span className="material-symbols-outlined fs-6">close</span>
-                                    </Button>
-                                    <div className="position-absolute top-0 start-0 m-3 text-muted small fw-bold">#{index + 1}</div>
+            <Row xs={1} lg={2} className="g-4 mb-3">
+                {team.map((member, index) => {
+                    if (loadingSlots[index]) {
+                        return (
+                            <Col key={`slot-${index}`}>
+                                <Card className="h-100 bg-dark text-muted border-secondary d-flex flex-column align-items-center justify-content-center empty-slot-card">
+                                    <MaterialIcon icon="sync" className="fs-2 spin-icon mb-2" />
+                                    <span className="small">Loading...</span>
+                                </Card>
+                            </Col>
+                        );
+                    }
 
-                                    <div className="mb-3 team-member-artwork-wrapper">
-                                        {member.artwork ? (
-                                            <Card.Img src={member.artwork} alt={member.name} className="team-member-artwork-img" />
-                                        ) : (
-                                            <div className="d-flex align-items-center justify-content-center h-100 text-muted border rounded team-member-no-image">No Image</div>
-                                        )}
-                                    </div>
-                                    <Card.Title className="text-capitalize fs-5 mb-1">{member.name}</Card.Title>
-                                    <div className="d-flex gap-2 mb-3">
-                                        {member.types.map((type) => (
-                                            <TypeBadge key={type} type={type} />
-                                        ))}
-                                    </div>
-                                    <div className="text-muted small mb-3">BST: {member.bst}</div>
-
-                                    {/* Form / Evolution Suggestions Chip Drawer */}
-                                    {suggestionsMap[index] && suggestionsMap[index].length > 0 && (
-                                        <div className="w-100 mt-auto border-top border-secondary pt-3">
-                                            <div className="small text-muted mb-1 text-center">Forms & Evolutions:</div>
-                                            <div className="d-flex flex-wrap justify-content-center gap-2">
-                                                {suggestionsMap[index].slice(0, 6).map((suggestionName) => (
+                    if (member) {
+                        return (
+                            <Col key={`slot-${index}`}>
+                                <PokemonCard
+                                    pokemon={{
+                                        id: member.id,
+                                        name: member.name,
+                                        imageUrl: member.artwork,
+                                    }}
+                                    types={member.types}
+                                    slotNumber={index + 1}
+                                    actionNode={
+                                        <Button
+                                            variant="outline-danger"
+                                            size="sm"
+                                            className="d-flex align-items-center justify-content-center p-1 border-0 slot-badge-icon"
+                                            onClick={() => handleRemoveSlot(index)}
+                                            aria-label={`Remove ${member.name} from slot ${index + 1}`}
+                                        >
+                                            <MaterialIcon icon="delete" className="fs-6" />
+                                        </Button>
+                                    }
+                                    hideSubtitle={true}
+                                    bodyExtras={
+                                        <div className="text-muted small fw-bold">BST: {member.bst}</div>
+                                    }
+                                    rightNode={
+                                        suggestionsMap[index] && suggestionsMap[index].length ? (
+                                            <div className="d-flex flex-wrap align-items-center gap-1 w-100 pe-2">
+                                                <span className="small text-muted fw-bold me-1 text-nowrap">Switch with:</span>
+                                                {suggestionsMap[index].slice(0, 8).map((suggestionName) => (
                                                     <Button
                                                         key={suggestionName}
                                                         variant="outline-secondary"
                                                         size="sm"
-                                                        className="text-capitalize rounded-pill px-3 py-0"
-                                                        style={{ fontSize: '0.75rem' }}
+                                                        className="text-capitalize rounded-pill px-2 py-0 suggestion-btn"
                                                         onClick={() => loadPokemonIntoSlot(index, suggestionName)}
                                                     >
-                                                        {suggestionName}
+                                                        {formatDisplayName(suggestionName)}
                                                     </Button>
                                                 ))}
                                             </div>
-                                        </div>
-                                    )}
-                                </Card.Body>
-                            ) : (
-                                <Card.Body className="d-flex flex-column align-items-center justify-content-center text-muted border border-secondary border-dashed rounded m-3" style={{ minHeight: '280px', borderStyle: 'dashed !important' }}>
-                                    <Button
-                                        variant="outline-secondary"
-                                        className="d-flex flex-column align-items-center border-0 p-4"
-                                        onClick={() => setActiveSlotIndex(index)}
-                                    >
-                                        <span className="material-symbols-outlined fs-1 mb-2">add_circle</span>
-                                        <span className="fw-bold">Add Pokémon</span>
-                                    </Button>
-                                </Card.Body>
-                            )}
-                        </Card>
-                    </Col>
-                ))}
+                                        ) : null
+                                    }
+                                />
+                            </Col>
+                        );
+                    }
+
+                    return (
+                        <Col key={`slot-${index}`}>
+                            <Card className="h-100 bg-dark border-secondary shadow-sm empty-slot-card">
+                                <Button
+                                    variant="outline-secondary"
+                                    className="d-flex flex-column align-items-center justify-content-center border-0 w-100 h-100 rounded"
+                                    onClick={() => setActiveSlotIndex(index)}
+                                >
+                                    <MaterialIcon icon="add_circle" className="fs-2 mb-1" />
+                                    <span className="fw-bold small">Add Pokémon</span>
+                                </Button>
+                            </Card>
+                        </Col>
+                    );
+                })}
             </Row>
 
             {/* Average Base Stats Card */}
@@ -320,9 +327,7 @@ export default function TeamBuilderClient(props) {
                     onClick={() => setDefensesCollapsed(prev => !prev)}
                 >
                     <h6 className="text-muted fw-bold text-uppercase mb-0">Type Defenses</h6>
-                    <span className={`material-symbols-outlined transition-transform ${defensesCollapsed ? '' : 'rotate-180'}`}>
-                        expand_more
-                    </span>
+                    <MaterialIcon icon="expand_more" className={`transition-transform ${defensesCollapsed ? '' : 'rotate-180'}`} />
                 </Card.Header>
                 <Collapse in={!defensesCollapsed}>
                     <div>
@@ -408,7 +413,7 @@ export default function TeamBuilderClient(props) {
                                     className="bg-transparent text-light border-secondary d-flex justify-content-between align-items-center"
                                 >
                                     <span className="text-capitalize fw-bold">{species.name}</span>
-                                    <span className="material-symbols-outlined text-muted fs-6">add</span>
+                                    <MaterialIcon icon="add" className="text-muted fs-6" />
                                 </ListGroup.Item>
                             ))
                         ) : (

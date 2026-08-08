@@ -22,3 +22,7 @@ This document guides AI Coding Assistants writing, running, and maintaining unit
 4. **Coverage & Verification**:
    - Always run `npm test` after adding or updating any test file to ensure clean passes across the full test suite, ESLint, and Stylelint.
    - Maintain 100% test passing metrics across component rendering, utility modules, and API helper functions.
+
+5. **Silencing Expected Errors**:
+   - When writing test cases that intentionally simulate errors (like failed API responses or invalid inputs) to test error handling logic, you MUST suppress the expected `console.error` logs.
+   - Use `const consoleSpy = jest.spyOn(console, 'error').mockImplementation(() => {});` before the action, and `consoleSpy.mockRestore();` after the assertion, to prevent intentional error logs from polluting the clean test output.

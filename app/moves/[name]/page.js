@@ -3,9 +3,10 @@ import { Container } from 'react-bootstrap';
 import PokemonList from '../../pokemons/pokemon-list';
 import DamageClassIcon from '../../components/damage-class-icon';
 import TypeBadge from '../../components/type-badge';
-import { fetchMoveByNameOrId, fetchPokemonByUrl, fetchMoveList } from '../../api-requests';
+import { fetchMoveByNameOrId, fetchMoveList } from '../../api-requests';
 import { generateCommonStaticParams } from '../../lib/static-params-util';
 import { limitConcurrency } from '../../lib/promise-utils';
+import { resolvePokemonResource, formatDisplayName } from '../../lib/pokemon-utils';
 
 export default async function MoveDetailPage({ params }) {
     const { name } = await params;
@@ -38,40 +39,12 @@ export default async function MoveDetailPage({ params }) {
 
     // Process Pokémon list (resolve base species IDs for varieties asynchronously)
     const processedPokemon = await limitConcurrency(pokemonList, 10, async (pokemon) => {
-        const parts = pokemon.url.split('/').filter(Boolean);
-        const id = parseInt(parts[parts.length - 1], 10);
-
-        let speciesId = id;
-        let speciesName = pokemon.name;
-
-        if (id >= 10000) {
-            try {
-                const res = await fetchPokemonByUrl(pokemon.url);
-
-                if (res.ok) {
-                    const pokemonData = await res.json();
-                    speciesName = pokemonData.species.name;
-                    const speciesParts = pokemonData.species.url.split('/').filter(Boolean);
-                    speciesId = parseInt(speciesParts[speciesParts.length - 1], 10);
-                }
-            } catch (e) {
-                console.error("Failed to fetch species details for variety:", pokemon.name, e);
-            }
-        }
-
-        return {
-            name: pokemon.name,
-            speciesName,
-            id,
-            speciesId,
-            paddedId: `#${String(speciesId).padStart(4, '0')}`,
-            imageUrl: `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/${speciesId}.png`,
-        };
+        return resolvePokemonResource(pokemon);
     });
 
     const moveType = moveJSON.type?.name || 'normal';
     const moveClass = moveJSON.damage_class?.name || 'physical';
-    const moveTarget = moveJSON.target?.name ? moveJSON.target.name.replace(/-/g, ' ') : null;
+    const moveTarget = moveJSON.target?.name ? formatDisplayName(moveJSON.target.name) : null;
     const priorityVal = moveJSON.priority !== undefined && moveJSON.priority !== null ? moveJSON.priority : 0;
     const priorityText = priorityVal > 0 ? `+${priorityVal}` : `${priorityVal}`;
 
@@ -81,7 +54,7 @@ export default async function MoveDetailPage({ params }) {
             <div className="card bg-dark border-secondary mb-4 text-light">
                 <div className="card-body">
                     <div className="d-flex flex-wrap align-items-center gap-3 mb-3">
-                        <strong className="text-capitalize text-info fs-5">{moveJSON.name.replace(/-/g, ' ')}:</strong>
+                        <strong className="text-capitalize text-info fs-5">{formatDisplayName(moveJSON.name)}:</strong>
                         <TypeBadge type={moveType} />
                         <DamageClassIcon damageClass={moveClass} showLabel={true} />
                         <span className="text-muted ms-md-auto">

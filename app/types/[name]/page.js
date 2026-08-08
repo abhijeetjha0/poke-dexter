@@ -2,9 +2,10 @@ import { Suspense } from 'react';
 import { Container } from 'react-bootstrap';
 import PokemonList from '../../pokemons/pokemon-list';
 import TypeBadge from '../../components/type-badge';
-import { fetchTypeByNameOrId, fetchPokemonByUrl, fetchTypeList } from '../../api-requests';
+import { fetchTypeByNameOrId, fetchTypeList } from '../../api-requests';
 import { generateCommonStaticParams } from '../../lib/static-params-util';
 import { limitConcurrency } from '../../lib/promise-utils';
+import { resolvePokemonResource } from '../../lib/pokemon-utils';
 
 export default async function TypePage({ params }) {
     const { name } = await params;
@@ -28,35 +29,7 @@ export default async function TypePage({ params }) {
 
     // Process Pokémon list
     const processedPokemon = await limitConcurrency(pokemonList, 10, async ({ pokemon }) => {
-        const parts = pokemon.url.split('/').filter(Boolean);
-        const id = parseInt(parts[parts.length - 1], 10);
-
-        let speciesId = id;
-        let speciesName = pokemon.name;
-
-        if (id >= 10000) {
-            try {
-                const res = await fetchPokemonByUrl(pokemon.url);
-
-                if (res.ok) {
-                    const pokemonData = await res.json();
-                    speciesName = pokemonData.species.name;
-                    const speciesParts = pokemonData.species.url.split('/').filter(Boolean);
-                    speciesId = parseInt(speciesParts[speciesParts.length - 1], 10);
-                }
-            } catch (e) {
-                console.error("Failed to fetch species details for variety:", pokemon.name, e);
-            }
-        }
-
-        return {
-            name: pokemon.name,
-            speciesName,
-            id,
-            speciesId,
-            paddedId: `#${String(speciesId).padStart(4, '0')}`,
-            imageUrl: `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/${speciesId}.png`,
-        };
+        return resolvePokemonResource(pokemon);
     });
 
     return (

@@ -11,12 +11,8 @@ import {
     fetchEvolutionChainByUrl,
 } from '../../api-requests';
 import { generateCommonStaticParams } from '../../lib/static-params-util';
-
-const ALL_TYPES = [
-    'normal', 'fighting', 'flying', 'poison', 'ground', 'rock',
-    'bug', 'ghost', 'steel', 'fire', 'water', 'grass',
-    'electric', 'psychic', 'ice', 'dragon', 'dark', 'fairy',
-];
+import { formatDisplayName } from '../../lib/pokemon-utils';
+import { ALL_TYPES } from '../../lib/type-effectiveness-utils';
 
 /**
  * Compute type defense multipliers for a list of defending types.
@@ -52,7 +48,11 @@ function extractLatestPokedexEntry(speciesData) {
     const entries = speciesData.flavor_text_entries || [];
     // Filter English entries, take the last one (latest game)
     const englishEntries = entries.filter(entry => entry.language?.name === 'en');
-    if (englishEntries.length === 0) return null;
+
+    if (englishEntries.length === 0) {
+        return null;
+    }
+
     const latest = englishEntries[englishEntries.length - 1];
 
     return {
@@ -64,17 +64,20 @@ function extractLatestPokedexEntry(speciesData) {
 // Process encounter data: group by game version with locations and methods.
 function processEncounters(encounterData) {
     const byVersion = {};
+
     for (const area of encounterData) {
-        const locationName = area.location_area?.name
-            ?.replace(/-/g, ' ')
+        const locationName = formatDisplayName(area.location_area?.name)
             .replace(/\b\w/g, char => char.toUpperCase()) || 'Unknown';
 
         for (const vd of (area.version_details || [])) {
             const version = vd.version?.name || 'unknown';
-            if (!byVersion[version]) byVersion[version] = {};
+
+            if (!byVersion[version]) {
+                byVersion[version] = {};
+            }
 
             const methods = (vd.encounter_details || []).map(encounterDetail => ({
-                method: encounterDetail.method?.name?.replace(/-/g, ' ') || 'unknown',
+                method: formatDisplayName(encounterDetail.method?.name) || 'unknown',
                 minLevel: encounterDetail.min_level,
                 maxLevel: encounterDetail.max_level,
                 chance: encounterDetail.chance,
@@ -85,8 +88,10 @@ function processEncounters(encounterData) {
             const seen = new Set();
             let batchMinLevel = Infinity;
             let batchMaxLevel = -Infinity;
+
             for (const methodObj of methods) {
                 const key = methodObj.method;
+
                 if (!seen.has(key)) {
                     seen.add(key);
                     uniqueMethods.push(methodObj);
@@ -100,14 +105,16 @@ function processEncounters(encounterData) {
                 const existing = byVersion[version][locationName];
                 // Merge methods using O(1) Set lookup
                 const existingMethodNames = new Set(existing.methods.map(existingMethod => existingMethod.method));
+
                 for (const uniqueMethod of uniqueMethods) {
                     if (!existingMethodNames.has(uniqueMethod.method)) {
                         existing.methods.push(uniqueMethod);
                         existingMethodNames.add(uniqueMethod.method);
                     }
                 }
+
                 // Update level range
-                if (uniqueMethods.length > 0) {
+                if (uniqueMethods.length) {
                     existing.minLevel = Math.min(existing.minLevel, batchMinLevel);
                     existing.maxLevel = Math.max(existing.maxLevel, batchMaxLevel);
                 }
@@ -115,8 +122,8 @@ function processEncounters(encounterData) {
                 byVersion[version][locationName] = {
                     location: locationName,
                     methods: uniqueMethods,
-                    minLevel: uniqueMethods.length > 0 ? batchMinLevel : 0,
-                    maxLevel: uniqueMethods.length > 0 ? batchMaxLevel : 0,
+                    minLevel: uniqueMethods.length ? batchMinLevel : 0,
+                    maxLevel: uniqueMethods.length ? batchMaxLevel : 0,
                 };
             }
         }
@@ -141,7 +148,7 @@ export default async function Page({ params }) {
     const responseJSON = await response.json();
 
     const { varieties } = responseJSON;
-    
+
     // Fetch all variety detail endpoints in parallel with limit
     const pokeInfoListJSON = await limitConcurrency(varieties, 10, async ({ pokemon }) => {
         const res = await fetchPokemonByUrl(pokemon.url);
@@ -167,11 +174,13 @@ export default async function Page({ params }) {
     // Fetch encounter data for the base form
     const baseId = baseForm.id;
     let encountersByVersion = {};
+
     try {
         const encountersResponse = await fetchPokemonEncounters(
             baseId,
             { next: { revalidate: 86400 } }
         );
+
         if (encountersResponse.ok) {
             const encounterData = await encountersResponse.json();
             encountersByVersion = processEncounters(encounterData);
@@ -201,6 +210,7 @@ export default async function Page({ params }) {
     const moveDetailsMap = {};
     moveDetailsResponses.forEach((detail, idx) => {
         const moveName = uniqueMoveNamesArray[idx];
+
         if (detail) {
             moveDetailsMap[moveName] = {
                 power: detail.power,
@@ -222,12 +232,14 @@ export default async function Page({ params }) {
 
     // --- 5. Evolution Chain ---
     let evolutionChainData = null;
+
     if (responseJSON.evolution_chain?.url) {
         try {
             const evRes = await fetchEvolutionChainByUrl(
-                responseJSON.evolution_chain.url, 
+                responseJSON.evolution_chain.url,
                 { next: { revalidate: 86400 } }
             );
+
             if (evRes.ok) {
                 evolutionChainData = await evRes.json();
             }
@@ -237,8 +249,8 @@ export default async function Page({ params }) {
     }
 
     return (
-        <PokemonDetailView 
-            speciesInfo={responseJSON} 
+        <PokemonDetailView
+            speciesInfo={responseJSON}
             varietyList={pokeInfoListJSON}
             moveDetailsMap={moveDetailsMap}
             pokedexEntry={pokedexEntry}

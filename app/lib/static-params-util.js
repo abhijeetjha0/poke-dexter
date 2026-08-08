@@ -1,7 +1,11 @@
 export async function generateCommonStaticParams(fetchFunction, limit, entityName) {
     try {
         const response = await fetchFunction(limit);
-        if (!response.ok) return [];
+
+        if (!response.ok) {
+            return [];
+        }
+
         const data = await response.json();
 
         return data.results.map((item) => ({

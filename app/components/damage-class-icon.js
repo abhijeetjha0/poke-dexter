@@ -19,6 +19,7 @@ const DAMAGE_CLASS_CONFIG = {
 };
 
 import { OverlayTrigger, Tooltip, Badge } from 'react-bootstrap';
+import MaterialIcon from './material-icon';
 
 export default function DamageClassIcon({ damageClass, showLabel = false, className = '' }) {
     const config = DAMAGE_CLASS_CONFIG[damageClass];
@@ -38,7 +39,7 @@ export default function DamageClassIcon({ damageClass, showLabel = false, classN
             bg={bgMap[damageClass]}
             className={`d-inline-flex align-items-center justify-content-center p-1 rounded gap-1 ${className}`.trim()}
         >
-            <span className="material-symbols-outlined fs-6 lh-1">{config.iconName}</span>
+            <MaterialIcon icon={config.iconName} className="fs-6 lh-1" />
             {showLabel && <span className="text-capitalize small fw-semibold px-1">{config.label}</span>}
         </Badge>
     );

@@ -76,9 +76,9 @@ describe('TeamBuilderClient Component', () => {
 
         await waitFor(() => {
             expect(screen.getByText('charizard')).toBeInTheDocument();
-            expect(screen.getByText('Average Base Stats')).toBeInTheDocument();
-            expect(screen.getByText('Forms & Evolutions:')).toBeInTheDocument();
-            expect(screen.getByRole('button', { name: /charizard-mega-x/i })).toBeInTheDocument();
+            expect(screen.getByText('BST: 100')).toBeInTheDocument();
+            expect(screen.getByText('Switch with:')).toBeInTheDocument();
+            expect(screen.getByRole('button', { name: /charizard mega x/i })).toBeInTheDocument();
         });
     });
 
@@ -123,7 +123,7 @@ describe('TeamBuilderClient Component', () => {
         fireEvent.click(screen.getByRole('button', { name: /minior/i }));
 
         await waitFor(() => {
-            expect(screen.getByText('minior-red-meteor')).toBeInTheDocument();
+            expect(screen.getByText('minior red meteor')).toBeInTheDocument();
         });
     });
 });

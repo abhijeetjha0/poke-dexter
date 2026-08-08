@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import MaterialIcon from './material-icon';
 import { Card, Collapse, ProgressBar } from 'react-bootstrap';
 
 const STAT_CONFIG = [
@@ -95,9 +96,7 @@ export default function BaseStatsCard({
                     <span className="text-info fw-bold small">
                         {totalLabel}: {total}
                     </span>
-                    <span className={`material-symbols-outlined transition-transform ${collapsed ? '' : 'rotate-180'}`}>
-                        expand_more
-                    </span>
+                    <MaterialIcon icon="expand_more" className={`transition-transform ${collapsed ? '' : 'rotate-180'}`} />
                 </div>
             </Card.Header>
             <Collapse in={!collapsed}>

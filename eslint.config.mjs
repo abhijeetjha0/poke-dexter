@@ -39,6 +39,7 @@ export default [
       ],
       "curly": ["error", "all"],
       "max-len": ["error", { "code": 120, "ignoreUrls": true, "ignoreStrings": true, "ignoreTemplateLiterals": true, "ignoreRegExpLiterals": true }],
+      "max-lines": ["error", { "max": 500, "skipBlankLines": true, "skipComments": true }],
     },
     settings: {
       react: {

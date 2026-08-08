@@ -4,9 +4,11 @@ import { fetchPokemonSpeciesList } from '../api-requests';
 
 export default async function Page() {
     const response = await fetchPokemonSpeciesList(2000);
+
     if (!response.ok) {
         throw new Error('Failed to fetch pokemons from PokéAPI');
     }
+
     const responseJSON = await response.json();
 
     return (

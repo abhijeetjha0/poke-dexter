@@ -8,12 +8,7 @@
 
 import { fetchTypeByNameOrId, fetchMoveDamageClass } from '../api-requests';
 import { limitConcurrency } from './promise-utils';
-
-const ALL_TYPES = [
-    'normal', 'fighting', 'flying', 'poison', 'ground', 'rock',
-    'bug', 'ghost', 'steel', 'fire', 'water', 'grass',
-    'electric', 'psychic', 'ice', 'dragon', 'dark', 'fairy',
-];
+import { ALL_TYPES } from './type-effectiveness-utils';
 
 const ALL_DAMAGE_CLASSES = ['physical', 'special', 'status'];
 
@@ -31,6 +26,7 @@ const CACHE_DURATION_MS = 24 * 60 * 60 * 1000; // 24 hours in-memory cache
  */
 export async function buildMoveTypeMap() {
     const now = Date.now();
+
     if (cachedTypeMap && (now - typeMapTimestamp) < CACHE_DURATION_MS) {
         return cachedTypeMap;
     }
@@ -45,12 +41,15 @@ export async function buildMoveTypeMap() {
 
     for (let i = 0; i < ALL_TYPES.length; i++) {
         const typeName = ALL_TYPES[i];
+
         if (!typeResponses[i].ok) {
             console.error(`Failed to fetch type: ${typeName}`);
             continue;
         }
+
         const typeData = await typeResponses[i].json();
         const moves = typeData.moves || [];
+
         for (const move of moves) {
             moveTypeMap[move.name] = typeName;
         }
@@ -70,6 +69,7 @@ export async function buildMoveTypeMap() {
  */
 export async function buildMoveDamageClassMap() {
     const now = Date.now();
+
     if (cachedDamageClassMap && (now - damageClassMapTimestamp) < CACHE_DURATION_MS) {
         return cachedDamageClassMap;
     }
@@ -84,12 +84,15 @@ export async function buildMoveDamageClassMap() {
 
     for (let i = 0; i < ALL_DAMAGE_CLASSES.length; i++) {
         const className = ALL_DAMAGE_CLASSES[i];
+
         if (!classResponses[i].ok) {
             console.error(`Failed to fetch damage class: ${className}`);
             continue;
         }
+
         const classData = await classResponses[i].json();
         const moves = classData.moves || [];
+
         for (const move of moves) {
             moveDamageClassMap[move.name] = className;
         }

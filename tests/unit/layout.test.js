@@ -9,6 +9,7 @@ jest.mock('../../app/components/navbar', () => {
 
 describe('RootLayout', () => {
     test('renders html, body, and children', () => {
+        const consoleSpy = jest.spyOn(console, 'error').mockImplementation(() => {});
         const { getByTestId, getByText, container } = render(
             <RootLayout>
                 <div data-testid="child">Test Child</div>
@@ -22,5 +23,7 @@ describe('RootLayout', () => {
         const main = container.querySelector('main');
         expect(main).toBeInTheDocument();
         expect(main.contains(getByTestId('child'))).toBe(true);
+        
+        consoleSpy.mockRestore();
     });
 });

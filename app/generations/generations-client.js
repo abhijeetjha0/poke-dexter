@@ -3,6 +3,8 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { Container, Row, Col, Card, Button, ButtonGroup, ListGroup, Badge } from 'react-bootstrap';
+import { getPokemonImageUrl } from '../lib/pokemon-utils';
+import MaterialIcon from '../components/material-icon';
 
 const GENERATIONS = [
     { id: 1, roman: 'Generation I', region: 'Kanto', range: '#0001 - #0151', count: 151, class: 'gen-1', mascotId: 6 }, // Charizard
@@ -21,6 +23,7 @@ export default function GenerationsClient() {
 
     useEffect(() => {
         const savedMode = localStorage.getItem('viewMode');
+
         if (savedMode === 'grid' || savedMode === 'list') {
             setTimeout(() => {
                 setViewMode(savedMode);
@@ -45,7 +48,7 @@ export default function GenerationsClient() {
                         aria-label="Grid View"
                         className="d-flex align-items-center justify-content-center p-2"
                     >
-                        <span className="material-symbols-outlined fs-5">grid_view</span>
+                        <MaterialIcon icon="grid_view" className="fs-5" />
                     </Button>
                     <Button
                         variant={viewMode === 'list' ? 'secondary' : 'outline-secondary'}
@@ -55,7 +58,7 @@ export default function GenerationsClient() {
                         aria-label="List View"
                         className="d-flex align-items-center justify-content-center p-2"
                     >
-                        <span className="material-symbols-outlined fs-5">format_list_bulleted</span>
+                        <MaterialIcon icon="format_list_bulleted" className="fs-5" />
                     </Button>
                 </ButtonGroup>
             </div>
@@ -70,7 +73,6 @@ export default function GenerationsClient() {
                                 bg="dark"
                                 border="secondary"
                                 className="h-100 text-decoration-none hover-primary transition-all overflow-hidden position-relative"
-                                style={{ cursor: 'pointer', minHeight: '160px' }}
                             >
                                 <Card.Body className="d-flex justify-content-between p-4 z-1">
                                     <div className="d-flex flex-column justify-content-between">
@@ -85,15 +87,13 @@ export default function GenerationsClient() {
                                     </div>
                                     <div
                                         className="position-absolute end-0 bottom-0 opacity-75"
-                                        style={{ transform: 'translate(10%, 10%)' }}
                                     >
                                         <img
-                                            src={`https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/${gen.mascotId}.png`}
+                                            src={getPokemonImageUrl(gen.mascotId)}
                                             alt={`${gen.region} mascot`}
                                             loading="lazy"
                                             width="140"
                                             height="140"
-                                            style={{ filter: 'drop-shadow(-5px -5px 10px rgba(0,0,0,0.5))' }}
                                         />
                                     </div>
                                 </Card.Body>
@@ -109,16 +109,14 @@ export default function GenerationsClient() {
                             as={Link}
                             href={`/pokemons?gen=${gen.id}`}
                             className="bg-dark border-secondary p-3 text-decoration-none hover-primary transition-all d-flex justify-content-between align-items-center"
-                            style={{ cursor: 'pointer' }}
                         >
                             <div className="d-flex align-items-center gap-4">
                                 <img
-                                    src={`https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/${gen.mascotId}.png`}
+                                    src={getPokemonImageUrl(gen.mascotId)}
                                     alt={`${gen.region} mascot`}
                                     width="60"
                                     height="60"
                                     loading="lazy"
-                                    style={{ filter: 'drop-shadow(0 4px 6px rgba(0,0,0,0.3))' }}
                                 />
                                 <div>
                                     <div className="d-flex align-items-baseline gap-2 mb-1">
@@ -131,7 +129,7 @@ export default function GenerationsClient() {
                                     </div>
                                 </div>
                             </div>
-                            <span className="material-symbols-outlined text-muted fs-4">arrow_forward</span>
+                            <MaterialIcon icon="arrow_forward" className="text-muted fs-4" />
                         </ListGroup.Item>
                     ))}
                 </ListGroup>

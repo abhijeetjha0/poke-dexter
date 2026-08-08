@@ -10,7 +10,12 @@ jest.mock('../../../../app/api-requests', () => ({
 
 jest.mock('../../../../app/pokemons/pokemon-list', () => {
     return function MockPokemonList({ processedListProp }) {
-        return <div data-testid="pokemon-grid">{processedListProp.length}</div>;
+        return (
+            <div data-testid="pokemon-grid">
+                {processedListProp.length && <span data-testid="mock-img">{processedListProp[0].imageUrl}</span>}
+                {processedListProp.length}
+            </div>
+        );
     };
 });
 
@@ -38,6 +43,9 @@ describe('AbilityDetailPage (Server Component)', () => {
         expect(getByText('overgrow:')).toBeInTheDocument();
         expect(getByText('Boosts Grass moves.')).toBeInTheDocument();
         expect(getByTestId('pokemon-grid')).toHaveTextContent('1');
+
+        // Verify imageUrl uses the ID from the URL (1)
+        expect(getByTestId('mock-img')).toHaveTextContent('https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/1.png');
     });
 
     test('renders 404 state when not found', async () => {

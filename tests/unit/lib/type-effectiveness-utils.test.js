@@ -3,7 +3,6 @@ import {
     getMultiplierClass,
     calculateTypeDefenses,
     calculateTeamTypeDefenses,
-    ALL_TYPES,
 } from '../../../app/lib/type-effectiveness-utils';
 
 describe('Type Effectiveness Utilities', () => {
