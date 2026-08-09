@@ -25,7 +25,7 @@ Subdirectory-specific guidelines are maintained in modular `AGENTS.md` files thr
 │   ├── items/               # Items index and details routes
 │   ├── lib/                 # Utility functions & helpers (move-type-utils.js)
 │   ├── moves/               # Moves index and details routes
-│   ├── pokemons/            # Pokédex routes & pokemons AGENTS.md
+│   ├── pokemons/            # Pokedex routes & pokemons AGENTS.md
 │   ├── styles/              # SCSS architecture & styles AGENTS.md
 │   ├── types/               # Types hub route & type-filtered listings
 │   ├── global-error.js      # Global Next.js error boundary
@@ -76,6 +76,7 @@ Subdirectory-specific guidelines are maintained in modular `AGENTS.md` files thr
 5. **Test Coverage Requirements**: Always add or update unit test cases covering any changes, bug fixes, or new features developed during a session.
 6. **Documentation Relative File Links**: File links in documentation files (`README.md`, `AGENTS.md`) MUST use repository-relative paths starting with `./` (e.g., `./app/page.js`). For dynamic route paths containing square brackets (`[name]`), brackets in the link target URL MUST be URL-encoded as `%5B` and `%5D` (e.g., `./app/pokemons/%5Bname%5D/page.js`) to guarantee clickability across markdown parsers.
 7. **No Inline Styles & No Disabled Lint Rules**: NEVER use inline `style={{ ... }}` attributes or `eslint-disable` / `stylelint-disable` comments in application code. All layout, color, and dynamic sizing styles MUST be maintained strictly within SCSS stylesheets (`app/styles/`) using semantic CSS classes or SCSS generators.
+8. **UI Manual Sync Requirement**: Whenever adding, removing, or updating a UI feature, agents MUST automatically update the `app/help/page.js` manual to reflect the changes to keep the project manual accurate and in-sync. The manual must use semantic `<section id="...">` hierarchy without page headers, and maintain anchor IDs to support the global floating help button.
 
 > **Note**: Subdirectory-specific guidelines (React component patterns, SCSS style structure, App Router conventions, PR description generation skill, and GitHub Actions workflows) are maintained directly within their respective modular files:
 > - [.agents/skills/browser-automation-test/SKILL.md](.agents/skills/browser-automation-test/SKILL.md)

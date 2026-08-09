@@ -2,7 +2,7 @@ import AbilitiesList from './abilities-list';
 import { fetchAbilityList } from '../api-requests';
 
 export const metadata = {
-    title: 'Pokemon Abilities Directory | PokeDexter',
+    title: 'Abilities',
     description: 'Explore all Pokémon abilities, understand their effects, and discover which Pokémon can learn them.',
 }
 

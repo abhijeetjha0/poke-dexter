@@ -17,7 +17,7 @@ PokeDexter is a feature-rich, cross-platform Pokémon information application. I
 
 ## 🌟 Key Features
 
-*   **Pokédex**: Search and browse through over 1,000 Pokémon species with an interactive search bar, paginated listings, and generation-based filtering.
+*   **Pokedex**: Search and browse through over 1,000 Pokémon species with an interactive search bar, paginated listings, and generation-based filtering.
 *   **Global Search**: Unified autocomplete search bar in the navigation menu to instantly jump to specific Pokémon, Moves, or Abilities.
 *   **Rich Details Views**: Comprehensive profile pages for individual Pokémon showing:
     *   Visual Evolution Chains
@@ -34,6 +34,17 @@ PokeDexter is a feature-rich, cross-platform Pokémon information application. I
 *   **Types**: Dynamic list of all 18 element types showing matching species.
 *   **Generations Navigation Hub**: A list of all generations, each with a link to view all Pokémon in that generation.
 *   **Mobile Responsiveness**: Designed using flexible edge-to-edge grid layouts on mobile and a fluid, animated mobile hamburger menu.
+*   **In-App UI Manual**: A comprehensive Help page detailing all features, accessible directly within the application (served on GitHub Pages).
+
+---
+
+## 📖 In-App UI Manual
+
+PokeDexter includes a fully integrated, interactive **Help Manual** documenting every feature and functionality available in the app. 
+Whether you're exploring the Pokedex, learning how to use the Team Builder's weakness analysis, or simply browsing items and moves, the manual provides detailed, step-by-step guidance.
+
+We highly suggest that users **read the manual** to fully understand how to use the application's extensive features. 
+You can access it at any time via the "Help" link in the top navigation bar, by clicking the floating info button on any page, or directly on the [GitHub Pages deployment](https://abhijeetjha0.github.io/poke-dexter/help).
 
 ---
 
@@ -56,7 +67,7 @@ The project utilizes the **Next.js App Router** with file-system-based routing. 
 
 *   **API Layer (`app/api-requests`)**: [app/api-requests/index.js](./app/api-requests/index.js) - Centralized PokéAPI network request module.
 *   **Home (`/`)**: [app/page.js](./app/page.js) - Landing page introducing PokeDexter.
-*   **Pokédex List (`/pokemons`)**: [app/pokemons/page.js](./app/pokemons/page.js) - Paginated list of all Pokémon.
+*   **Pokedex List (`/pokemons`)**: [app/pokemons/page.js](./app/pokemons/page.js) - Paginated list of all Pokémon.
 *   **Pokémon Details (`/pokemons/[name]`)**: [app/pokemons/[name]/page.js](./app/pokemons/%5Bname%5D/page.js) - Dynamic profile page for each Pokémon.
 *   **Team Builder (`/team-builder`)**: [app/team-builder/page.js](./app/team-builder/page.js) - Interactive team composition and analysis tool.
 *   **Abilities List (`/abilities`)**: [app/abilities/page.js](./app/abilities/page.js) - Index list of abilities.
@@ -68,6 +79,7 @@ The project utilizes the **Next.js App Router** with file-system-based routing. 
 *   **Generations List (`/generations`)**: [app/generations/page.js](./app/generations/page.js) - List page for generation-specific Pokémon lists.
 *   **Types List (`/types`)**: [app/types/page.js](./app/types/page.js) - Listing of Pokémon categorized by standard element types.
 *   **Type Details (`/types/[name]`)**: [app/types/[name]/page.js](./app/types/%5Bname%5D/page.js) - Detailed list of Pokémon belonging to a specific element type.
+*   **Help / User Manual (`/help`)**: [app/help/page.js](./app/help/page.js) - In-app manual explaining how to use all the UI features.
 
 ---
 

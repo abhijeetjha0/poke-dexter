@@ -31,17 +31,23 @@ describe('TeamTypeDefensesCard Component', () => {
     });
 
     it('should return null if teamAnalysis is missing', () => {
-        const { container } = render(<TeamTypeDefensesCard teamAnalysis={null} collapsed={false} setCollapsed={mockSetCollapsed} />);
+        const { container } = render(
+            <TeamTypeDefensesCard teamAnalysis={null} collapsed={false} setCollapsed={mockSetCollapsed} />
+        );
         expect(container).toBeEmptyDOMElement();
     });
 
     it('should return null if teamAnalysis.summary is missing', () => {
-        const { container } = render(<TeamTypeDefensesCard teamAnalysis={{}} collapsed={false} setCollapsed={mockSetCollapsed} />);
+        const { container } = render(
+            <TeamTypeDefensesCard teamAnalysis={{}} collapsed={false} setCollapsed={mockSetCollapsed} />
+        );
         expect(container).toBeEmptyDOMElement();
     });
 
     it('should render the table and ALL_TYPES rows', () => {
-        render(<TeamTypeDefensesCard teamAnalysis={mockTeamAnalysis} collapsed={false} setCollapsed={mockSetCollapsed} />);
+        render(
+            <TeamTypeDefensesCard teamAnalysis={mockTeamAnalysis} collapsed={false} setCollapsed={mockSetCollapsed} />
+        );
         
         expect(screen.getByText('Type Defenses')).toBeInTheDocument();
         const typeBadges = screen.getAllByTestId('type-badge');
@@ -49,7 +55,9 @@ describe('TeamTypeDefensesCard Component', () => {
     });
 
     it('should call setCollapsed when header is clicked', () => {
-        render(<TeamTypeDefensesCard teamAnalysis={mockTeamAnalysis} collapsed={false} setCollapsed={mockSetCollapsed} />);
+        render(
+            <TeamTypeDefensesCard teamAnalysis={mockTeamAnalysis} collapsed={false} setCollapsed={mockSetCollapsed} />
+        );
         
         const header = screen.getByText('Type Defenses').closest('.card-header');
         fireEvent.click(header);
@@ -65,7 +73,9 @@ describe('TeamTypeDefensesCard Component', () => {
             neutral: 3, neutralNames: ['squirtle', 'caterpie', 'weedle']
         };
 
-        render(<TeamTypeDefensesCard teamAnalysis={mockTeamAnalysis} collapsed={false} setCollapsed={mockSetCollapsed} />);
+        render(
+            <TeamTypeDefensesCard teamAnalysis={mockTeamAnalysis} collapsed={false} setCollapsed={mockSetCollapsed} />
+        );
         
         // fire row: 2 weak, 1 resist, 0 immune, 3 neutral
         // We can find the counts in the document
@@ -82,7 +92,9 @@ describe('TeamTypeDefensesCard Component', () => {
             neutral: 0, neutralNames: []
         };
 
-        render(<TeamTypeDefensesCard teamAnalysis={mockTeamAnalysis} collapsed={false} setCollapsed={mockSetCollapsed} />);
+        render(
+            <TeamTypeDefensesCard teamAnalysis={mockTeamAnalysis} collapsed={false} setCollapsed={mockSetCollapsed} />
+        );
         
         const waterBadge = screen.getAllByTestId('type-badge').find(b => b.textContent === 'water');
         const row = waterBadge.closest('tr');

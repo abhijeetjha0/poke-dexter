@@ -2,11 +2,11 @@
 
 import { useState, useMemo } from 'react';
 import Link from 'next/link';
-import { Container, Row, Col, Form, InputGroup, Alert, Card } from 'react-bootstrap';
+import { Container, Row, Col, Form, Alert, Card } from 'react-bootstrap';
 import ClientImage from '../components/client-image';
 import CountBadge from '../components/count-badge';
 import AppPagination from '../components/app-pagination';
-import MaterialIcon from '../components/material-icon';
+import LocalSearchBar from '../components/local-search-bar';
 import { getItemSpriteUrl } from '../lib/item-category-utils';
 import { formatDisplayName } from '../lib/pokemon-utils';
 
@@ -51,19 +51,13 @@ export default function ItemsList({ initialItems, itemCategoryMap = {}, category
                     <CountBadge count={filteredItems.length} className="fs-6 px-3 py-1" />
                 </Col>
                 <Col className="flex-grow-1 items-search-col">
-                    <InputGroup>
-                        <Form.Control
-                            type="text"
-                            placeholder="Search items (e.g., master-ball, potion)..."
-                            value={searchTerm}
-                            onChange={handleSearchChange}
-                            id="items-search-bar"
-                            className="bg-dark text-light border-secondary shadow-none"
-                        />
-                        <InputGroup.Text className="bg-dark border-secondary text-light">
-                            <MaterialIcon icon="search" className="fs-5" />
-                        </InputGroup.Text>
-                    </InputGroup>
+                    <LocalSearchBar
+                        value={searchTerm}
+                        onChange={handleSearchChange}
+                        placeholder="Search items (e.g., master-ball, potion)..."
+                        id="items-search-bar"
+                        variant="dark"
+                    />
                 </Col>
                 {categoryList.length && (
                     <Col xs={12} sm="auto" className="items-category-col">

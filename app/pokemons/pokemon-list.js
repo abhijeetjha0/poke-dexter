@@ -4,12 +4,23 @@ import { useState, useMemo, useEffect, useRef, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { fetchPokemonByIdOrName } from '../api-requests';
 import { limitConcurrency } from '../lib/promise-utils';
-import MaterialIcon from '../components/material-icon';
 import PokemonGrid from '../components/pokemon-grid';
 import PokemonTableView from '../components/pokemon-table-view';
 import CountBadge from '../components/count-badge';
+import LocalSearchBar from '../components/local-search-bar';
 import { getSpeciesName, isVariety, getPokemonImageUrl } from '../lib/pokemon-utils';
-import { Form, InputGroup, Button, ButtonGroup, Nav, Container, Row, Col, Alert } from 'react-bootstrap';
+import { Nav, Container, Row, Col, Alert } from 'react-bootstrap';
+import useViewMode from '../hooks/useViewMode';
+import ViewModeToggle from '../components/view-mode-toggle';
+
+const formatPokemonDetails = (detail) => ({
+    types: detail.types.map(typeObj => typeObj.type.name),
+    stats: detail.stats.reduce((acc, statObj) => {
+        acc[statObj.stat.name] = statObj.base_stat;
+
+        return acc;
+    }, {})
+});
 
 const GENERATIONS = [
     { name: 'All', start: 1, end: 9999 },
@@ -53,24 +64,7 @@ function PokemonListInner(props) {
     const activeGen = genQuery ? (genQuery === 'All' ? 'All' : `Gen ${genQuery}`) : 'All';
     const [searchTerm, setSearchTerm] = useState('');
     const [visibleCount, setVisibleCount] = useState(INITIAL_LOAD_COUNT);
-
-    // View mode state with localStorage persistence (safe from SSR hydration mismatch)
-    const [viewMode, setViewMode] = useState('grid');
-
-    useEffect(() => {
-        const savedMode = localStorage.getItem('viewMode');
-
-        if (savedMode === 'grid' || savedMode === 'list') {
-            setTimeout(() => {
-                setViewMode(savedMode);
-            }, 0);
-        }
-    }, []);
-
-    const handleViewModeChange = (mode) => {
-        setViewMode(mode);
-        localStorage.setItem('viewMode', mode);
-    };
+    const [viewMode, handleViewModeChange] = useViewMode('grid');
 
     // Cache for visible pokemon typings and base stats
     const [pokemonDetails, setPokemonDetails] = useState({});
@@ -243,14 +237,7 @@ function PokemonListInner(props) {
                     setPokemonDetails(prev => {
                         const next = { ...prev };
                         results.forEach(detail => {
-                            next[detail.id] = {
-                                types: detail.types.map(typeObj => typeObj.type.name),
-                                stats: detail.stats.reduce((acc, statObj) => {
-                                    acc[statObj.stat.name] = statObj.base_stat;
-
-                                    return acc;
-                                }, {})
-                            };
+                            next[detail.id] = formatPokemonDetails(detail);
                         });
 
                         return next;
@@ -303,14 +290,7 @@ function PokemonListInner(props) {
                                 const next = { ...prev };
                                 results.forEach(detail => {
                                     if (!next[detail.id]) {
-                                        next[detail.id] = {
-                                            types: detail.types.map(typeObj => typeObj.type.name),
-                                            stats: detail.stats.reduce((acc, statObj) => {
-                                                acc[statObj.stat.name] = statObj.base_stat;
-
-                                                return acc;
-                                            }, {})
-                                        };
+                                        next[detail.id] = formatPokemonDetails(detail);
                                     }
                                 });
 
@@ -343,24 +323,9 @@ function PokemonListInner(props) {
                         {sectionTitle}
                         <CountBadge count={countBadge} className="fs-6" />
                     </div>
-                    <ButtonGroup className="ms-auto">
-                        <Button
-                            variant={viewMode === 'grid' ? 'secondary' : 'outline-secondary'}
-                            onClick={() => handleViewModeChange('grid')}
-                            title="Grid View"
-                            className="d-flex align-items-center"
-                        >
-                            <MaterialIcon icon="grid_view" />
-                        </Button>
-                        <Button
-                            variant={viewMode === 'list' ? 'secondary' : 'outline-secondary'}
-                            onClick={() => handleViewModeChange('list')}
-                            title="List View"
-                            className="d-flex align-items-center"
-                        >
-                            <MaterialIcon icon="format_list_bulleted" />
-                        </Button>
-                    </ButtonGroup>
+                    <div className="ms-auto">
+                        <ViewModeToggle viewMode={viewMode} onViewModeChange={handleViewModeChange} />
+                    </div>
                 </div>
             )}
 
@@ -368,39 +333,16 @@ function PokemonListInner(props) {
             {!hideSearch && (
                 <Row className="mb-4 align-items-center g-2 flex-nowrap">
                     <Col className="flex-grow-1">
-                        <InputGroup>
-                            <Form.Control
-                                type="text"
-                                placeholder="Search Pokemon by name or national ID..."
-                                value={searchTerm}
-                                onChange={(e) => setSearchTerm(e.target.value)}
-                                className="bg-dark text-light border-secondary shadow-none"
-                            />
-                            <InputGroup.Text className="bg-dark border-secondary text-light">
-                                <MaterialIcon icon="search" className="fs-5" />
-                            </InputGroup.Text>
-                        </InputGroup>
+                        <LocalSearchBar
+                            value={searchTerm}
+                            onChange={(e) => setSearchTerm(e.target.value)}
+                            placeholder="Search Pokemon by name or national ID..."
+                            variant="dark"
+                        />
                     </Col>
                     {!sectionTitle && (
                         <Col xs="auto">
-                            <ButtonGroup>
-                                <Button
-                                    variant={viewMode === 'grid' ? 'secondary' : 'outline-secondary'}
-                                    onClick={() => handleViewModeChange('grid')}
-                                    title="Grid View"
-                                    className="d-flex align-items-center"
-                                >
-                                    <MaterialIcon icon="grid_view" />
-                                </Button>
-                                <Button
-                                    variant={viewMode === 'list' ? 'secondary' : 'outline-secondary'}
-                                    onClick={() => handleViewModeChange('list')}
-                                    title="List View"
-                                    className="d-flex align-items-center"
-                                >
-                                    <MaterialIcon icon="format_list_bulleted" />
-                                </Button>
-                            </ButtonGroup>
+                            <ViewModeToggle viewMode={viewMode} onViewModeChange={handleViewModeChange} />
                         </Col>
                     )}
                 </Row>

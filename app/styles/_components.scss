@@ -1,6 +1,10 @@
 @use 'variables' as *;
 
-/* ─── Global Search: single focus ring on the outer InputGroup ───── */
+/* ─── Global & Local Search ────────────────────────────────────────────────── */
+
+.sticky-search-panel {
+  top: 70px;
+}
 
 /* Strip all focus styling from the inner elements */
 .input-group>.form-control:focus,
@@ -1184,4 +1188,23 @@
 
 .cursor-pointer {
   cursor: pointer;
+}
+
+.help-floating-button {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  width: 56px;
+  height: 56px;
+  z-index: 1050;
+
+  .material-symbols-outlined {
+    font-size: 28px;
+  }
+}
+
+/* Navbar Sticky */
+.app-navbar-sticky {
+  z-index: 1020 !important;
+  top: 15px !important;
 }

@@ -14,6 +14,7 @@ const NAV_ITEMS = [
     { label: 'Items', path: '/items' },
     { label: 'Types', path: '/types' },
     { label: 'Generations', path: '/generations' },
+    { label: 'Help', path: '/help' },
 ];
 
 export default function Navbar() {
@@ -21,17 +22,13 @@ export default function Navbar() {
     const pathname = usePathname();
 
     const isActive = (path) => {
-        if (path === '/') {
-            return pathname === '/';
-        }
-
         return pathname === path || pathname.startsWith(path + '/');
     };
 
     const handleClose = () => setExpanded(false);
 
     return (
-        <BootstrapNavbar expanded={expanded} expand="lg" bg="dark" variant="dark" collapseOnSelect className="mb-3 border border-secondary rounded">
+        <BootstrapNavbar sticky="top" expanded={expanded} expand="lg" bg="dark" variant="dark" collapseOnSelect className="mb-3 border border-secondary rounded app-navbar-sticky">
             <Container fluid>
                 <BootstrapNavbar.Brand as={Link} href="/" onClick={handleClose} className="fw-bold text-info">
                     PokeDexter

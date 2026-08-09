@@ -1,6 +1,7 @@
 import 'bootstrap/dist/css/bootstrap.min.css';
 import './global.scss';
 import Navbar from './components/navbar';
+import HelpFloatingButton from './components/help-floating-button';
 
 export const metadata = {
     title: 'PokeDexter | The Ultimate Pokemon Database',
@@ -14,6 +15,7 @@ export default function RootLayout({ children }) {
                 <div className="app-container">
                     <Navbar />
                     <main>{children}</main>
+                    <HelpFloatingButton />
                 </div>
             </body>
         </html>

@@ -1,6 +1,6 @@
 # app/pokemons/AGENTS.md
 
-This document specifies rules and architecture for the main Pokédex features under `app/pokemons/`.
+This document specifies rules and architecture for the main Pokedex features under `app/pokemons/`.
 
 ---
 

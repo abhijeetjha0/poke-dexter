@@ -6,14 +6,15 @@
   "description": "Poke Dexter is a Pokemon Information Cross Platform Application.",
   "main": "script.js",
   "scripts": {
+    "build": "next build",
     "clean": "rm -rf .next && rm -rf node_modules",
     "dev": "next dev",
-    "build": "next build",
-    "start": "next start",
+    "check-duplicate": "jscpd",
     "lint": "eslint .",
     "lint-fix": "eslint . --fix",
     "lint-style": "stylelint '**/*.scss' --ignore-path .gitignore",
     "lint-style-fix": "stylelint '**/*.scss' --fix --ignore-path .gitignore",
+    "start": "next start",
     "test": "jest",
     "test-filter": "jest -t",
     "test:watch": "jest --watch"
@@ -39,6 +40,7 @@
     "jest": "^29.7.0",
     "jest-environment-jsdom": "^29.7.0",
     "jest-fetch-mock": "^3.0.3",
+    "jscpd": "^5.0.14",
     "sass-embedded": "^1.100.0",
     "stylelint": "^16.0.0",
     "stylelint-config-standard-scss": "^13.0.0"

@@ -1,4 +1,4 @@
-import { render, fireEvent } from '@testing-library/react';
+import { render, fireEvent, screen } from '@testing-library/react';
 import PokemonDetailView from '../../../../app/pokemons/[name]/pokemon-detail-view';
 
 jest.mock('next/navigation', () => ({
@@ -24,6 +24,7 @@ const mockVarietyList = [
         types: [{ type: { name: 'grass' } }],
         stats: [{ stat: { name: 'hp' }, base_stat: 45 }],
         sprites: { front_default: 'img.png' },
+        cries: { latest: 'cry.mp3' },
         height: 7,
         weight: 69
     }
@@ -64,7 +65,7 @@ describe('PokemonDetailView Component', () => {
             />
         );
 
-        // Pokédex entry is always visible (no title = no collapse per AGENTS.md rule)
+        // Pokedex entry is always visible (no title = no collapse per AGENTS.md rule)
         expect(getByText('"Test entry."')).toBeInTheDocument();
 
         // Base Stats panel has a title and is collapsible
@@ -182,5 +183,105 @@ describe('PokemonDetailView Component', () => {
         // Evolution chain should be visible because pumpkaboo-average evolves
         expect(getByText('Evolution Chain')).toBeInTheDocument();
         expect(getByText('pumpkaboo')).toBeInTheDocument(); // Base node matches and falls back
+    });
+
+    test('changes active variety when pills are clicked', () => {
+        const multiVarietyList = [
+            ...mockVarietyList,
+            {
+                name: 'venusaur-mega',
+                id: 3,
+                abilities: [], moves: [], types: [], stats: [], height: 20, weight: 1000,
+                sprites: { front_default: 'mega.png' },
+                is_default: false
+            }
+        ];
+
+        const { getByText } = render(
+            <PokemonDetailView
+                name="venusaur"
+                speciesInfo={{ ...mockSpeciesInfo, name: 'venusaur' }}
+                varietyList={multiVarietyList}
+                moveDetailsMap={{}}
+                typeDefenses={{}}
+                encountersByVersion={{}}
+            />
+        );
+
+        // Click the Mega pill
+        const megaPill = getByText('mega');
+        fireEvent.click(megaPill);
+
+        // Expect the mega's weight to be visible
+        expect(getByText('100 kg')).toBeInTheDocument();
+    });
+
+    test('expands location versions when clicked', () => {
+        const mockEncounters = {
+            red: [
+                {
+                    location: 'Pallet Town',
+                    methods: [{ minLevel: 5, maxLevel: 5, chance: 10, method: 'walk' }]
+                }
+            ]
+        };
+
+        const { getByText } = render(
+            <PokemonDetailView
+                name="bulbasaur"
+                speciesInfo={mockSpeciesInfo}
+                varietyList={mockVarietyList}
+                moveDetailsMap={{}}
+                typeDefenses={{}}
+                encountersByVersion={mockEncounters}
+            />
+        );
+
+        // Expand Locations section
+        fireEvent.click(getByText('Game Locations'));
+
+        // Click the "Red" version tab
+        fireEvent.click(getByText('Red'));
+        expect(getByText('Pallet Town')).toBeInTheDocument();
+    });
+
+    test('renders moves section correctly', () => {
+        const { getByText } = render(
+            <PokemonDetailView
+                name="bulbasaur"
+                speciesInfo={mockSpeciesInfo}
+                varietyList={mockVarietyList}
+                moveDetailsMap={{ 'tackle': { damage_class: 'physical' } }}
+                typeDefenses={{}}
+                encountersByVersion={{}}
+            />
+        );
+
+        expect(getByText('Moves')).toBeInTheDocument();
+        fireEvent.click(getByText('Moves'));
+
+        expect(screen.getByText(/Physical/i)).toBeInTheDocument();
+        fireEvent.click(screen.getByText(/Physical/i));
+    });
+
+    test('plays cry when clicked', () => {
+        // Mock Audio
+        const mockAudio = {
+            play: jest.fn(() => Promise.resolve()),
+            volume: 1
+        };
+        global.Audio = jest.fn(() => mockAudio);
+
+        render(
+            <PokemonDetailView
+                name="bulbasaur"
+                speciesInfo={mockSpeciesInfo}
+                varietyList={mockVarietyList}
+                moveDetailsMap={{ 'tackle': { damage_class: { name: 'physical' } } }}
+            />
+        );
+
+        fireEvent.click(screen.getByRole('button', { name: /Play audio cry/i }));
+        expect(mockAudio.play).toHaveBeenCalled();
     });
 });

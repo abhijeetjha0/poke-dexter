@@ -1,10 +1,12 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import React from 'react';
 import Link from 'next/link';
-import { Container, Row, Col, Card, Button, ButtonGroup, ListGroup, Badge } from 'react-bootstrap';
+import { Container, Row, Col, Card, Badge, ListGroup } from 'react-bootstrap';
 import { getPokemonImageUrl } from '../lib/pokemon-utils';
 import MaterialIcon from '../components/material-icon';
+import useViewMode from '../hooks/useViewMode';
+import ViewModeToggle from '../components/view-mode-toggle';
 
 const GENERATIONS = [
     { id: 1, roman: 'Generation I', region: 'Kanto', range: '#0001 - #0151', count: 151, class: 'gen-1', mascotId: 6 }, // Charizard
@@ -19,48 +21,12 @@ const GENERATIONS = [
 ];
 
 export default function GenerationsClient() {
-    const [viewMode, setViewMode] = useState('grid');
-
-    useEffect(() => {
-        const savedMode = localStorage.getItem('viewMode');
-
-        if (savedMode === 'grid' || savedMode === 'list') {
-            setTimeout(() => {
-                setViewMode(savedMode);
-            }, 0);
-        }
-    }, []);
-
-    const handleViewModeChange = (mode) => {
-        setViewMode(mode);
-        localStorage.setItem('viewMode', mode);
-    };
+    const [viewMode, handleViewModeChange] = useViewMode('grid');
 
     return (
         <Container fluid className="p-0">
             <div className="d-flex justify-content-end mb-4">
-                <ButtonGroup>
-                    <Button
-                        variant={viewMode === 'grid' ? 'secondary' : 'outline-secondary'}
-                        onClick={() => handleViewModeChange('grid')}
-                        id="view-toggle-grid"
-                        title="Grid View"
-                        aria-label="Grid View"
-                        className="d-flex align-items-center justify-content-center p-2"
-                    >
-                        <MaterialIcon icon="grid_view" className="fs-5" />
-                    </Button>
-                    <Button
-                        variant={viewMode === 'list' ? 'secondary' : 'outline-secondary'}
-                        onClick={() => handleViewModeChange('list')}
-                        id="view-toggle-list"
-                        title="List View"
-                        aria-label="List View"
-                        className="d-flex align-items-center justify-content-center p-2"
-                    >
-                        <MaterialIcon icon="format_list_bulleted" className="fs-5" />
-                    </Button>
-                </ButtonGroup>
+                <ViewModeToggle viewMode={viewMode} onViewModeChange={handleViewModeChange} />
             </div>
 
             {viewMode === 'grid' ? (
