@@ -16,7 +16,7 @@ describe('Navbar Component', () => {
 
         expect(screen.getByText('PokeDexter')).toBeInTheDocument();
         expect(screen.getAllByText('Pokedex').length).toBeGreaterThan(0);
-        expect(screen.getAllByText('Team Builder').length).toBeGreaterThan(0);
+        expect(screen.getAllByText('Team Builder (Beta)').length).toBeGreaterThan(0);
         expect(screen.getAllByText('Abilities').length).toBeGreaterThan(0);
         expect(screen.getAllByText('Moves').length).toBeGreaterThan(0);
         expect(screen.getAllByText('Types').length).toBeGreaterThan(0);

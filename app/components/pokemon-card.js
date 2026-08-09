@@ -1,7 +1,8 @@
 'use client';
 
 import Link from 'next/link';
-import { Card } from 'react-bootstrap';
+import { Card, Dropdown } from 'react-bootstrap';
+import MaterialIcon from './material-icon';
 import TypeBadge from './type-badge';
 import { getPokemonSpriteUrl, formatDisplayName } from '../lib/pokemon-utils';
 
@@ -12,6 +13,7 @@ export default function PokemonCard({
     href = null, 
     showAbilityType = false,
     actionNode = null,
+    menuOptions = null,
     footerNode = null,
     bodyExtras = null,
     rightNode = null,
@@ -23,9 +25,35 @@ export default function PokemonCard({
 
     const cardContent = (
         <Card className="h-100 bg-dark text-light border-secondary shadow-sm hover-overlay position-relative" id={`pokemon-card-${id || name}`}>
-            {actionNode && (
+            {actionNode && !menuOptions && (
                 <div className="position-absolute top-0 end-0 m-0 z-1">
                     {actionNode}
+                </div>
+            )}
+            {menuOptions && menuOptions.length > 0 && (
+                <div className="position-absolute top-0 end-0 m-0 z-1">
+                    <Dropdown align="end">
+                        <Dropdown.Toggle variant="link" className="text-muted p-1 border-0 slot-badge-icon shadow-none text-decoration-none" bsPrefix="p-0">
+                            <MaterialIcon icon="more_vert" className="fs-5" />
+                        </Dropdown.Toggle>
+                        <Dropdown.Menu variant="dark" className="shadow border-secondary">
+                            {menuOptions.map((opt, idx) => (
+                                <Dropdown.Item 
+                                    key={idx} 
+                                    onClick={(e) => {
+                                        e.preventDefault();
+
+                                        if (opt.onClick) { 
+                                            opt.onClick(); 
+                                        }
+                                    }}
+                                    className={opt.variant ? `text-${opt.variant}` : ''}
+                                >
+                                    {opt.label}
+                                </Dropdown.Item>
+                            ))}
+                        </Dropdown.Menu>
+                    </Dropdown>
                 </div>
             )}
             <Card.Body className="d-flex align-items-center p-3 gap-3">
@@ -38,8 +66,8 @@ export default function PokemonCard({
                         onError={(e) => { e.target.src = defaultImageUrl; }}
                     />
                 </div>
-                <div className="d-flex flex-grow-1 min-w-0 align-items-stretch py-1">
-                    <div className={`text-start d-flex flex-column justify-content-center gap-1 ${rightNode ? 'w-50 pe-3 border-end border-secondary border-opacity-50' : 'w-100'}`}>
+                <div className={`d-flex flex-grow-1 min-w-0 align-items-stretch py-1 ${rightNode ? 'gap-4' : ''}`}>
+                    <div className={`text-start d-flex flex-column justify-content-center gap-1 min-w-0 ${rightNode ? 'flex-shrink-0' : 'w-100'}`}>
                         {!hideSubtitle && subtitle && (
                             <Card.Subtitle className="mb-0 text-muted small fw-bold">{subtitle}</Card.Subtitle>
                         )}
@@ -65,9 +93,12 @@ export default function PokemonCard({
                         {bodyExtras}
                     </div>
                     {rightNode && (
-                        <div className="w-50 ps-3 d-flex flex-column justify-content-center">
-                            {rightNode}
-                        </div>
+                        <>
+                            <div className="vr border-secondary border-opacity-50 m-0"></div>
+                            <div className="flex-grow-1 min-w-0 d-flex flex-column justify-content-center">
+                                {rightNode}
+                            </div>
+                        </>
                     )}
                 </div>
             </Card.Body>

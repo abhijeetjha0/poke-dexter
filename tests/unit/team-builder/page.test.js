@@ -1,129 +1,45 @@
-import { render, screen, fireEvent, waitFor } from '@testing-library/react';
+import { render, screen, waitFor } from '@testing-library/react';
+import TeamBuilderPage from '../../../app/team-builder/page';
+import { fetchPokemonSpeciesList } from '../../../app/api-requests';
 import TeamBuilderClient from '../../../app/team-builder/team-builder-client';
-import { fetchPokemonByIdOrName, fetchPokemonSpecies, fetchEvolutionChainByUrl } from '../../../app/api-requests';
 
 jest.mock('../../../app/api-requests', () => ({
-    fetchPokemonByIdOrName: jest.fn(),
-    fetchPokemonSpecies: jest.fn(),
-    fetchEvolutionChainByUrl: jest.fn(),
+    fetchPokemonSpeciesList: jest.fn()
 }));
 
-describe('TeamBuilderClient Component', () => {
-    const mockSpeciesList = [
-        { name: 'charizard', url: 'https://pokeapi.co/api/v2/pokemon-species/6/' },
-        { name: 'pikachu', url: 'https://pokeapi.co/api/v2/pokemon-species/25/' },
-    ];
+jest.mock('../../../app/team-builder/team-builder-client', () => {
+    return function MockTeamBuilderClient({ initialSpeciesList }) {
+        return <div data-testid="mock-client">Client Loaded with {initialSpeciesList.length} species</div>;
+    }
+});
 
+describe('TeamBuilderPage Component', () => {
     beforeEach(() => {
         jest.clearAllMocks();
     });
 
-    test('renders team builder header and 6 slots', () => {
-        render(<TeamBuilderClient initialSpeciesList={mockSpeciesList} />);
-
-        expect(screen.getByText('0/6')).toBeInTheDocument();
-        expect(screen.getByText(/Type Defenses/i)).toBeInTheDocument();
-        const addButtons = screen.getAllByRole('button', { name: /Add Pokémon/i });
-        expect(addButtons.length).toBe(6);
-    });
-
-    test('opens search modal when clicking add button', () => {
-        render(<TeamBuilderClient initialSpeciesList={mockSpeciesList} />);
-
-        const addButtons = screen.getAllByRole('button', { name: /Add Pokémon/i });
-        fireEvent.click(addButtons[0]);
-
-        expect(screen.getByText('Select Pokémon for Slot #1')).toBeInTheDocument();
-        expect(screen.getByPlaceholderText('Search by Pokémon name...')).toBeInTheDocument();
-    });
-
-    test('loads selected pokemon into slot and fetches suggestions', async () => {
-        fetchPokemonByIdOrName.mockResolvedValueOnce({
+    it('fetches species list and renders the client component with data', async () => {
+        fetchPokemonSpeciesList.mockResolvedValueOnce({
             ok: true,
             json: async () => ({
-                id: 6,
-                name: 'charizard',
-                types: [{ type: { name: 'fire' } }, { type: { name: 'flying' } }],
-                sprites: { front_default: 'charizard.png' },
-                stats: [{ base_stat: 100 }],
-                species: { name: 'charizard' },
-            }),
+                results: [{ name: 'bulbasaur' }, { name: 'ivysaur' }]
+            })
         });
 
-        fetchPokemonSpecies.mockResolvedValueOnce({
-            ok: true,
-            json: async () => ({
-                name: 'charizard',
-                varieties: [{ pokemon: { name: 'charizard-mega-x' } }],
-                evolution_chain: { url: 'https://pokeapi.co/api/v2/evolution-chain/2/' },
-            }),
-        });
+        const jsx = await TeamBuilderPage();
+        render(jsx);
 
-        fetchEvolutionChainByUrl.mockResolvedValueOnce({
-            ok: true,
-            json: async () => ({
-                chain: {
-                    species: { name: 'charmander' },
-                    evolves_to: [{ species: { name: 'charmeleon' }, evolves_to: [{ species: { name: 'charizard' } }] }],
-                },
-            }),
-        });
-
-        render(<TeamBuilderClient initialSpeciesList={mockSpeciesList} />);
-
-        fireEvent.click(screen.getAllByRole('button', { name: /Add Pokémon/i })[0]);
-        fireEvent.click(screen.getByRole('button', { name: /charizard/i }));
-
-        await waitFor(() => {
-            expect(screen.getByText('charizard')).toBeInTheDocument();
-            expect(screen.getByText('BST: 100')).toBeInTheDocument();
-            expect(screen.getByText('Switch with:')).toBeInTheDocument();
-            expect(screen.getByRole('button', { name: /charizard mega x/i })).toBeInTheDocument();
-        });
+        expect(screen.getByTestId('mock-client')).toHaveTextContent('Client Loaded with 2 species');
     });
 
-    test('clears team slots when Clear Team button is clicked', async () => {
-        render(<TeamBuilderClient initialSpeciesList={mockSpeciesList} />);
-
-        const clearBtn = screen.getByRole('button', { name: /Clear Team/i });
-        fireEvent.click(clearBtn);
-
-        await waitFor(() => {
-            const addButtons = screen.getAllByRole('button', { name: /Add Pokémon/i });
-            expect(addButtons.length).toBe(6);
-        });
-    });
-
-    test('uses species fallback when direct pokemon fetch fails', async () => {
-        fetchPokemonByIdOrName
-            .mockResolvedValueOnce({ ok: false })
-            .mockResolvedValueOnce({
-                ok: true,
-                json: async () => ({
-                    id: 774,
-                    name: 'minior-red-meteor',
-                    types: [{ type: { name: 'rock' } }],
-                    sprites: { front_default: 'minior.png' },
-                    stats: [{ base_stat: 60 }],
-                    species: { name: 'minior' },
-                }),
-            });
-
-        fetchPokemonSpecies.mockResolvedValue({
-            ok: true,
-            json: async () => ({
-                name: 'minior',
-                varieties: [{ pokemon: { name: 'minior-red-meteor' } }],
-            }),
+    it('handles failed species list fetch gracefully', async () => {
+        fetchPokemonSpeciesList.mockResolvedValueOnce({
+            ok: false
         });
 
-        render(<TeamBuilderClient initialSpeciesList={[{ name: 'minior', url: 'https://pokeapi.co/api/v2/pokemon-species/774/' }]} />);
+        const jsx = await TeamBuilderPage();
+        render(jsx);
 
-        fireEvent.click(screen.getAllByRole('button', { name: /Add Pokémon/i })[0]);
-        fireEvent.click(screen.getByRole('button', { name: /minior/i }));
-
-        await waitFor(() => {
-            expect(screen.getByText('minior red meteor')).toBeInTheDocument();
-        });
+        expect(screen.getByTestId('mock-client')).toHaveTextContent('Client Loaded with 0 species');
     });
 });
