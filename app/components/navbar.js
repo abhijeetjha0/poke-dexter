@@ -8,7 +8,7 @@ import { Navbar as BootstrapNavbar, Container, Nav } from 'react-bootstrap';
 
 const NAV_ITEMS = [
     { label: 'Pokedex', path: '/pokemons' },
-    { label: 'Team Builder', path: '/team-builder' },
+    { label: 'Team Builder (Beta)', path: '/team-builder' },
     { label: 'Abilities', path: '/abilities' },
     { label: 'Moves', path: '/moves' },
     { label: 'Items', path: '/items' },

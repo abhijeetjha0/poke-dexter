@@ -5,15 +5,20 @@ import { fetchPokemonByIdOrName, fetchPokemonSpecies, fetchEvolutionChainByUrl }
 import {
     calculateTeamTypeDefenses,
     calculateTeamAverageStats,
-    ALL_TYPES,
 } from '../lib/type-effectiveness-utils';
 import MaterialIcon from '../components/material-icon';
 import { formatDisplayName } from '../lib/pokemon-utils';
-import { Container, Row, Col, Card, Button, Badge, Modal, Form, Table, Alert, OverlayTrigger, Tooltip, ListGroup, Collapse } from 'react-bootstrap';
+import { Container, Row, Col, Card, Button, Alert } from 'react-bootstrap';
 import BaseStatsCard from '../components/base-stats-card';
 import TypeBadge from '../components/type-badge';
 import CountBadge from '../components/count-badge';
 import PokemonCard from '../components/pokemon-card';
+import SuggestionModal from '../components/suggestion-modal';
+import TeamTypeDefensesCard from '../components/team-type-defenses-card';
+import PokemonSearchModal from '../components/pokemon-search-modal';
+
+const getShuffledArray = (arr) => [...arr].sort(() => 0.5 - Math.random());
+const getRandomElement = (arr) => arr[Math.floor(Math.random() * arr.length)];
 
 export default function TeamBuilderClient(props) {
     const { initialSpeciesList = [] } = props;
@@ -23,6 +28,16 @@ export default function TeamBuilderClient(props) {
     const [loadingSlots, setLoadingSlots] = useState({});
     const [suggestionsMap, setSuggestionsMap] = useState({});
     const [defensesCollapsed, setDefensesCollapsed] = useState(false);
+
+    // Suggestion Modal State
+    const [suggestModalSlot, setSuggestModalSlot] = useState(null);
+    const [filterSameType, setFilterSameType] = useState(false);
+    const [filterSameGeneration, setFilterSameGeneration] = useState(false);
+    const [includeLegendaries, setIncludeLegendaries] = useState(false);
+    const [suggestionResults, setSuggestionResults] = useState(null);
+    const [isSearchingSuggestions, setIsSearchingSuggestions] = useState(false);
+    const [suggestionError, setSuggestionError] = useState(null);
+    const [lastSearchedFilters, setLastSearchedFilters] = useState(null);
 
     const filteredSpecies = useMemo(() => {
         const term = searchTerm.trim().toLowerCase();
@@ -83,12 +98,21 @@ export default function TeamBuilderClient(props) {
             const speciesName = pokeData.species?.name || pokeData.name;
             let varieties = [];
             let evolutions = [];
+            let generationId = null;
+            let isLegendary = false;
 
             const speciesRes = await fetchPokemonSpecies(speciesName);
 
             if (speciesRes.ok) {
                 const speciesData = await speciesRes.json();
                 varieties = (speciesData.varieties || []).map((v) => v.pokemon.name);
+                
+                if (speciesData.generation?.url) {
+                    const parts = speciesData.generation.url.split('/');
+                    generationId = parseInt(parts[parts.length - 2], 10);
+                }
+                
+                isLegendary = speciesData.is_legendary || speciesData.is_mythical;
 
                 if (speciesData.evolution_chain?.url) {
                     const evoRes = await fetchEvolutionChainByUrl(speciesData.evolution_chain.url);
@@ -141,6 +165,8 @@ export default function TeamBuilderClient(props) {
                 artwork,
                 stats,
                 bst,
+                generationId,
+                isLegendary,
                 varieties,
                 evolutions,
             };
@@ -185,17 +211,130 @@ export default function TeamBuilderClient(props) {
         setSuggestionsMap({});
     };
 
+    const handleOpenSuggestModal = (slotIndex) => {
+        setSuggestModalSlot(slotIndex);
+        setFilterSameType(false);
+        setFilterSameGeneration(false);
+        setIncludeLegendaries(false);
+        setSuggestionResults(null);
+        setSuggestionError(null);
+        setLastSearchedFilters(null);
+    };
+
+    const handleFindAlternatives = async () => {
+        const member = team[suggestModalSlot];
+
+        if (!member) {
+            return;
+        }
+
+        setIsSearchingSuggestions(true);
+        setSuggestionResults(null);
+        setSuggestionError(null);
+
+        try {
+            const filters = {};
+            
+            if (filterSameType && member.types.length) {
+                filters.types = member.types;
+            }
+
+            if (filterSameGeneration && member.generationId) {
+                filters.generationId = member.generationId;
+            }
+
+            if (includeLegendaries) {
+                filters.includeLegendaries = true;
+            }
+
+            const { fetchAdvancedSuggestionsGraphQL } = await import('../api-requests/graphql-requests');
+            const res = await fetchAdvancedSuggestionsGraphQL(filters);
+            
+            if (!res.ok) {
+                throw new Error('Failed to fetch advanced suggestions');
+            }
+
+            const { data } = await res.json();
+            let results = data.pokemon_v2_pokemon || [];
+
+            // Calculate properties for sorting and filtering
+            let processedResults = results.map(p => {
+                const bst = (p.pokemon_v2_pokemonstats || []).reduce((acc, statObj) => acc + statObj.base_stat, 0);
+                const types = (p.pokemon_v2_pokemontypes || []).map(t => t.pokemon_v2_type.name);
+                const generationId = p.pokemon_v2_pokemonspecy?.generation_id || null;
+                
+                // Calculate type match score: how many types are shared with the member
+                const typeMatchScore = types.filter(t => member.types.includes(t)).length;
+                
+                return {
+                    name: p.name,
+                    bst,
+                    types,
+                    generationId,
+                    typeMatchScore
+                };
+            });
+
+            // Filter higher BST and not the same member
+            processedResults = processedResults.filter(p => p.bst > member.bst && p.name !== member.name);
+
+            // Sort: 1. Highest BST, 2. Highest Type Match, 3. Same Gen
+            processedResults.sort((a, b) => {
+                if (b.bst !== a.bst) {
+                    return b.bst - a.bst;
+                }
+
+                if (b.typeMatchScore !== a.typeMatchScore) {
+                    return b.typeMatchScore - a.typeMatchScore;
+                }
+
+                const aSameGen = a.generationId === member.generationId ? 1 : 0;
+                const bSameGen = b.generationId === member.generationId ? 1 : 0;
+
+                if (bSameGen !== aSameGen) {
+                    return bSameGen - aSameGen;
+                }
+
+                return 0;
+            });
+
+            // Keep top 10
+            processedResults = processedResults.slice(0, 10);
+
+            setSuggestionResults(processedResults.map(p => p.name));
+            setLastSearchedFilters({
+                filterSameType,
+                filterSameGeneration,
+                includeLegendaries
+            });
+        } catch (error) {
+            console.error('Error fetching alternatives:', error);
+            setSuggestionError('Failed to load suggestions. Please try again.');
+        } finally {
+            setIsSearchingSuggestions(false);
+        }
+    };
+
     const handleRandomizeTeam = () => {
         if (!initialSpeciesList.length) {
             return;
         }
 
-        const shuffled = [...initialSpeciesList].sort(() => 0.5 - Math.random());
+        const shuffled = getShuffledArray(initialSpeciesList);
         const selected = shuffled.slice(0, 6);
 
         selected.forEach((species, index) => {
             loadPokemonIntoSlot(index, species.name);
         });
+    };
+
+    const handleRandomizeSlot = (slotIndex) => {
+        if (!initialSpeciesList.length) {
+            return;
+        }
+
+        const randomSpecies = getRandomElement(initialSpeciesList);
+        loadPokemonIntoSlot(slotIndex, randomSpecies.name);
     };
 
     const teamAnalysis = useMemo(() => calculateTeamTypeDefenses(team), [team]);
@@ -220,7 +359,7 @@ export default function TeamBuilderClient(props) {
             </div>
 
             {/* Critical Weaknesses Warning Banner */}
-            {teamAnalysis.criticalWeaknesses.length && (
+            {teamAnalysis.criticalWeaknesses.length > 0 && (
                 <Alert variant="danger" className="d-flex align-items-center flex-wrap gap-2 mb-3">
                     <MaterialIcon icon="warning" className="fs-4 me-1" />
                     <span className="fw-bold">3 or more Pokémon are weak to:</span>
@@ -255,17 +394,21 @@ export default function TeamBuilderClient(props) {
                                     }}
                                     types={member.types}
                                     slotNumber={index + 1}
-                                    actionNode={
-                                        <Button
-                                            variant="outline-danger"
-                                            size="sm"
-                                            className="d-flex align-items-center justify-content-center p-1 border-0 slot-badge-icon"
-                                            onClick={() => handleRemoveSlot(index)}
-                                            aria-label={`Remove ${member.name} from slot ${index + 1}`}
-                                        >
-                                            <MaterialIcon icon="delete" className="fs-6" />
-                                        </Button>
-                                    }
+                                    menuOptions={[
+                                        { 
+                                            label: 'Delete', 
+                                            variant: 'danger', 
+                                            onClick: () => handleRemoveSlot(index) 
+                                        },
+                                        { 
+                                            label: 'Randomize', 
+                                            onClick: () => handleRandomizeSlot(index) 
+                                        },
+                                        { 
+                                            label: 'Suggest Alternatives', 
+                                            onClick: () => handleOpenSuggestModal(index) 
+                                        }
+                                    ]}
                                     hideSubtitle={true}
                                     bodyExtras={
                                         <div className="text-muted small fw-bold">BST: {member.bst}</div>
@@ -321,107 +464,52 @@ export default function TeamBuilderClient(props) {
             )}
 
             {/* Team Type Defense Matrix Table */}
-            <Card bg="dark" border="secondary" className="mb-3">
-                <Card.Header
-                    className="d-flex justify-content-between align-items-center border-secondary cursor-pointer py-2"
-                    onClick={() => setDefensesCollapsed(prev => !prev)}
-                >
-                    <h6 className="text-muted fw-bold text-uppercase mb-0">Type Defenses</h6>
-                    <MaterialIcon icon="expand_more" className={`transition-transform ${defensesCollapsed ? '' : 'rotate-180'}`} />
-                </Card.Header>
-                <Collapse in={!defensesCollapsed}>
-                    <div>
-                        <Card.Body className="p-0">
-                            <Table variant="dark" bordered hover className="mb-0 text-center align-middle matrix-table-compact">
-                                <thead>
-                                    <tr>
-                                        <th className="bg-secondary bg-opacity-25">Type</th>
-                                        <th className="bg-secondary bg-opacity-25" title="Weak (>1x)">2x</th>
-                                        <th className="bg-secondary bg-opacity-25" title="Resist (<1x)">1/2x</th>
-                                        <th className="bg-secondary bg-opacity-25" title="Immune (0x)">0x</th>
-                                        <th className="bg-secondary bg-opacity-25" title="Neutral (1x)">1x</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    {ALL_TYPES.map((attackType) => {
-                                        const rowData = teamAnalysis.summary[attackType];
-                                        const isCritical = rowData.weak >= 3;
-
-                                        const renderCell = (count, names, variant) => {
-                                            if (count === 0) {
-                                                return (
-                                                    <Badge bg="secondary" pill className="p-1 opacity-25 matrix-badge">
-                                                        0
-                                                    </Badge>
-                                                );
-                                            }
-
-                                            return (
-                                                <OverlayTrigger
-                                                    placement="top"
-                                                    overlay={<Tooltip className="text-capitalize">{names.join(', ')}</Tooltip>}
-                                                >
-                                                    <Badge bg={variant} pill className="p-1 cursor-pointer matrix-badge">
-                                                        {count}
-                                                    </Badge>
-                                                </OverlayTrigger>
-                                            );
-                                        };
-
-                                        return (
-                                            <tr key={attackType} className={isCritical ? 'table-danger' : ''}>
-                                                <td className={isCritical ? 'text-dark' : ''}>
-                                                    <TypeBadge type={attackType} />
-                                                </td>
-                                                <td>{renderCell(rowData.weak, rowData.weakNames, 'danger')}</td>
-                                                <td>{renderCell(rowData.resist, rowData.resistNames, 'success')}</td>
-                                                <td>{renderCell(rowData.immune, rowData.immuneNames, 'primary')}</td>
-                                                <td>{renderCell(rowData.neutral, rowData.neutralNames, 'secondary')}</td>
-                                            </tr>
-                                        );
-                                    })}
-                                </tbody>
-                            </Table>
-                        </Card.Body>
-                    </div>
-                </Collapse>
-            </Card>
+            <TeamTypeDefensesCard 
+                teamAnalysis={teamAnalysis} 
+                collapsed={defensesCollapsed} 
+                setCollapsed={setDefensesCollapsed} 
+            />
 
             {/* In-Page Search Modal Overlay */}
-            <Modal show={activeSlotIndex !== null} onHide={() => setActiveSlotIndex(null)} centered scrollable>
-                <Modal.Header closeButton closeVariant="white" className="bg-dark text-light border-secondary">
-                    <Modal.Title className="fs-5">Select Pokémon for Slot #{activeSlotIndex !== null ? activeSlotIndex + 1 : ''}</Modal.Title>
-                </Modal.Header>
-                <Modal.Body className="bg-dark text-light p-0">
-                    <div className="p-3 border-bottom border-secondary position-sticky top-0 bg-dark z-3">
-                        <Form.Control
-                            type="text"
-                            placeholder="Search by Pokémon name..."
-                            value={searchTerm}
-                            onChange={(e) => setSearchTerm(e.target.value)}
-                            autoFocus
-                            className="bg-transparent text-light border-secondary shadow-none"
-                        />
-                    </div>
-                    <ListGroup variant="flush">
-                        {filteredSpecies.length ? (
-                            filteredSpecies.map((species) => (
-                                <ListGroup.Item
-                                    key={species.name}
-                                    action
-                                    onClick={() => loadPokemonIntoSlot(activeSlotIndex, species.name)}
-                                    className="bg-transparent text-light border-secondary d-flex justify-content-between align-items-center"
-                                >
-                                    <span className="text-capitalize fw-bold">{species.name}</span>
-                                    <MaterialIcon icon="add" className="text-muted fs-6" />
-                                </ListGroup.Item>
-                            ))
-                        ) : (
-                            <div className="p-4 text-center text-muted">No matching Pokémon species found</div>
-                        )}
-                    </ListGroup>
-                </Modal.Body>
-            </Modal>
+            <PokemonSearchModal
+                show={activeSlotIndex !== null}
+                onHide={() => setActiveSlotIndex(null)}
+                activeSlotIndex={activeSlotIndex}
+                searchTerm={searchTerm}
+                setSearchTerm={setSearchTerm}
+                filteredSpecies={filteredSpecies}
+                onSelectPokemon={(slotIndex, speciesName) => {
+                    loadPokemonIntoSlot(slotIndex, speciesName);
+                    setActiveSlotIndex(null);
+                }}
+            />
+
+            <SuggestionModal
+                show={suggestModalSlot !== null}
+                onHide={() => setSuggestModalSlot(null)}
+                pokemon={team[suggestModalSlot]}
+                filterSameType={filterSameType}
+                setFilterSameType={setFilterSameType}
+                filterSameGeneration={filterSameGeneration}
+                setFilterSameGeneration={setFilterSameGeneration}
+                includeLegendaries={includeLegendaries}
+                setIncludeLegendaries={setIncludeLegendaries}
+                onFindAlternatives={handleFindAlternatives}
+                isSearchingSuggestions={isSearchingSuggestions}
+                isSuggestDisabled={
+                    isSearchingSuggestions || 
+                    (lastSearchedFilters !== null && 
+                     lastSearchedFilters.filterSameType === filterSameType && 
+                     lastSearchedFilters.filterSameGeneration === filterSameGeneration && 
+                     lastSearchedFilters.includeLegendaries === includeLegendaries)
+                }
+                suggestionError={suggestionError}
+                suggestionResults={suggestionResults}
+                onSelectSuggestion={(suggestionName) => {
+                    loadPokemonIntoSlot(suggestModalSlot, suggestionName);
+                    setSuggestModalSlot(null);
+                }}
+            />
         </Container>
     );
 }

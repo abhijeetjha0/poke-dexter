@@ -1,5 +1,5 @@
 import React from 'react';
-import { render, screen } from '@testing-library/react';
+import { render, screen, fireEvent } from '@testing-library/react';
 import PokemonCard from '../../../app/components/pokemon-card';
 
 // Mock Next.js Link
@@ -64,6 +64,16 @@ describe('PokemonCard', () => {
         render(<PokemonCard pokemon={pkmWithHidden} showAbilityType={true} />);
         
         expect(screen.getByText('Hidden Ability')).toBeInTheDocument();
+    });
+
+    it('handles image load error by falling back to default image', () => {
+        render(<PokemonCard pokemon={mockPokemon} />);
+        
+        const img = screen.getByAltText('pikachu');
+        fireEvent.error(img);
+        
+        // The defaultImageUrl should be set, which is based on the id
+        expect(img).toHaveAttribute('src', 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/25.png');
     });
 
     it('renders extra nodes', () => {
