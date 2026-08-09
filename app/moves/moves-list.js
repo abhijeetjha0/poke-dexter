@@ -4,9 +4,11 @@ import { useState, useMemo, useEffect } from 'react';
 import Link from 'next/link';
 import { Container, Row, Col, Form, InputGroup, Card, Button, ButtonGroup, Alert, ListGroup } from 'react-bootstrap';
 import DamageClassIcon from '../components/damage-class-icon';
+import MaterialIcon from '../components/material-icon';
 import TypeBadge from '../components/type-badge';
 import CountBadge from '../components/count-badge';
 import AppPagination from '../components/app-pagination';
+import { formatDisplayName } from '../lib/pokemon-utils';
 
 const MOVES_PER_PAGE = 50;
 
@@ -71,7 +73,7 @@ export default function MovesList({ initialMoves, moveTypeMap, moveDamageClassMa
                             className="bg-dark text-light border-secondary shadow-none"
                         />
                         <InputGroup.Text className="bg-dark border-secondary text-light">
-                            <span className="material-symbols-outlined fs-5">search</span>
+                            <MaterialIcon icon="search" className="fs-5" />
                         </InputGroup.Text>
                     </InputGroup>
                 </Col>
@@ -84,7 +86,7 @@ export default function MovesList({ initialMoves, moveTypeMap, moveDamageClassMa
                             title="Grid View"
                             className="d-flex align-items-center"
                         >
-                            <span className="material-symbols-outlined">grid_view</span>
+                            <MaterialIcon icon="grid_view" />
                         </Button>
                         <Button
                             id="view-toggle-list"
@@ -93,7 +95,7 @@ export default function MovesList({ initialMoves, moveTypeMap, moveDamageClassMa
                             title="List View"
                             className="d-flex align-items-center"
                         >
-                            <span className="material-symbols-outlined">format_list_bulleted</span>
+                            <MaterialIcon icon="format_list_bulleted" />
                         </Button>
                     </ButtonGroup>
                 </Col>
@@ -126,7 +128,7 @@ export default function MovesList({ initialMoves, moveTypeMap, moveDamageClassMa
                                     >
                                         <Card.Body className="d-flex flex-column align-items-center justify-content-center p-3 gap-2">
                                             <h6 className="text-capitalize text-light mb-1 fw-bold">
-                                                {move.name.replace(/-/g, ' ')}
+                                                {formatDisplayName(move.name)}
                                             </h6>
                                             <div className="d-flex align-items-center justify-content-center gap-2 flex-wrap">
                                                 <TypeBadge type={moveType} asLink={false} />
@@ -152,12 +154,12 @@ export default function MovesList({ initialMoves, moveTypeMap, moveDamageClassMa
                                     className="bg-dark border-secondary text-light d-flex justify-content-between align-items-center p-3 text-decoration-none hover-primary transition-all cursor-pointer"
                                 >
                                     <h6 className="text-capitalize mb-0 fw-bold">
-                                        {move.name.replace(/-/g, ' ')}
+                                        {formatDisplayName(move.name)}
                                     </h6>
                                     <div className="d-flex align-items-center gap-3">
                                         <TypeBadge type={moveType} asLink={false} />
                                         {damageClass && <DamageClassIcon damageClass={damageClass} showLabel={true} />}
-                                        <span className="material-symbols-outlined text-muted fs-5">arrow_forward</span>
+                                        <MaterialIcon icon="arrow_forward" className="text-muted fs-5" />
                                     </div>
                                 </ListGroup.Item>
                             );

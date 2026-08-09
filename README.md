@@ -9,7 +9,7 @@
 [![Deploy Status](https://github.com/abhijeetjha0/poke-dexter/actions/workflows/deploy.yml/badge.svg)](https://github.com/abhijeetjha0/poke-dexter/actions/workflows/deploy.yml)
 [![Code Coverage](https://abhijeetjha0.github.io/poke-dexter/coverage/badge.svg)](https://abhijeetjha0.github.io/poke-dexter/coverage/)
 
-PokeDexter is a feature-rich, cross-platform Pokémon information application. It is built using **Next.js**, **React**, and **SCSS**, featuring a glassmorphic design, centralized API architecture, unit test coverage, and complete mobile responsiveness. Special thanks and shout out to the amazing [PokéAPI](https://pokeapi.co/) for powering this app!
+PokeDexter is a feature-rich, cross-platform Pokémon information application. It is built using **Next.js**, **React**, and **SCSS**, featuring a sleek dark-mode design, centralized API architecture, unit test coverage, and complete mobile responsiveness. Special thanks and shout out to the amazing [PokéAPI](https://pokeapi.co/) for powering this app!
 
 > **Collaborators**: [Abhijit Kumar Jha](https://github.com/abhijeetjha0) and [Kanishk Tanwar](https://github.com/kanishktanwar).
 
@@ -17,29 +17,36 @@ PokeDexter is a feature-rich, cross-platform Pokémon information application. I
 
 ## 🌟 Key Features
 
-*   **Pokédex Directory**: Search and browse through over 1,000 Pokémon species with an interactive search bar, paginated listings, and generation-based filtering.
+*   **Pokédex**: Search and browse through over 1,000 Pokémon species with an interactive search bar, paginated listings, and generation-based filtering.
+*   **Global Search**: Unified autocomplete search bar in the navigation menu to instantly jump to specific Pokémon, Moves, or Abilities.
 *   **Rich Details Views**: Comprehensive profile pages for individual Pokémon showing:
+    *   Visual Evolution Chains
     *   Dynamic variety listings (Megas, Gigantamax, Alolan forms, etc.)
     *   English description entries
     *   Stat tables with bars
     *   Calculated double/half/immune type defense multipliers
     *   Game-by-game encounter locations and capture methods
     *   Interactive move learnsets (level up, machine, tutor, egg)
-*   **Abilities Directory**: Index of all passive/active abilities, featuring search functionality and detailed lists of compatible Pokémon.
-*   **Moves Directory**: Complete directory of catalogued moves showing Power, Accuracy, PP, damage class (Physical, Special, Status), and which Pokémon learn them.
-*   **Types Directory**: Dynamic list of all 18 element types showing matching species.
-*   **Generations Navigation Hub**: Visual cards for all 9 Pokémon generations, styled with region-themed colors and representative mascot artwork overlays (Charizard, Lugia, Rayquaza, etc.).
-*   **Mobile Responsiveness**: Designed using flexible grid layouts and a fluid, animated mobile hamburger menu.
+*   **Team Builder**: Create and manage custom Pokémon teams (up to 6 members), analyze team type defenses, and calculate aggregate weaknesses/resistances.
+*   **Abilities**: Index of all passive/active abilities, featuring search functionality and detailed lists of compatible Pokémon.
+*   **Moves**: Complete directory of catalogued moves showing Power, Accuracy, PP, damage class (Physical, Special, Status), and which Pokémon learn them.
+*   **Items Dex**: Searchable directory of items with detailed pages showing effects, fling power, cost, attributes, and wild Pokémon that hold the item.
+*   **Types**: Dynamic list of all 18 element types showing matching species.
+*   **Generations Navigation Hub**: A list of all generations, each with a link to view all Pokémon in that generation.
+*   **Mobile Responsiveness**: Designed using flexible edge-to-edge grid layouts on mobile and a fluid, animated mobile hamburger menu.
 
 ---
 
 ## 🛠️ Tech Stack
 
-*   **Core**: [Next.js](https://nextjs.org/) (App Router, Static Export configuration) & [React 19](https://react.dev/)
-*   **Styling**: [Sass (SCSS)](https://sass-lang.com/) for custom color variables, component themes, and media queries (no Tailwind CSS utility clutter)
+*   **Core**: [Next.js 16](https://nextjs.org/) (App Router, Static Export configuration) & [React 19](https://react.dev/)
+*   **UI Framework**: [React Bootstrap](https://react-bootstrap.netlify.app/) (Grid systems, responsive navbar, component styling)
+*   **Styling**: [Sass (SCSS)](https://sass-lang.com/) for custom color variables, component themes, and media queries
+*   **Code Quality**: [ESLint 9](https://eslint.org/) for JavaScript/JSX and [Stylelint 16](https://stylelint.io/) for SCSS validation
 *   **Testing**: [Jest](https://jestjs.io/) & [React Testing Library](https://testing-library.com/) with [jest-fetch-mock](https://github.com/jefflau/jest-fetch-mock)
 *   **Typography**: Google Fonts (Outfit for body, Orbitron for high-tech digital readouts)
-*   **API**: [PokéAPI](https://pokeapi.co/) for complete real-time Pokémon data (encapsulated via `app/api-requests`)
+*   **Icons**: [Google Material Symbols](https://fonts.google.com/icons) for modern, lightweight, and scalable iconography
+*   **API**: [PokéAPI v2](https://pokeapi.co/) for complete real-time Pokémon data (encapsulated via `app/api-requests`)
 
 ---
 
@@ -49,14 +56,18 @@ The project utilizes the **Next.js App Router** with file-system-based routing. 
 
 *   **API Layer (`app/api-requests`)**: [app/api-requests/index.js](./app/api-requests/index.js) - Centralized PokéAPI network request module.
 *   **Home (`/`)**: [app/page.js](./app/page.js) - Landing page introducing PokeDexter.
-*   **Directory (`/pokemons`)**: [app/pokemons/page.js](./app/pokemons/page.js) - Paginated directory of all Pokémon.
+*   **Pokédex List (`/pokemons`)**: [app/pokemons/page.js](./app/pokemons/page.js) - Paginated list of all Pokémon.
 *   **Pokémon Details (`/pokemons/[name]`)**: [app/pokemons/[name]/page.js](./app/pokemons/%5Bname%5D/page.js) - Dynamic profile page for each Pokémon.
-*   **Abilities Directory (`/abilities`)**: [app/abilities/page.js](./app/abilities/page.js) - Index list of abilities.
+*   **Team Builder (`/team-builder`)**: [app/team-builder/page.js](./app/team-builder/page.js) - Interactive team composition and analysis tool.
+*   **Abilities List (`/abilities`)**: [app/abilities/page.js](./app/abilities/page.js) - Index list of abilities.
 *   **Ability Details (`/abilities/[name]`)**: [app/abilities/[name]/page.js](./app/abilities/%5Bname%5D/page.js) - Detailed view of Pokémon having a specific ability.
-*   **Moves Directory (`/moves`)**: [app/moves/page.js](./app/moves/page.js) - Catalog of moves.
+*   **Moves List (`/moves`)**: [app/moves/page.js](./app/moves/page.js) - Catalog of moves.
 *   **Move Details (`/moves/[name]`)**: [app/moves/[name]/page.js](./app/moves/%5Bname%5D/page.js) - List of Pokémon that can learn a specific move.
-*   **Generations Hub (`/generations`)**: [app/generations/page.js](./app/generations/page.js) - Hub page for generation-specific Pokémon lists.
-*   **Types Hub (`/types`)**: [app/types/page.js](./app/types/page.js) - Listing of Pokémon categorized by standard element types.
+*   **Items List (`/items`)**: [app/items/page.js](./app/items/page.js) - Index list of all Pokémon items.
+*   **Item Details (`/items/[name]`)**: [app/items/[name]/page.js](./app/items/%5Bname%5D/page.js) - Detailed view of a specific item.
+*   **Generations List (`/generations`)**: [app/generations/page.js](./app/generations/page.js) - List page for generation-specific Pokémon lists.
+*   **Types List (`/types`)**: [app/types/page.js](./app/types/page.js) - Listing of Pokémon categorized by standard element types.
+*   **Type Details (`/types/[name]`)**: [app/types/[name]/page.js](./app/types/%5Bname%5D/page.js) - Detailed list of Pokémon belonging to a specific element type.
 
 ---
 
@@ -84,7 +95,7 @@ Start the development server:
 ```bash
 npm run dev
 ```
-Open your browser and navigate to [http://localhost:3000](http://localhost:3000) to view the application.
+Open your browser and navigate to [localhost](http://localhost:3000) to view the application.
 
 ---
 

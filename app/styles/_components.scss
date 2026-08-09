@@ -3,9 +3,9 @@
 /* ─── Global Search: single focus ring on the outer InputGroup ───── */
 
 /* Strip all focus styling from the inner elements */
-.input-group > .form-control:focus,
-.input-group > .form-control:focus-visible,
-.input-group > .input-group-text:focus-within {
+.input-group>.form-control:focus,
+.input-group>.form-control:focus-visible,
+.input-group>.input-group-text:focus-within {
   outline: none !important;
   box-shadow: none !important;
   border-color: var(--bs-border-color) !important;
@@ -83,24 +83,81 @@
   color: #111;
 }
 
-.type-normal { background-color: $type-normal !important; }
-.type-fire { background-color: $type-fire !important; }
-.type-water { background-color: $type-water !important; }
-.type-electric { background-color: $type-electric !important; color: #111 !important; text-shadow: none !important; }
-.type-grass { background-color: $type-grass !important; }
-.type-ice { background-color: $type-ice !important; color: #111 !important; text-shadow: none !important; }
-.type-fighting { background-color: $type-fighting !important; }
-.type-poison { background-color: $type-poison !important; }
-.type-ground { background-color: $type-ground !important; }
-.type-flying { background-color: $type-flying !important; }
-.type-psychic { background-color: $type-psychic !important; }
-.type-bug { background-color: $type-bug !important; }
-.type-rock { background-color: $type-rock !important; }
-.type-ghost { background-color: $type-ghost !important; }
-.type-dragon { background-color: $type-dragon !important; }
-.type-dark { background-color: $type-dark !important; }
-.type-steel { background-color: $type-steel !important; }
-.type-fairy { background-color: $type-fairy !important; }
+.type-normal {
+  background-color: $type-normal !important;
+}
+
+.type-fire {
+  background-color: $type-fire !important;
+}
+
+.type-water {
+  background-color: $type-water !important;
+}
+
+.type-electric {
+  background-color: $type-electric !important;
+  color: #111 !important;
+  text-shadow: none !important;
+}
+
+.type-grass {
+  background-color: $type-grass !important;
+}
+
+.type-ice {
+  background-color: $type-ice !important;
+  color: #111 !important;
+  text-shadow: none !important;
+}
+
+.type-fighting {
+  background-color: $type-fighting !important;
+}
+
+.type-poison {
+  background-color: $type-poison !important;
+}
+
+.type-ground {
+  background-color: $type-ground !important;
+}
+
+.type-flying {
+  background-color: $type-flying !important;
+}
+
+.type-psychic {
+  background-color: $type-psychic !important;
+}
+
+.type-bug {
+  background-color: $type-bug !important;
+}
+
+.type-rock {
+  background-color: $type-rock !important;
+}
+
+.type-ghost {
+  background-color: $type-ghost !important;
+}
+
+.type-dragon {
+  background-color: $type-dragon !important;
+}
+
+.type-dark {
+  background-color: $type-dark !important;
+}
+
+.type-steel {
+  background-color: $type-steel !important;
+}
+
+.type-fairy {
+  background-color: $type-fairy !important;
+}
 
 /* Global Focus Ring Customization */
 :focus-visible,
@@ -241,12 +298,29 @@
 }
 
 /* Spacing Utilities */
-.mb-0 { margin-bottom: 0 !important; }
-.mb-1 { margin-bottom: 1rem !important; }
-.mb-2 { margin-bottom: 2rem !important; }
-.mt-0 { margin-top: 0 !important; }
-.mt-1 { margin-top: 1rem !important; }
-.mt-2 { margin-top: 2rem !important; }
+.mb-0 {
+  margin-bottom: 0 !important;
+}
+
+.mb-1 {
+  margin-bottom: 1rem !important;
+}
+
+.mb-2 {
+  margin-bottom: 2rem !important;
+}
+
+.mt-0 {
+  margin-top: 0 !important;
+}
+
+.mt-1 {
+  margin-top: 1rem !important;
+}
+
+.mt-2 {
+  margin-top: 2rem !important;
+}
 
 /* Ability Page Styles */
 .ability-detail-header-card {
@@ -488,8 +562,15 @@
 }
 
 /* Common table / list utilities */
-.text-nowrap { white-space: nowrap; }
-.flex-center-gap-small { display: flex; align-items: center; gap: 0.25rem; }
+.text-nowrap {
+  white-space: nowrap;
+}
+
+.flex-center-gap-small {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+}
 
 .type-badge-sm {
   font-size: 0.7rem;
@@ -554,9 +635,17 @@
 }
 
 /* Generation Client Utilities */
-.flex-1-300 { flex: 1 1 300px; }
-.no-underline { text-decoration: none !important; }
-.z-2 { z-index: 2; }
+.flex-1-300 {
+  flex: 1 1 300px;
+}
+
+.no-underline {
+  text-decoration: none !important;
+}
+
+.z-2 {
+  z-index: 2;
+}
 
 .mascot-container {
   width: 56px;
@@ -700,12 +789,12 @@
   &.expanded {
     min-width: 250px;
     width: 300px;
-    
-    @media (width <= 600px) {
+
+    @media (width <=600px) {
       width: 200px;
     }
 
-    @media (width <= 350px) {
+    @media (width <=350px) {
       width: 150px;
     }
   }
@@ -790,7 +879,8 @@
     border-bottom: none;
   }
 
-  &:hover, &.selected {
+  &:hover,
+  &.selected {
     background: rgba(255, 255, 255, 0.08);
   }
 }
@@ -815,9 +905,20 @@
   border-radius: 4px;
   font-weight: 700;
 
-  &.badge-pokemon { background: rgba(59, 130, 246, 0.2); color: #60a5fa; }
-  &.badge-ability { background: rgba(16, 185, 129, 0.2); color: #34d399; }
-  &.badge-move { background: rgba(239, 68, 68, 0.2); color: #f87171; }
+  &.badge-pokemon {
+    background: rgba(59, 130, 246, 0.2);
+    color: #60a5fa;
+  }
+
+  &.badge-ability {
+    background: rgba(16, 185, 129, 0.2);
+    color: #34d399;
+  }
+
+  &.badge-move {
+    background: rgba(239, 68, 68, 0.2);
+    color: #f87171;
+  }
 }
 
 .no-results {
@@ -879,8 +980,11 @@
   color: inherit;
   transition: background 0.18s ease, border-color 0.18s ease, transform 0.15s ease;
   cursor: pointer;
-  width: 96px;
-  height: 96px;
+  min-width: 96px;
+  max-width: 140px;
+  width: fit-content;
+  min-height: 96px;
+  height: auto;
   text-align: center;
   flex-shrink: 0;
 
@@ -894,11 +998,15 @@
   .name {
     font-weight: 600;
     font-size: 0.75rem;
+    line-height: 1.15;
     text-transform: capitalize;
     color: #e2e8f0;
-    white-space: nowrap;
+    white-space: normal;
+    word-wrap: break-word;
     overflow: hidden;
-    text-overflow: ellipsis;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
     max-width: 100%;
   }
 
@@ -914,7 +1022,9 @@
     border-color: #4ade80;
     background: rgba(74, 222, 128, 0.08);
 
-    .name { color: #4ade80; }
+    .name {
+      color: #4ade80;
+    }
   }
 }
 
@@ -1030,7 +1140,37 @@
   }
 }
 
+.moves-table-wrapper {
+  max-height: 350px;
+  overflow-y: auto;
+}
 
+.items-search-col {
+  min-width: 250px;
+}
 
+.items-category-col {
+  min-width: 200px;
+}
 
+.pill-badge-btn {
+  font-size: 0.75rem;
+}
 
+.empty-slot-card {
+  min-height: 130px;
+  border-style: dashed !important;
+}
+
+.slot-badge-icon {
+  opacity: 0.8;
+  border-radius: 0 var(--bs-border-radius) 0 var(--bs-border-radius);
+}
+
+.suggestion-btn {
+  font-size: 0.7rem;
+}
+
+.cursor-pointer {
+  cursor: pointer;
+}

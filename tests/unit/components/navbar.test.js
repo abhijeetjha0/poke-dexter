@@ -21,6 +21,8 @@ describe('Navbar Component', () => {
         expect(screen.getAllByText('Moves').length).toBeGreaterThan(0);
         expect(screen.getAllByText('Types').length).toBeGreaterThan(0);
         expect(screen.getAllByText('Generations').length).toBeGreaterThan(0);
+        expect(screen.getByText('Items')).toBeInTheDocument();
+        expect(screen.getByText('Items').closest('a')).toHaveAttribute('href', '/items');
     });
 
     test('toggles mobile menu when hamburger button is clicked', () => {

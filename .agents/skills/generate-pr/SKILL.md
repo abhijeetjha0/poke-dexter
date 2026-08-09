@@ -11,24 +11,27 @@ Use this skill whenever asked to analyze the current Git changeset and draft a P
 
 ## 📌 Core Rules & Learnings for AI Agents
 
-1. **Branch Naming Standards**:
+1. **Deep Analysis Requirement**:
+   - You MUST deeply scan each and every changeset in the current Git diff. Do not gloss over changes. Perform a deep, file-by-file analysis to ensure every technical update, architectural shift, and minor fix is accurately captured and explained.
+
+2. **Branch Naming Standards**:
    - Use short, lowercase, hyphenated branch names describing the feature or task (e.g., `improve-ux-using-ai`, `deployment`, `add-unit-tests`, `api-requests-refactor`).
 
-2. **Title Standard**:
+3. **Title Standard**:
    - State the main motive/objective of the Merge Request clearly and concisely (e.g., `Project Standards Improvements`). No rigid prefix required.
 
-3. **Rich Markdown & Visual Formatting**:
+4. **Rich Markdown & Visual Formatting**:
    - **Highlight File Paths & Code Symbols**: Enclose all file paths, directory paths, npm commands, and code symbols in inline code backticks (e.g., `app/api-requests/`, `package.json`, `.github/workflows/deploy.yml`, `npm test`, `devDependencies`).
    - **Bold Key Modules & Features**: Use **bold text** (`**...**`) for key feature names, modules, or architectural layers at the start of bullet points so the PR description is scannable and visually engaging.
 
-4. **Human-Readable Language**:
+5. **Human-Readable Language**:
    - Write clear, developer-friendly descriptions explaining **what was really touched** rather than repeating generic file paths or repetitive boilerplate.
 
-5. **Conditional Sections**:
+6. **Conditional Sections**:
    - **Technical updates done**: Include `### Technical updates done:` ONLY if technical, configuration, test, or codebase changes occurred in the changeset.
    - **UX updates done**: Include `### UX updates done:` ONLY if UI component, layout, routing, or SCSS styling changes occurred in the changeset.
 
-6. **Detailed Technical Specifications**:
+7. **Detailed Technical Specifications**:
    - **`package.json`**: When modified, explicitly list added/updated `dependencies` and `devDependencies` (e.g., `next`, `jest`, `@testing-library/react`), configured scripts (e.g., `test`, `lint-style`), and Node engine boundaries (e.g., `>=24.12.0`).
    - **`.github/workflows/deploy.yml`**: When modified, explicitly specify the exact workflow step additions (e.g., added mandatory `npm test` step prior to `npm run build`).
    - **Testing (`tests/`, `jest.config.js`)**: If test configuration is touched, explicitly mention it (e.g., `Added Jest unit test runner and setupTests environment configuration`). If test cases are added or fixed, summarize them with an 'Added' or 'Fixed' message around the feature/component name without listing individual test filenames.
@@ -38,18 +41,18 @@ Use this skill whenever asked to analyze the current Git changeset and draft a P
    - **Documentation & Agent Rules**: Mention specific updates across master `AGENTS.md` and modular `AGENTS.md` files, including any new architectural rules (e.g. hydration mismatch prevention).
    - **Refactoring & Convention Enforcement**: Explicitly list structural realignments (e.g. moving tests to mirror application directory structure) and codebase standardization efforts (e.g. renaming variables to adhere to descriptive naming rules or updating ESLint exclusions).
 
-7. **Bug Fix Guidelines**:
+8. **Bug Fix Guidelines**:
    - For bug fix changesets, state the exact bug resolved in the title (e.g. `Fix search input crash on empty query`).
    - Describe both the **root cause** and the **fix applied** under `### Technical updates done:` or `### UX updates done:` (e.g., `Fixed hydration error in Navbar by deferring location check to useEffect hook`).
 
-8. **Strict Human-Only Roadmap Section**:
+9. **Strict Human-Only Roadmap Section**:
    - Output the header `### Expected updates in future: (Optional)` and **strictly leave the body blank**.
    - AI Agents MUST NEVER pre-fill roadmap items or placeholder text in this section—it is strictly reserved for human input.
 
-9. **Pre-Merge Verification Checklist**:
+10. **Pre-Merge Verification Checklist**:
    - Ensure all automated verification checks (`npm test`, `npm run lint`, `npm run lint-style`, `npm run build`) pass prior to opening or merging PRs.
 
-10. **Git Protection**:
+11. **Git Protection**:
     - Write output to `PR/PR.md`.
     - Ensure `/PR` is listed in `.gitignore` so `PR/PR.md` is **never committed or pushed to Git**.
 

@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import { getPokemonImageUrl } from './lib/pokemon-utils';
 
 export default function HomePage() {
     return (
@@ -22,7 +23,7 @@ export default function HomePage() {
             <div className="hero-artwork">
                 <img
                     className="mascot-img-bulba"
-                    src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/1.png"
+                    src={getPokemonImageUrl(1)}
                     alt="Bulbasaur Mascot"
                     width="150"
                     height="150"
@@ -30,7 +31,7 @@ export default function HomePage() {
                 />
                 <img
                     className="mascot-img-chari"
-                    src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/6.png"
+                    src={getPokemonImageUrl(6)}
                     alt="Charizard Mascot"
                     width="220"
                     height="220"

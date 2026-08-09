@@ -122,3 +122,39 @@ export async function fetchAbilityList(limit = 500, options) {
 export async function fetchEvolutionChainByUrl(url, options) {
     return fetch(url, options);
 }
+
+/**
+ * Fetches detail data for an item by name or ID.
+ * @param {string|number} itemName
+ * @param {RequestInit} [options]
+ */
+export async function fetchItemByNameOrId(itemName, options) {
+    return fetch(`${BASE_URL}/item/${itemName}`, options);
+}
+
+/**
+ * Fetches all items list.
+ * @param {number} [limit=2500]
+ * @param {RequestInit} [options]
+ */
+export async function fetchItemList(limit = 2500, options) {
+    return fetch(`${BASE_URL}/item?limit=${limit}`, options);
+}
+
+/**
+ * Fetches all item categories.
+ * @param {number} [limit=100]
+ * @param {RequestInit} [options]
+ */
+export async function fetchItemCategoryList(limit = 100, options) {
+    return fetch(`${BASE_URL}/item-category?limit=${limit}`, options);
+}
+
+/**
+ * Fetches details for an item category by name or ID.
+ * @param {string|number} categoryNameOrId
+ * @param {RequestInit} [options]
+ */
+export async function fetchItemCategoryByNameOrId(categoryNameOrId, options) {
+    return fetch(`${BASE_URL}/item-category/${categoryNameOrId}`, options);
+}

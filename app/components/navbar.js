@@ -11,6 +11,7 @@ const NAV_ITEMS = [
     { label: 'Team Builder', path: '/team-builder' },
     { label: 'Abilities', path: '/abilities' },
     { label: 'Moves', path: '/moves' },
+    { label: 'Items', path: '/items' },
     { label: 'Types', path: '/types' },
     { label: 'Generations', path: '/generations' },
 ];

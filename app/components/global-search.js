@@ -2,8 +2,10 @@
 
 import { useState, useEffect, useRef, useMemo } from 'react';
 import { useRouter } from 'next/navigation';
-import { fetchPokemonSpeciesList, fetchAbilityList, fetchMoveList } from '../api-requests';
+import { fetchPokemonSpeciesList, fetchAbilityList, fetchMoveList, fetchItemList } from '../api-requests';
 import { Button, Form, InputGroup, ListGroup, Badge } from 'react-bootstrap';
+import MaterialIcon from './material-icon';
+import { formatDisplayName } from '../lib/pokemon-utils';
 
 // Cache to prevent multiple fetches across instances or remounts
 let globalSearchDataCache = null;
@@ -32,7 +34,7 @@ export default function GlobalSearch({ onNavigate = () => { } }) {
 
     // Fetch data when expanded (lazy load)
     useEffect(() => {
-        if (!isExpanded || data.length > 0) {
+        if (!isExpanded || data.length) {
             return;
         }
 
@@ -46,26 +48,29 @@ export default function GlobalSearch({ onNavigate = () => { } }) {
             }
 
             try {
-                const [pokemonRes, abilityRes, moveRes] = await Promise.all([
+                const [pokemonRes, abilityRes, moveRes, itemRes] = await Promise.all([
                     fetchPokemonSpeciesList(2000),
                     fetchAbilityList(500),
                     fetchMoveList(1000),
+                    fetchItemList(2500),
                 ]);
 
                 if (!isMounted) {
                     return;
                 }
 
-                const [pokemonData, abilityData, moveData] = await Promise.all([
+                const [pokemonData, abilityData, moveData, itemData] = await Promise.all([
                     pokemonRes.json(),
                     abilityRes.json(),
                     moveRes.json(),
+                    itemRes.json(),
                 ]);
 
                 const categories = [
                     { list: pokemonData.results, type: 'pokemon', path: 'pokemons' },
                     { list: abilityData.results, type: 'ability', path: 'abilities' },
                     { list: moveData.results, type: 'move', path: 'moves' },
+                    { list: itemData.results, type: 'item', path: 'items' },
                 ];
 
                 const combined = [];
@@ -79,7 +84,7 @@ export default function GlobalSearch({ onNavigate = () => { } }) {
                         combined.push({
                             name: item.name,
                             type: category.type,
-                            label: item.name.replace(/-/g, ' '),
+                            label: formatDisplayName(item.name),
                             url: `/${category.path}/${item.name}`,
                         });
                     }
@@ -189,13 +194,13 @@ export default function GlobalSearch({ onNavigate = () => { } }) {
                     onClick={() => setIsExpanded(true)}
                     aria-label="Open search"
                 >
-                    <span className="material-symbols-outlined fs-5">search</span>
+                    <MaterialIcon icon="search" className="fs-5" />
                 </Button>
             ) : (
                 <Form.Group className="mb-0">
                     <InputGroup>
                         <InputGroup.Text className="bg-transparent border-end-0">
-                            <span className="material-symbols-outlined fs-6">search</span>
+                            <MaterialIcon icon="search" className="fs-6" />
                         </InputGroup.Text>
                         <Form.Control
                             ref={inputRef}
@@ -219,7 +224,7 @@ export default function GlobalSearch({ onNavigate = () => { } }) {
 
             {isExpanded && isFocused && searchTerm.trim() !== '' && (
                 <div className="position-absolute w-100 mt-1 shadow rounded z-3 bg-dark border border-secondary">
-                    {suggestions.length > 0 ? (
+                    {suggestions.length ? (
                         <ListGroup variant="flush">
                             {suggestions.map((item, index) => {
                                 const isSelected = index === selectedIndex;
@@ -236,8 +241,9 @@ export default function GlobalSearch({ onNavigate = () => { } }) {
                                         <span className="text-capitalize">{item.label}</span>
                                         <Badge bg={
                                             item.type === 'pokemon' ? 'primary' :
-                                            item.type === 'ability' ? 'success' : 'info'
-                                        } pill className="text-uppercase">
+                                                item.type === 'ability' ? 'success' :
+                                                    item.type === 'item' ? 'warning' : 'info'
+                                        } pill className={`text-uppercase ${item.type === 'item' ? 'text-dark' : ''}`}>
                                             {item.type}
                                         </Badge>
                                     </ListGroup.Item>

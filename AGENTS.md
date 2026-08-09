@@ -22,6 +22,7 @@ Subdirectory-specific guidelines are maintained in modular `AGENTS.md` files thr
 │   ├── api-requests/        # Centralized PokéAPI request module & AGENTS.md
 │   ├── components/          # Reusable UI components & components AGENTS.md
 │   ├── generations/         # Generation hub route & interactive client component
+│   ├── items/               # Items index and details routes
 │   ├── lib/                 # Utility functions & helpers (move-type-utils.js)
 │   ├── moves/               # Moves index and details routes
 │   ├── pokemons/            # Pokédex routes & pokemons AGENTS.md
@@ -70,18 +71,11 @@ Subdirectory-specific guidelines are maintained in modular `AGENTS.md` files thr
 
 1. **Verification Requirement**: Never declare a task resolved without running `npm test`, `npm run lint`, `npm run lint-style`, and `npm run build` when modifying application code files. **STRICT EXCLUSION**: Verification commands MUST be completely skipped when only updating Markdown (`.md`) documentation files or AGENTS instruction files.
 2. **No Placeholders**: Maintain accurate PokéAPI integration parameters and valid Pokémon domain models across all dynamic and static views.
-3. **Keep AGENTS.md Up to Date**: Update relevant modular `AGENTS.md` files whenever tooling, configuration, routing, or SCSS style architecture changes.
+3. **Keep Documentation Up to Date**: Update `README.md` and relevant modular `AGENTS.md` files whenever new features, tooling, configuration, routing, or SCSS style architecture changes.
 4. **Linting Exclusions**: Markdown (`**/*.md`) and other non-JS/TS documentation or asset files (e.g., `.txt`, `.json`, `.css`, `.svg`) must be globally ignored in `eslint.config.mjs` following industry standards, preventing the linter from unnecessarily scanning or parsing them.
 5. **Test Coverage Requirements**: Always add or update unit test cases covering any changes, bug fixes, or new features developed during a session.
 6. **Documentation Relative File Links**: File links in documentation files (`README.md`, `AGENTS.md`) MUST use repository-relative paths starting with `./` (e.g., `./app/page.js`). For dynamic route paths containing square brackets (`[name]`), brackets in the link target URL MUST be URL-encoded as `%5B` and `%5D` (e.g., `./app/pokemons/%5Bname%5D/page.js`) to guarantee clickability across markdown parsers.
 7. **No Inline Styles & No Disabled Lint Rules**: NEVER use inline `style={{ ... }}` attributes or `eslint-disable` / `stylelint-disable` comments in application code. All layout, color, and dynamic sizing styles MUST be maintained strictly within SCSS stylesheets (`app/styles/`) using semantic CSS classes or SCSS generators.
-8. **Single-Line Simple Callbacks**: Simple single-statement callbacks or cleanup functions (such as `useEffect` unmount cleanup `return () => { isMounted = false; };`) MUST be written concisely on a single line instead of multi-line blocks.
-9. **Property Destructuring for Repeated Access**: When accessing an object property or event field (e.g. `event.key`, `pokemon.name`) multiple times within a function or callback, destructure it upfront (e.g. `const { key } = event;`) to avoid redundant property lookups and improve code readability.
-10. **Single-Line Unwrapped Concise JSX**: When rendering a single concise JSX element (such as in conditional branches, logical AND expressions `{condition && <Element />}`), write it directly on a single line without wrapping parentheses `(...)`.
-11. **No Nested Template Literals in JSX**: Never use nested template literals (e.g. `` `/path/${condition ? `?query=${val}` : ''}` ``) inside JSX attributes or callbacks. Turbopack/Next.js parsers can fail to parse this syntax (`Expected '</', got 'no substitution template literal'`). Always extract complex URL constructions or query parameters to a variable using string concatenation before using it in a JSX callback or attribute.
-12. **Duplicate Return Prevention**: When applying multi-line edits or replacing chunks, always verify that the surrounding context does not create duplicate statements (e.g. `return ( return (`), which cause immediate parsing failures (`Expression expected`).
-13. **Strict Variable Existence & Declaration Verification**: Before referencing any variable, constant, or identifier in any callback, function, route handler, or component scope (especially when migrating or refactoring code), ALWAYS explicitly verify that the variable is defined and initialized within the accessible scope to prevent runtime `ReferenceError` crashes.
-14. **Global Hyphen Replacement for Display Names**: Always use global regex replacement `.replace(/-/g, ' ')` instead of single-string replacement `.replace('-', ' ')` when formatting API slugs (Pokémon names, move names, ability names, growth rates, forms) for UI display. Single string `.replace('-', ' ')` only replaces the first hyphen, leaving subsequent hyphens (e.g. `all-out-pummeling--physical`, `10-000-000-volt-pikachu`) broken in rendered headers.
 
 > **Note**: Subdirectory-specific guidelines (React component patterns, SCSS style structure, App Router conventions, PR description generation skill, and GitHub Actions workflows) are maintained directly within their respective modular files:
 > - [.agents/skills/browser-automation-test/SKILL.md](.agents/skills/browser-automation-test/SKILL.md)

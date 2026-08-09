@@ -3,6 +3,7 @@ import GlobalError from '../../app/global-error';
 
 describe('GlobalError Component', () => {
     test('renders error message and reset button', () => {
+        const consoleSpy = jest.spyOn(console, 'error').mockImplementation(() => {});
         const mockReset = jest.fn();
         const { getByText, getByRole } = render(<GlobalError error={new Error('Test')} reset={mockReset} />);
 
@@ -13,5 +14,7 @@ describe('GlobalError Component', () => {
 
         fireEvent.click(button);
         expect(mockReset).toHaveBeenCalled();
+        
+        consoleSpy.mockRestore();
     });
 });

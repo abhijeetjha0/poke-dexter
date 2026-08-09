@@ -19,6 +19,7 @@ export default async function MovesPage() {
     if (!movesResponse.ok) {
         throw new Error('Failed to fetch moves from PokéAPI');
     }
+
     const responseJSON = await movesResponse.json();
     const moves = responseJSON.results || [];
 
