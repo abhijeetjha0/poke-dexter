@@ -3,7 +3,7 @@ import { fetchItemList } from '../api-requests';
 import { buildItemCategoryMap } from '../lib/item-category-utils';
 
 export const metadata = {
-    title: 'Pokémon Items Dex | PokeDexter',
+    title: 'Items',
     description: 'Explore all Pokémon items, view their effects, attributes, cost, and more.',
 }
 

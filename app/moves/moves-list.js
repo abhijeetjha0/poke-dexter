@@ -1,38 +1,24 @@
 'use client';
 
-import { useState, useMemo, useEffect } from 'react';
+import React, { useState, useMemo } from 'react';
 import Link from 'next/link';
-import { Container, Row, Col, Form, InputGroup, Card, Button, ButtonGroup, Alert, ListGroup } from 'react-bootstrap';
+import { Container, Row, Col, Card, Alert, ListGroup } from 'react-bootstrap';
 import DamageClassIcon from '../components/damage-class-icon';
 import MaterialIcon from '../components/material-icon';
 import TypeBadge from '../components/type-badge';
 import CountBadge from '../components/count-badge';
+import LocalSearchBar from '../components/local-search-bar';
 import AppPagination from '../components/app-pagination';
 import { formatDisplayName } from '../lib/pokemon-utils';
+import useViewMode from '../hooks/useViewMode';
+import ViewModeToggle from '../components/view-mode-toggle';
 
 const MOVES_PER_PAGE = 50;
 
 export default function MovesList({ initialMoves, moveTypeMap, moveDamageClassMap = {} }) {
     const [searchTerm, setSearchTerm] = useState('');
     const [currentPage, setCurrentPage] = useState(1);
-
-    // View mode state with localStorage persistence (safe from SSR hydration mismatch)
-    const [viewMode, setViewMode] = useState('grid');
-
-    useEffect(() => {
-        const savedMode = localStorage.getItem('viewMode');
-
-        if (savedMode === 'grid' || savedMode === 'list') {
-            setTimeout(() => {
-                setViewMode(savedMode);
-            }, 0);
-        }
-    }, []);
-
-    const handleViewModeChange = (mode) => {
-        setViewMode(mode);
-        localStorage.setItem('viewMode', mode);
-    };
+    const [viewMode, handleViewModeChange] = useViewMode('grid');
 
     const filteredMoves = useMemo(() => {
         const lowerCaseSearchTerm = searchTerm.toLowerCase();
@@ -63,41 +49,16 @@ export default function MovesList({ initialMoves, moveTypeMap, moveDamageClassMa
             {/* Search Input & View Toggle */}
             <Row className="mb-3 align-items-center g-2 flex-nowrap">
                 <Col className="flex-grow-1">
-                    <InputGroup>
-                        <Form.Control
-                            type="text"
-                            placeholder="Search moves (e.g., Thunderbolt, Tackle, Flamethrower)..."
-                            value={searchTerm}
-                            onChange={handleSearchChange}
-                            id="moves-search-bar"
-                            className="bg-dark text-light border-secondary shadow-none"
-                        />
-                        <InputGroup.Text className="bg-dark border-secondary text-light">
-                            <MaterialIcon icon="search" className="fs-5" />
-                        </InputGroup.Text>
-                    </InputGroup>
+                    <LocalSearchBar
+                        value={searchTerm}
+                        onChange={handleSearchChange}
+                        placeholder="Search moves (e.g., Thunderbolt, Tackle, Flamethrower)..."
+                        id="moves-search-bar"
+                        variant="dark"
+                    />
                 </Col>
                 <Col xs="auto">
-                    <ButtonGroup>
-                        <Button
-                            id="view-toggle-grid"
-                            variant={viewMode === 'grid' ? 'secondary' : 'outline-secondary'}
-                            onClick={() => handleViewModeChange('grid')}
-                            title="Grid View"
-                            className="d-flex align-items-center"
-                        >
-                            <MaterialIcon icon="grid_view" />
-                        </Button>
-                        <Button
-                            id="view-toggle-list"
-                            variant={viewMode === 'list' ? 'secondary' : 'outline-secondary'}
-                            onClick={() => handleViewModeChange('list')}
-                            title="List View"
-                            className="d-flex align-items-center"
-                        >
-                            <MaterialIcon icon="format_list_bulleted" />
-                        </Button>
-                    </ButtonGroup>
+                    <ViewModeToggle viewMode={viewMode} onViewModeChange={handleViewModeChange} />
                 </Col>
             </Row>
 

@@ -14,7 +14,7 @@ app/
 ├── generations/         # Generations visual hub route & interactive client component
 ├── lib/                 # Shared data utilities & calculations (move-type-utils.js)
 ├── moves/               # Moves catalog & details routes (/moves, /moves/[name])
-├── pokemons/            # Pokédex listings & details routes (/pokemons, /pokemons/[name])
+├── pokemons/            # Pokedex listings & details routes (/pokemons, /pokemons/[name])
 ├── styles/              # SCSS style architecture & styles AGENTS.md
 ├── types/               # Pokémon element types directory & route (/types, /types/[name])
 ├── global-error.js      # Root error boundary component
@@ -53,3 +53,4 @@ app/
 23. **Strict Variable Existence & Declaration Verification**: Before referencing any variable, constant, or identifier in any callback, function, route handler, or component scope (especially when migrating or refactoring code), ALWAYS explicitly verify that the variable is defined and initialized within the accessible scope to prevent runtime `ReferenceError` crashes.
 24. **Global Hyphen Replacement for Display Names**: Always use global regex replacement `.replace(/-/g, ' ')` instead of single-string replacement `.replace('-', ' ')` when formatting API slugs (Pokémon names, move names, ability names, growth rates, forms) for UI display. Single string `.replace('-', ' ')` only replaces the first hyphen, leaving subsequent hyphens (e.g. `all-out-pummeling--physical`, `10-000-000-volt-pikachu`) broken in rendered headers.
 25. **Proactive DRY Principle & Utility Extraction**: When encountering duplicated logic across multiple files or components (e.g. data parsing, formatting, or complex calculations like resolving Pokémon resources), you MUST proactively analyze the duplication, extract it into a centralized, testable utility function (e.g., in `app/lib/`), and refactor all existing call sites to use the new utility. Avoid copying and pasting identical code blocks. If you create a new utility, document its usage in the relevant `AGENTS.md` file so future agents can leverage it.
+26. **UI Manual Sync Requirement**: Whenever adding, removing, or updating a UI feature, agents MUST automatically update the `app/help/page.js` manual to reflect the changes to keep the project manual accurate and in-sync. The manual must use semantic `<section id="...">` hierarchy without page headers, and maintain anchor IDs to support the global floating help button.

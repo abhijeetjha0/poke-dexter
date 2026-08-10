@@ -1,0 +1,467 @@
+[
+  {
+    "id": "pokedex",
+    "icon": "catching_pokemon",
+    "iconClass": "text-danger",
+    "title": "Pokedex",
+    "description": "The Pokedex is the core feature of the application. It acts as a massive list of over 1000 known Pokémon species.",
+    "points": [
+      {
+        "label": "Browsing the List",
+        "text": "The list allows you to visually browse all known Pokémon, displaying their names, images, and elemental types.",
+        "steps": [
+          "Scroll through the list to see all Pokémon.",
+          "Observe the basic information (types, ID, and stats) displayed on each card."
+        ]
+      },
+      {
+        "label": "Searching the Current Page",
+        "text": "You can quickly find a specific Pokémon on the current page using the local search bar.",
+        "steps": [
+          "Locate the search bar above the Pokémon list.",
+          "Type a Pokémon's name.",
+          "The list will instantly filter to match your search query."
+        ]
+      },
+      {
+        "label": "Filtering by Generation",
+        "text": "Pokémon are grouped into specific eras or games called Generations. This feature lets you isolate Pokémon from a specific era.",
+        "steps": [
+          "Locate the Generation buttons/tabs at the top of the page.",
+          "Click a specific Generation (e.g., Generation 1).",
+          "The list will instantly update to show only Pokémon from that Generation."
+        ]
+      },
+      {
+        "label": "Changing View Mode",
+        "text": "You can customize how the Pokedex is displayed to suit your preference, choosing between detailed cards or compact rows.",
+        "steps": [
+          "Locate the View toggle icons (Grid or List) in the top right corner.",
+          "Click the Grid icon to see large, picture-heavy cards.",
+          "Click the List icon to see a compact, informational table layout."
+        ]
+      },
+      {
+        "label": "Navigating Pages",
+        "text": "Due to the vast number of Pokémon, the list is paginated to load faster and be easier to browse.",
+        "steps": [
+          "Scroll to the bottom of the Pokedex list.",
+          "Click the numbered pagination buttons to jump to a specific page.",
+          "Alternatively, use the \"Next\" and \"Previous\" buttons to move sequentially, or use the start and end buttons to jump to the first or extreme last page."
+        ]
+      }
+    ]
+  },
+  {
+    "id": "pokemon-details",
+    "icon": "info",
+    "iconClass": "text-info",
+    "title": "Pokémon Details",
+    "description": "Clicking on any Pokémon's card opens their detailed profile page. Here you learn everything about them:",
+    "points": [
+      {
+        "label": "Pokémon Card & Basic Info",
+        "text": "The top section displays the Pokémon's core identity, including its official artwork, types, and unique sound.",
+        "steps": [
+          "View the Pokémon's ID, Name, and elemental typing at the top.",
+          "Look at the official artwork sprite.",
+          "Click the 'Play Cry' button (if available) to hear the Pokémon's unique sound."
+        ]
+      },
+      {
+        "label": "Pokédex Entry & Characteristics",
+        "text": "This section provides biological and lore information about the Pokémon.",
+        "steps": [
+          "Read the flavor text to learn about the Pokémon's behavior and lore.",
+          "Review the characteristics table for physical traits like Height, Weight, and specific categories.",
+          "Check the Catch Rate and Base Experience yield."
+        ]
+      },
+      {
+        "label": "Forms & Varieties",
+        "text": "Many Pokémon have alternative forms (like Mega Evolutions or Regional Forms) that change their stats and appearance.",
+        "steps": [
+          "Look for the pill-shaped form buttons at the top of the details page (if the Pokémon has multiple forms).",
+          "Click a button to instantly swap the page's data to that specific form."
+        ]
+      },
+      {
+        "label": "Base Stats",
+        "text": "Base stats determine a Pokémon's combat effectiveness, including their health, attack power, and speed.",
+        "steps": [
+          "Scroll down to the Base Stats section.",
+          "View each stat (HP, Attack, Defense, Special Attack, Special Defense, Speed) represented as a colored progress bar.",
+          "Check the total sum of all base stats to gauge the Pokémon's overall strength."
+        ]
+      },
+      {
+        "label": "Type Defenses",
+        "text": "A Pokémon's elemental types determine its weaknesses and resistances in battle.",
+        "steps": [
+          "Scroll down to the Type Defenses grid.",
+          "See exactly which elements deal double damage (Weaknesses) or half damage (Resistances) to this Pokémon.",
+          "Use this information to plan your battle strategy."
+        ]
+      },
+      {
+        "label": "Evolution Chain",
+        "text": "Most Pokémon can evolve into stronger forms. This flowchart shows the Pokémon's entire family tree.",
+        "steps": [
+          "Scroll to the Evolution flowchart section.",
+          "Trace the path to see what this Pokémon evolves from or evolves into.",
+          "Note the specific conditions required for evolution (e.g., leveling up, using an item)."
+        ]
+      },
+      {
+        "label": "Abilities",
+        "text": "Abilities are passive traits that activate in or out of battle.",
+        "steps": [
+          "Locate the Abilities section on the page.",
+          "Read the description of each ability to understand its effect.",
+          "Note if an ability is a 'Hidden Ability', which is typically rarer."
+        ]
+      },
+      {
+        "label": "Moves",
+        "text": "Pokémon learn various active attacks for combat by leveling up or using special items.",
+        "steps": [
+          "Scroll down to the move tables at the bottom of the page.",
+          "Browse the attacks categorized by how they are learned (e.g., Level Up, Machine).",
+          "Check each move's Power, Accuracy, and Damage Class (Physical, Special, or Status)."
+        ]
+      },
+      {
+        "label": "Game Locations",
+        "text": "You can find out exactly where to catch the Pokémon in the various video game releases.",
+        "steps": [
+          "Locate the Encounter Locations section.",
+          "Expand a specific game version to see the routes or areas where the Pokémon can be found.",
+          "Check the specific encounter methods (e.g., walking in tall grass, surfing)."
+        ]
+      }
+    ]
+  },
+  {
+    "id": "team-builder",
+    "icon": "groups",
+    "iconClass": "text-success",
+    "title": "Team Builder",
+    "description": "In the Pokémon universe, a trainer can carry up to 6 Pokémon at a time. The Team Builder lets you craft your dream team and analyze how well they work together.",
+    "points": [
+      {
+        "label": "Adding Pokémon to your Squad",
+        "text": "You need to add specific Pokémon to your squad to start building a team.",
+        "steps": [
+          "Navigate to the Team Builder page.",
+          "Click the \"Add Pokémon\" button.",
+          "A 'Select Pokémon' Modal will open with a search bar.",
+          "Type the name of a Pokémon in the search bar and select it from the results to add it to your squad (up to 6)."
+        ]
+      },
+      {
+        "label": "Managing Individual Pokémon",
+        "text": "Each Pokémon in your squad has a dedicated options menu for quick management.",
+        "steps": [
+          "Click the kebab icon (three vertical dots) on a Pokémon's card to open its options.",
+          "Select \"Delete\" to remove the Pokémon from your squad.",
+          "Select \"Randomize\" to instantly replace it with a completely random Pokémon.",
+          "Select \"Suggest Alternatives\" to find better replacements."
+        ]
+      },
+      {
+        "label": "Suggesting Alternatives",
+        "text": "The Alternatives popup provides smart recommendations to replace a specific Pokémon while maintaining or improving team synergy.",
+        "steps": [
+          "Open the Alternatives popup from a Pokémon's kebab menu.",
+          "Use the 'Same Type' filter to only suggest Pokémon that share the exact same elemental types.",
+          "Use the 'Same Generation' filter to only suggest Pokémon introduced in the same generation.",
+          "Toggle 'Include Legendaries' to allow rare legendary or mythical Pokémon in your results.",
+          "Click the \"Clear\" button to reset any applied filters.",
+          "Click the \"Suggest\" button to generate a fresh list of recommendations based on your criteria."
+        ]
+      },
+      {
+        "label": "Forms and Evolutions Badges",
+        "text": "The Team Builder intelligently notifies you if a Pokémon can be upgraded or changed.",
+        "steps": [
+          "Look for interactive suggestion badges on a Pokémon's card in your squad.",
+          "Click a badge to quickly switch the Pokémon to its evolution, pre-evolution, or alternative form."
+        ]
+      },
+      {
+        "label": "Managing the Entire Team",
+        "text": "You can use automated tools to generate or clear your entire squad.",
+        "steps": [
+          "To clear the entire team, open the options menu and select \"Clear Team\".",
+          "To auto-fill a valid team instantly, click the \"Randomize\" button."
+        ]
+      },
+      {
+        "label": "Team Stats & Average BST",
+        "text": "Gauge the raw power of your team using the built-in stat calculators.",
+        "steps": [
+          "Review the Average BST (Base Stat Total) displayed for your squad.",
+          "Use this number to understand the general power level of your team (higher is generally stronger)."
+        ]
+      },
+      {
+        "label": "Analyzing Team Defenses",
+        "text": "A well-balanced team covers each other's elemental weaknesses. The Team Defenses panel calculates this automatically.",
+        "steps": [
+          "Check the \"Weakness Alert\" panel near the top to quickly see if \"3 or more Pokémon are weak to:\" a specific element.",
+          "Scroll down to the \"Team Defenses\" panel to review the full matrix of your team's combined weaknesses and resistances.",
+          "Look for cells highlighted in pink or red in the matrix—these indicate overlapping vulnerabilities that require the most attention.",
+          "Hover or click on any number badge in the matrix to see exactly which Pokémon have that specific weakness or resistance.",
+          "If a number is red and high, you should adjust your squad to cover that weakness!"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "abilities",
+    "icon": "bolt",
+    "iconClass": "text-warning",
+    "title": "Abilities",
+    "description": "Abilities are passive traits that Pokémon possess, which can affect battles or stats.",
+    "points": [
+      {
+        "label": "Navigating to Abilities",
+        "text": "The Abilities page lists all passive traits found in the Pokémon universe.",
+        "steps": [
+          "Look at the top navigation bar.",
+          "Click \"Abilities\" to view the full list."
+        ]
+      },
+      {
+        "label": "Searching the List",
+        "text": "Since there are many abilities, searching is the fastest way to find a specific trait.",
+        "steps": [
+          "Locate the dedicated search box at the top of the Abilities page.",
+          "Type the name of the ability you are looking for.",
+          "The list will instantly filter down to match your query."
+        ]
+      },
+      {
+        "label": "Viewing Details",
+        "text": "Each Ability has specific mechanics and descriptions.",
+        "steps": [
+          "Find the Ability in the list.",
+          "Read its description directly from the table or card."
+        ]
+      },
+      {
+        "label": "Seeing Compatible Pokémon",
+        "text": "Not all Pokémon have every ability. You can see exactly who possesses it.",
+        "steps": [
+          "Click on the title of any Ability in the list.",
+          "You will be taken to a new page showing a full list of every single Pokémon capable of possessing it."
+        ]
+      }
+    ]
+  },
+  {
+    "id": "moves",
+    "icon": "sports_martial_arts",
+    "iconClass": "text-danger",
+    "title": "Moves",
+    "description": "Moves are active attacks or status techniques that Pokémon use in battle.",
+    "points": [
+      {
+        "label": "Navigating to Moves",
+        "text": "The Moves page contains a comprehensive list of all attacks and techniques.",
+        "steps": [
+          "Look at the top navigation bar.",
+          "Click \"Moves\" to view the full list."
+        ]
+      },
+      {
+        "label": "Searching the List",
+        "text": "With hundreds of moves available, searching is the fastest way to find a specific attack.",
+        "steps": [
+          "Locate the dedicated search box at the top of the Moves page.",
+          "Type the name of the move you are looking for.",
+          "The list will instantly filter down to match your query."
+        ]
+      },
+      {
+        "label": "Changing View Mode",
+        "text": "You can customize how the moves are displayed to suit your preference.",
+        "steps": [
+          "Locate the View toggle icons (Grid or List) next to the search bar.",
+          "Click the Grid icon to see compact move cards.",
+          "Click the List icon to see an expanded, detailed table layout."
+        ]
+      },
+      {
+        "label": "Viewing Details",
+        "text": "Each Move has specific mechanical details like Power and Accuracy.",
+        "steps": [
+          "Find the Move in the list.",
+          "Read its description and core stats directly from the table.",
+          "Pay close attention to its Damage Class (Physical, Special, or Status)."
+        ]
+      },
+      {
+        "label": "Seeing Compatible Pokémon",
+        "text": "You can check which Pokémon are capable of learning a specific move.",
+        "steps": [
+          "Click on the title of any Move in the list.",
+          "You will be taken to a new page showing a full list of every single Pokémon capable of learning it."
+        ]
+      }
+    ]
+  },
+  {
+    "id": "items",
+    "icon": "backpack",
+    "iconClass": "text-primary",
+    "title": "Items",
+    "description": "Items are objects you can use or give to your Pokémon to hold in battle.",
+    "points": [
+      {
+        "label": "Navigating to Items",
+        "text": "The Items page contains a comprehensive list of all items.",
+        "steps": [
+          "Look at the top navigation bar.",
+          "Click \"Items\" to view the full list."
+        ]
+      },
+      {
+        "label": "Searching Items",
+        "text": "You can quickly search for specific items by name.",
+        "steps": [
+          "Locate the dedicated search box at the top of the Items page.",
+          "Type the name of the item you are looking for.",
+          "The list will instantly filter down to match your query."
+        ]
+      },
+      {
+        "label": "Filtering by Category",
+        "text": "Items are grouped into distinct categories (like healing, holding, or evolution stones).",
+        "steps": [
+          "Locate the Category dropdown filter next to the search bar.",
+          "Click the dropdown and select a specific category.",
+          "The list will update to show only items belonging to that category."
+        ]
+      },
+      {
+        "label": "Viewing Details",
+        "text": "Each item has a specific description and category.",
+        "steps": [
+          "Find the item in the list.",
+          "Review the item's description and its shop cost.",
+          "Click on the item's category to find other similar items."
+        ]
+      }
+    ]
+  },
+  {
+    "id": "types",
+    "icon": "category",
+    "iconClass": "text-info",
+    "title": "Types",
+    "description": "The 18 elemental Types govern all combat matchups in the Pokémon universe.",
+    "points": [
+      {
+        "label": "Navigating to Types",
+        "text": "The Types page lists all elemental types and their interactions.",
+        "steps": [
+          "Look at the top navigation bar.",
+          "Click \"Types\" to view the full list of elements."
+        ]
+      },
+      {
+        "label": "Analyzing Type Matchups",
+        "text": "Every type has strengths and weaknesses against other types.",
+        "steps": [
+          "Browse the list of types on the Types page.",
+          "Click on a specific Type (like Fire or Dragon).",
+          "Review its elemental matchups (what it's weak to, resists, or is immune to)."
+        ]
+      },
+      {
+        "label": "Browsing Pokémon by Type",
+        "text": "You can easily find all Pokémon that share a specific elemental type.",
+        "steps": [
+          "On a Type's details page, scroll down to the Pokémon list.",
+          "Browse the list of all Pokémon belonging to that element."
+        ]
+      }
+    ]
+  },
+  {
+    "id": "generations",
+    "icon": "history",
+    "iconClass": "text-secondary",
+    "title": "Generations",
+    "description": "Pokémon are released in waves called Generations, each usually tied to a new video game region.",
+    "points": [
+      {
+        "label": "Navigating to Generations",
+        "text": "The Generations page lets you explore Pokémon based on when they were introduced.",
+        "steps": [
+          "Look at the top navigation bar.",
+          "Click \"Generations\" to view the list of all generations."
+        ]
+      },
+      {
+        "label": "Browsing a Generation",
+        "text": "Each Generation contains all the Pokémon that originally debuted in that specific region.",
+        "steps": [
+          "Select a Generation from the list.",
+          "Browse all the Pokémon from that region (e.g., Generation 1: Kanto)."
+        ]
+      },
+      {
+        "label": "Changing View Mode",
+        "text": "You can change how the Generations are displayed on the page.",
+        "steps": [
+          "Locate the View toggle icons in the top right corner.",
+          "Click the Grid icon to view generations as large cards.",
+          "Click the List icon to view them as a compact list."
+        ]
+      }
+    ]
+  },
+  {
+    "id": "global-search",
+    "icon": "search",
+    "iconClass": "text-secondary",
+    "title": "Global Search",
+    "description": "The Global Search Bar located in the top navigation menu (available on every single page) is your fastest way to jump around the app.",
+    "points": [
+      {
+        "label": "Focusing the Search Bar",
+        "text": "The global search bar is always accessible and allows you to find anything instantly.",
+        "steps": [
+          "Look for the global search input in the top navigation bar.",
+          "Click inside the input box to focus it."
+        ]
+      },
+      {
+        "label": "Typing a Query",
+        "text": "The search index is comprehensive, covering multiple data types simultaneously.",
+        "steps": [
+          "Start typing the name of a Pokémon, Move, or Ability.",
+          "Wait for the dropdown menu to appear."
+        ]
+      },
+      {
+        "label": "Reviewing Suggestions",
+        "text": "Suggestions are grouped by their category to help you find exactly what you mean.",
+        "steps": [
+          "Look at the dropdown menu that appears below the search bar.",
+          "Notice how results are automatically categorized (e.g., Pokémon, Items, Moves)."
+        ]
+      },
+      {
+        "label": "Jumping to a Page",
+        "text": "You can navigate directly to a specific details page without browsing manually.",
+        "steps": [
+          "Click a suggestion with your mouse.",
+          "Alternatively, use your keyboard up/down arrows to highlight a suggestion and press Enter."
+        ]
+      }
+    ]
+  }
+]

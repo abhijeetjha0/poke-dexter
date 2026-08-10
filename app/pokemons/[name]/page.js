@@ -43,7 +43,7 @@ function computeTypeDefenses(typeDataList) {
     return defenses;
 }
 
-// Extract the latest English Pokédex entry (flavor text) from species data.
+// Extract the latest English Pokedex entry (flavor text) from species data.
 function extractLatestPokedexEntry(speciesData) {
     const entries = speciesData.flavor_text_entries || [];
     // Filter English entries, take the last one (latest game)
@@ -156,7 +156,7 @@ export default async function Page({ params }) {
         return res.json();
     });
 
-    // --- 1. Pokédex Entry ---
+    // --- 1. Pokedex Entry ---
     const pokedexEntry = extractLatestPokedexEntry(responseJSON);
 
     // --- 2. Type Defenses ---

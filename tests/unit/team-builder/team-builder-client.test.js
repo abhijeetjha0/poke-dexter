@@ -21,6 +21,12 @@ describe('TeamBuilderClient Component', () => {
 
     beforeEach(() => {
         jest.clearAllMocks();
+        // Spy on console.error to keep test output clean during expected errors
+        jest.spyOn(console, 'error').mockImplementation(() => {});
+    });
+
+    afterEach(() => {
+        jest.restoreAllMocks();
     });
 
     test('renders team builder header and 6 slots', () => {
@@ -238,5 +244,130 @@ describe('TeamBuilderClient Component', () => {
 
         // Suggest button should be re-enabled
         expect(suggestBtn).not.toBeDisabled();
+    });
+
+    test('filters species list when searching', () => {
+        render(<TeamBuilderClient initialSpeciesList={mockSpeciesList} />);
+        
+        const addButtons = screen.getAllByRole('button', { name: /Add Pokémon/i });
+        fireEvent.click(addButtons[0]);
+
+        const searchInput = screen.getByPlaceholderText('Search by Pokémon name...');
+        fireEvent.change(searchInput, { target: { value: 'char' } });
+
+        expect(screen.getByRole('button', { name: /charizard/i })).toBeInTheDocument();
+        expect(screen.queryByRole('button', { name: /^pikachu$/i })).not.toBeInTheDocument();
+    });
+
+    test('handles missing chain node safely', async () => {
+        // We simulate fetchEvolutionChain returning no chain
+        fetchPokemonByIdOrName.mockResolvedValueOnce({
+            ok: true,
+            json: async () => ({
+                id: 25,
+                name: 'pikachu',
+                types: [],
+                sprites: { front_default: 'pikachu.png' },
+                stats: [],
+                species: { name: 'pikachu' },
+            }),
+        });
+
+        fetchPokemonSpecies.mockResolvedValueOnce({
+            ok: true,
+            json: async () => ({
+                name: 'pikachu',
+                evolution_chain: { url: 'chain-url' },
+            }),
+        });
+
+        fetchEvolutionChainByUrl.mockResolvedValueOnce({
+            ok: true,
+            json: async () => ({}), // Missing chain object
+        });
+
+        render(<TeamBuilderClient initialSpeciesList={mockSpeciesList} />);
+        fireEvent.click(screen.getAllByRole('button', { name: /Add Pokémon/i })[0]);
+        fireEvent.click(screen.getByRole('button', { name: /pikachu/i }));
+
+        await waitFor(() => {
+            expect(screen.getByText('pikachu')).toBeInTheDocument();
+        });
+    });
+
+    test('kebab menu: Randomize, Switch, and Delete actions', async () => {
+        fetchPokemonByIdOrName.mockResolvedValue({
+            ok: true,
+            json: async () => ({
+                id: 6,
+                name: 'charizard',
+                types: [],
+                sprites: { front_default: 'charizard.png' },
+                stats: [],
+                species: { name: 'charizard' },
+            }),
+        });
+
+        fetchPokemonSpecies.mockResolvedValue({
+            ok: true,
+            json: async () => ({ name: 'charizard' }),
+        });
+
+        fetchEvolutionChainByUrl.mockResolvedValue({
+            ok: true,
+            json: async () => ({ chain: {} }),
+        });
+
+        render(<TeamBuilderClient initialSpeciesList={mockSpeciesList} />);
+
+        // Add a Pokemon to slot 0
+        fireEvent.click(screen.getAllByRole('button', { name: /Add Pokémon/i })[0]);
+        fireEvent.click(screen.getByRole('button', { name: /charizard/i }));
+
+        await waitFor(() => expect(screen.getByText('charizard')).toBeInTheDocument());
+
+        // Open kebab menu
+        const kebabMenu = screen.getAllByText('more_vert')[0];
+        fireEvent.click(kebabMenu);
+
+        // Click Delete
+        fireEvent.click(screen.getByText('Delete', { selector: 'a' }));
+        
+        await waitFor(() => {
+            expect(screen.queryByText('charizard')).not.toBeInTheDocument();
+        });
+
+        // Add again to test Switch
+        fireEvent.click(screen.getAllByRole('button', { name: /Add Pokémon/i })[0]);
+        fireEvent.click(screen.getByRole('button', { name: /charizard/i }));
+
+        await waitFor(() => expect(screen.queryAllByText('more_vert').length).toBeGreaterThan(0));
+
+        // Click Kebab menu and Suggest Alternatives
+        fireEvent.click(screen.getAllByText('more_vert')[0]);
+        fireEvent.click(screen.getByText('Suggest Alternatives'));
+
+        // It should open suggestion modal
+        await waitFor(() => expect(screen.getByText('Alternatives')).toBeInTheDocument());
+
+        // Add again to test Randomize
+        fireEvent.click(screen.getAllByText('more_vert')[0]);
+        fireEvent.click(screen.getAllByText('Randomize')[1]);
+        
+        // Wait for randomize fetch to complete
+        await waitFor(() => expect(screen.getByText('charizard')).toBeInTheDocument());
+    });
+
+    test('handles fetch failure gracefully', async () => {
+        fetchPokemonByIdOrName.mockResolvedValueOnce({ ok: false });
+        fetchPokemonSpecies.mockResolvedValueOnce({ ok: false });
+
+        render(<TeamBuilderClient initialSpeciesList={mockSpeciesList} />);
+        fireEvent.click(screen.getAllByRole('button', { name: /Add Pokémon/i })[0]);
+        fireEvent.click(screen.getByRole('button', { name: /charizard/i }));
+
+        await waitFor(() => {
+            expect(screen.getAllByRole('button', { name: /Add Pokémon/i }).length).toBe(6);
+        });
     });
 });

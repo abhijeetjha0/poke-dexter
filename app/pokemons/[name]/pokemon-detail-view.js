@@ -198,7 +198,7 @@ function PokemonDetailViewInner({
                         </Card.Body>
                     </Card>
 
-                    {/* Pokédex Entry + Specs Combined */}
+                    {/* Pokedex Entry + Specs Combined */}
                     <Card bg="dark" border="secondary" className="mb-4">
                         <Card.Body>
                             {pokedexEntry && (

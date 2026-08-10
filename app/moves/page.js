@@ -3,7 +3,7 @@ import { buildMoveMetaMaps } from '../lib/move-type-utils';
 import { fetchMoveList } from '../api-requests';
 
 export const metadata = {
-    title: 'Pokémon Moves Directory | PokeDexter',
+    title: 'Moves',
     description: 'Explore all Pokémon moves, view their elemental types, damage categories, power, accuracy, and compatible Pokémon.',
 }
 

@@ -3,7 +3,7 @@ import { Container } from 'react-bootstrap';
 import TypeBadge from '../components/type-badge';
 
 export const metadata = {
-    title: 'Pokemon Types Directory | PokeDexter',
+    title: 'Types',
     description: 'Browse all 18 Pokémon element types, view their type match-ups, and catalog Pokémon by element typing.',
 };
 

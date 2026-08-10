@@ -1,7 +1,6 @@
-import { render, screen, waitFor } from '@testing-library/react';
+import { render, screen } from '@testing-library/react';
 import TeamBuilderPage from '../../../app/team-builder/page';
 import { fetchPokemonSpeciesList } from '../../../app/api-requests';
-import TeamBuilderClient from '../../../app/team-builder/team-builder-client';
 
 jest.mock('../../../app/api-requests', () => ({
     fetchPokemonSpeciesList: jest.fn()

@@ -3,7 +3,7 @@ import TeamBuilderClient from './team-builder-client';
 import { fetchPokemonSpeciesList } from '../api-requests';
 
 export const metadata = {
-    title: 'Team Builder & Type Analyzer | PokeDexter',
+    title: 'Team Builder (Beta)',
     description: 'Assemble a 6-Pokémon team and analyze team-wide defensive type weaknesses, coverage, and alternate form suggestions.',
 };
 

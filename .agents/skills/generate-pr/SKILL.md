@@ -75,7 +75,7 @@ Title: Project Standards Improvements
 
 ### UX updates done:
 1. **Navbar**: Added mobile hamburger menu drawer, active tab route indicators, and navigation links.
-2. **Pokédex Page**: Added search input filter, artwork sprite cards with species IDs, and generation selection pills.
+2. **Pokedex Page**: Added search input filter, artwork sprite cards with species IDs, and generation selection pills.
 3. **Pokémon Detail View**: Updated layout theming, expanded stats breakdown cards, and added interactive type/ability/move pills.
 
 ### Expected updates in future: (Optional)

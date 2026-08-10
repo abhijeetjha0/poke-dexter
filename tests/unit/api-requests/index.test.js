@@ -14,7 +14,8 @@ import {
     fetchItemList,
     fetchItemByNameOrId,
     fetchItemCategoryList,
-    fetchItemCategoryByNameOrId
+    fetchItemCategoryByNameOrId,
+    fetchEvolutionChainByUrl
 } from '../../../app/api-requests';
 
 describe('Centralized PokeAPI Requests Module', () => {
@@ -165,5 +166,14 @@ describe('Centralized PokeAPI Requests Module', () => {
 
         expect(fetch).toHaveBeenCalledWith('https://pokeapi.co/api/v2/item-category/standard-balls', undefined);
         expect(data.name).toBe('standard-balls');
+    });
+
+    test('fetchEvolutionChainByUrl calls the exact provided url', async () => {
+        fetch.mockResponseOnce(JSON.stringify({ chain: {} }));
+        const res = await fetchEvolutionChainByUrl('https://pokeapi.co/api/v2/evolution-chain/1/');
+        const data = await res.json();
+
+        expect(fetch).toHaveBeenCalledWith('https://pokeapi.co/api/v2/evolution-chain/1/', undefined);
+        expect(data.chain).toEqual({});
     });
 });

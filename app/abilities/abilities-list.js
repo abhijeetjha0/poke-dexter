@@ -2,10 +2,10 @@
 
 import { useState, useMemo } from 'react';
 import Link from 'next/link';
-import { Container, Row, Col, Form, InputGroup, Card, Alert } from 'react-bootstrap';
+import { Container, Row, Col, Card, Alert } from 'react-bootstrap';
 import CountBadge from '../components/count-badge';
 import AppPagination from '../components/app-pagination';
-import MaterialIcon from '../components/material-icon';
+import LocalSearchBar from '../components/local-search-bar';
 import { formatDisplayName } from '../lib/pokemon-utils';
 
 const ABILITIES_PER_PAGE = 50;
@@ -45,19 +45,13 @@ export default function AbilitiesList({ initialAbilities }) {
                     <CountBadge count={filteredAbilities.length} className="fs-6 px-3 py-1" />
                 </Col>
                 <Col className="flex-grow-1">
-                    <InputGroup>
-                        <Form.Control
-                            type="text"
-                            placeholder="Search abilities (e.g., Levitate, Intimidate)..."
-                            value={searchTerm}
-                            onChange={handleSearchChange}
-                            id="abilities-search-bar"
-                            className="bg-dark text-light border-secondary shadow-none"
-                        />
-                        <InputGroup.Text className="bg-dark border-secondary text-light">
-                            <MaterialIcon icon="search" className="fs-5" />
-                        </InputGroup.Text>
-                    </InputGroup>
+                    <LocalSearchBar
+                        value={searchTerm}
+                        onChange={handleSearchChange}
+                        placeholder="Search abilities (e.g., Levitate, Intimidate)..."
+                        id="abilities-search-bar"
+                        variant="dark"
+                    />
                 </Col>
             </Row>
 
