@@ -1,0 +1,40 @@
+@use '../variables' as *;
+
+.btn {
+  font-family: $font-sans;
+  font-weight: 600;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  transition: all 0.2s ease;
+
+  &[disabled] {
+    opacity: 0.4;
+    cursor: not-allowed;
+    transform: none;
+    box-shadow: none;
+  }
+}
+
+.btn-active {
+  background: $accent-cyan !important;
+  color: #080a10 !important;
+  font-weight: 800 !important;
+  border-color: $accent-cyan !important;
+  box-shadow: 0 0 10px rgba(6, 182, 212, 0.4) !important;
+}
+
+/* Like Button styles */
+.like-button-container {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.likes-count {
+  font-weight: 700;
+  font-size: 1.1rem;
+  font-family: $font-digital;
+  color: $accent-cyan;
+}

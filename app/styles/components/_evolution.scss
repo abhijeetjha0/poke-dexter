@@ -1,0 +1,170 @@
+@use '../variables' as *;
+
+/* ─── Evolution Chain ──────────────────────────────────────────────── */
+
+/*
+ * Layout model (horizontal tree):
+ *
+ *  evolution-chain-container
+ *    evolution-node-group
+ *      evolution-branch  ← flex-row: [card] + [evolution-children]
+ *        evolution-link-card   (the Pokémon, left side)
+ *        evolution-children    (all children stacked vertically, right side)
+ *          evolution-child-wrapper  ← flex-row: [arrow-container] + [evolution-branch]
+ *            evolution-arrow-container  (icon + method text)
+ *            evolution-branch           (child card + its own children recursively)
+ */
+
+.evolution-chain-container {
+  overflow-x: auto;
+  padding-bottom: 0.25rem;
+}
+
+.evolution-node-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  min-width: fit-content;
+}
+
+/* Horizontal: card on left, children column on right */
+.evolution-branch {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 0;
+}
+
+/* The clickable Pokémon card */
+.evolution-link-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.25rem;
+  padding: 0.5rem;
+  border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: rgba(255, 255, 255, 0.04);
+  text-decoration: none;
+  color: inherit;
+  transition: background 0.18s ease, border-color 0.18s ease, transform 0.15s ease;
+  cursor: pointer;
+  min-width: 96px;
+  max-width: 140px;
+  width: fit-content;
+  min-height: 96px;
+  height: auto;
+  text-align: center;
+  flex-shrink: 0;
+
+
+  .name {
+    font-weight: 600;
+    font-size: 0.75rem;
+    line-height: 1.15;
+    text-transform: capitalize;
+    color: #e2e8f0;
+    white-space: normal;
+    word-wrap: break-word;
+    overflow: hidden;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    line-clamp: 2;
+    -webkit-box-orient: vertical;
+    max-width: 100%;
+  }
+
+  &:hover {
+    background: rgba(255, 255, 255, 0.09);
+    border-color: rgba(255, 255, 255, 0.25);
+    transform: translateY(-2px);
+    text-decoration: none;
+    color: inherit;
+  }
+
+  &.active-node {
+    border-color: #4ade80;
+    background: rgba(74, 222, 128, 0.08);
+
+    .name {
+      color: #4ade80;
+    }
+  }
+}
+
+/* Each child: [arrow+method] then [child branch] horizontally */
+.evolution-child-wrapper {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 0;
+}
+
+/* Children of a node: stacked vertically, all centered beside the parent */
+.evolution-children {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  align-items: flex-start;
+  justify-content: center;
+}
+
+/* Arrow icon + method text, between parent and child */
+.evolution-arrow-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  text-align: center;
+  padding: 0.5rem 0.4rem 0;
+  flex-shrink: 0;
+  width: 86px;
+  gap: 0.15rem;
+}
+
+.evolution-arrow {
+  color: rgba(255, 255, 255, 0.3);
+  line-height: 1;
+
+  .material-symbols-outlined {
+    font-size: 1.25rem;
+    display: block;
+  }
+}
+
+.evolution-method {
+  font-size: 0.62rem;
+  color: rgba(255, 255, 255, 0.42);
+  line-height: 1.25;
+  max-width: 76px;
+  word-break: break-word;
+  white-space: normal;
+}
+
+.pokemon-sprite-wrapper {
+  width: 64px;
+  height: 64px;
+}
+
+.pokemon-sprite-img {
+  object-fit: contain;
+}
+
+.pokemon-table-sprite-img {
+  object-fit: contain;
+}
+
+.team-member-artwork-wrapper {
+  height: 120px;
+}
+
+.team-member-artwork-img {
+  width: 120px;
+  height: 120px;
+  object-fit: contain;
+}
+
+.team-member-no-image {
+  width: 120px;
+}

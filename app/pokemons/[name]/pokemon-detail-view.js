@@ -2,6 +2,7 @@
 
 import { useState, Suspense } from 'react';
 import { useSearchParams } from 'next/navigation';
+import Image from 'next/image';
 import { Container, Row, Col, Card, Button, ListGroup, Collapse } from 'react-bootstrap';
 import MaterialIcon from '../../components/material-icon';
 import TypeDefenseGrid from '../../components/type-defense-grid';
@@ -176,11 +177,15 @@ function PokemonDetailViewInner({
                                 )}
                             </div>
                             <div className="text-center">
-                                <img
+                                <Image
                                     src={sprites.other?.['official-artwork']?.front_default || sprites.front_default}
                                     alt={name}
-                                    className="img-fluid pokemon-detail-hero-img"
+                                    className="pokemon-detail-hero-img"
+                                    width={400}
+                                    height={400}
+                                    loading="eager"
                                     onError={(e) => {
+                                        e.target.srcset = sprites.front_default;
                                         e.target.src = sprites.front_default;
                                     }}
                                 />

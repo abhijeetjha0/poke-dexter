@@ -106,4 +106,28 @@ describe('SuggestionModal Component', () => {
         expect(screen.getByText(/results \(35\)/i)).toBeInTheDocument();
         expect(screen.getByText('+5 more...')).toBeInTheDocument();
     });
+
+    test('handles pokemon with missing types gracefully', () => {
+        const typelessPokemon = {
+            name: 'missingno',
+            artwork: 'missingno.png'
+            // types is undefined
+        };
+        render(<SuggestionModal {...defaultProps} pokemon={typelessPokemon} />);
+        
+        // Should still render the Same Type checkbox but with no TypeBadges
+        expect(screen.getByRole('checkbox', { name: /same type:/i })).toBeInTheDocument();
+    });
+
+    test('displays empty state when suggestion results is empty', () => {
+        render(<SuggestionModal {...defaultProps} suggestionResults={[]} />);
+        
+        expect(screen.getByText(/results \(0\)/i)).toBeInTheDocument();
+        expect(screen.getByText('No Pokémon match the selected filters.')).toBeInTheDocument();
+    });
+
+    test('returns null if pokemon is not provided', () => {
+        const { container } = render(<SuggestionModal {...defaultProps} pokemon={null} />);
+        expect(container.firstChild).toBeNull();
+    });
 });

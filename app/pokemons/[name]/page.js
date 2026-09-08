@@ -61,6 +61,51 @@ function extractLatestPokedexEntry(speciesData) {
     };
 }
 
+// Deduplicate methods within a single encounter detail list
+function extractUniqueMethods(encounterDetails) {
+    const methods = (encounterDetails || []).map(encounterDetail => ({
+        method: formatDisplayName(encounterDetail.method?.name) || 'unknown',
+        minLevel: encounterDetail.min_level,
+        maxLevel: encounterDetail.max_level,
+        chance: encounterDetail.chance,
+    }));
+
+    const uniqueMethods = [];
+    const seen = new Set();
+    let batchMinLevel = Infinity;
+    let batchMaxLevel = -Infinity;
+
+    for (const methodObj of methods) {
+        const key = methodObj.method;
+
+        if (!seen.has(key)) {
+            seen.add(key);
+            uniqueMethods.push(methodObj);
+            batchMinLevel = Math.min(batchMinLevel, methodObj.minLevel);
+            batchMaxLevel = Math.max(batchMaxLevel, methodObj.maxLevel);
+        }
+    }
+
+    return { uniqueMethods, batchMinLevel, batchMaxLevel };
+}
+
+// Merge new methods into an existing location entry
+function mergeLocationEncounters(existing, uniqueMethods, batchMinLevel, batchMaxLevel) {
+    const existingMethodNames = new Set(existing.methods.map(m => m.method));
+
+    for (const uniqueMethod of uniqueMethods) {
+        if (!existingMethodNames.has(uniqueMethod.method)) {
+            existing.methods.push(uniqueMethod);
+            existingMethodNames.add(uniqueMethod.method);
+        }
+    }
+
+    if (uniqueMethods.length) {
+        existing.minLevel = Math.min(existing.minLevel, batchMinLevel);
+        existing.maxLevel = Math.max(existing.maxLevel, batchMaxLevel);
+    }
+}
+
 // Process encounter data: group by game version with locations and methods.
 function processEncounters(encounterData) {
     const byVersion = {};
@@ -76,48 +121,10 @@ function processEncounters(encounterData) {
                 byVersion[version] = {};
             }
 
-            const methods = (vd.encounter_details || []).map(encounterDetail => ({
-                method: formatDisplayName(encounterDetail.method?.name) || 'unknown',
-                minLevel: encounterDetail.min_level,
-                maxLevel: encounterDetail.max_level,
-                chance: encounterDetail.chance,
-            }));
+            const { uniqueMethods, batchMinLevel, batchMaxLevel } = extractUniqueMethods(vd.encounter_details);
 
-            // Deduplicate methods per location
-            const uniqueMethods = [];
-            const seen = new Set();
-            let batchMinLevel = Infinity;
-            let batchMaxLevel = -Infinity;
-
-            for (const methodObj of methods) {
-                const key = methodObj.method;
-
-                if (!seen.has(key)) {
-                    seen.add(key);
-                    uniqueMethods.push(methodObj);
-                    batchMinLevel = Math.min(batchMinLevel, methodObj.minLevel);
-                    batchMaxLevel = Math.max(batchMaxLevel, methodObj.maxLevel);
-                }
-            }
-
-            // Check if this location already exists for this version
             if (byVersion[version][locationName]) {
-                const existing = byVersion[version][locationName];
-                // Merge methods using O(1) Set lookup
-                const existingMethodNames = new Set(existing.methods.map(existingMethod => existingMethod.method));
-
-                for (const uniqueMethod of uniqueMethods) {
-                    if (!existingMethodNames.has(uniqueMethod.method)) {
-                        existing.methods.push(uniqueMethod);
-                        existingMethodNames.add(uniqueMethod.method);
-                    }
-                }
-
-                // Update level range
-                if (uniqueMethods.length) {
-                    existing.minLevel = Math.min(existing.minLevel, batchMinLevel);
-                    existing.maxLevel = Math.max(existing.maxLevel, batchMaxLevel);
-                }
+                mergeLocationEncounters(byVersion[version][locationName], uniqueMethods, batchMinLevel, batchMaxLevel);
             } else {
                 byVersion[version][locationName] = {
                     location: locationName,

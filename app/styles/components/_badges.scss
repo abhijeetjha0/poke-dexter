@@ -1,0 +1,115 @@
+@use '../variables' as *;
+
+/* Pokemon Type Badges */
+.type-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.25rem 0.75rem;
+  border-radius: 20px;
+  font-size: 0.8rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: #fff;
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.4);
+}
+
+.badge-cyan {
+  background: $accent-cyan;
+  font-size: 0.8rem;
+  padding: 0.2rem 0.8rem;
+  border-radius: 15px;
+  text-shadow: none;
+  color: #111;
+}
+
+.type-normal {
+  background-color: $type-normal !important;
+}
+
+.type-fire {
+  background-color: $type-fire !important;
+}
+
+.type-water {
+  background-color: $type-water !important;
+}
+
+.type-electric {
+  background-color: $type-electric !important;
+  color: #111 !important;
+  text-shadow: none !important;
+}
+
+.type-grass {
+  background-color: $type-grass !important;
+}
+
+.type-ice {
+  background-color: $type-ice !important;
+  color: #111 !important;
+  text-shadow: none !important;
+}
+
+.type-fighting {
+  background-color: $type-fighting !important;
+}
+
+.type-poison {
+  background-color: $type-poison !important;
+}
+
+.type-ground {
+  background-color: $type-ground !important;
+}
+
+.type-flying {
+  background-color: $type-flying !important;
+}
+
+.type-psychic {
+  background-color: $type-psychic !important;
+}
+
+.type-bug {
+  background-color: $type-bug !important;
+}
+
+.type-rock {
+  background-color: $type-rock !important;
+}
+
+.type-ghost {
+  background-color: $type-ghost !important;
+}
+
+.type-dragon {
+  background-color: $type-dragon !important;
+}
+
+.type-dark {
+  background-color: $type-dark !important;
+}
+
+.type-steel {
+  background-color: $type-steel !important;
+}
+
+.type-fairy {
+  background-color: $type-fairy !important;
+}
+
+/* Badge variants */
+.badge-secondary {
+  background: var(--panel-border);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  font-size: 0.8rem;
+  padding: 0.2rem 0.8rem;
+  border-radius: 15px;
+  color: var(--text-muted);
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+}

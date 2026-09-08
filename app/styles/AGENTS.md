@@ -38,3 +38,6 @@ This document specifies rules and standards for AI Coding Assistants modifying S
     - `InputGroup` components must utilize the `.input-group:focus-within` pattern in SCSS stylesheets to ensure unified focus borders and box shadows across both input controls (`.form-control`) and input group text addons (`.input-group-text`).
 11. **Compact Layouts & Spacing Optimization**:
     - Extra empty space should not be left in the design wherever possible. Optimize margins and padding (e.g., using `mb-0`, `mb-1`, or `p-2`) to keep components compact, especially for modal windows, filter bars, and card layouts targeting mobile interfaces.
+12. **Sticky Header Scroll Offsets**:
+    - Pages with stacked sticky headers (such as the main navbar combined with sticky search/filter toolbars) must assign appropriate `scroll-margin-top` (e.g., `10.5rem` for `.help-section`) to anchor targets or sections to ensure linked headings remain visible and are not obscured beneath sticky panels upon navigation.
+

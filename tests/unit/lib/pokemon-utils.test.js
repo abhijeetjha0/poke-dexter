@@ -124,5 +124,17 @@ describe('pokemon-utils', () => {
             expect(result.speciesName).toBe('lycanroc-midday');
             expect(result.speciesId).toBe(745);
         });
+
+        it('falls back gracefully if variety species fetch throws an error', async () => {
+            jest.spyOn(console, 'error').mockImplementation(() => {});
+            apiRequests.fetchPokemonByUrl.mockRejectedValueOnce(new Error('Network error'));
+
+            const pokemon = { name: 'lycanroc-midday', url: 'https://pokeapi.co/api/v2/pokemon/745/' };
+            const result = await resolvePokemonResource(pokemon);
+            
+            expect(result.speciesName).toBe('lycanroc-midday');
+            expect(result.speciesId).toBe(745);
+            expect(console.error).toHaveBeenCalledWith('Failed to fetch species details for variety:', 'lycanroc-midday', expect.any(Error));
+        });
     });
 });

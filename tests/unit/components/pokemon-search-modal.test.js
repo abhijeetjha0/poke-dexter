@@ -26,6 +26,12 @@ describe('PokemonSearchModal Component', () => {
         expect(screen.getByText('Select Pokémon for Slot #3')).toBeInTheDocument();
     });
 
+    it('should render the modal title correctly when activeSlotIndex is null', () => {
+        render(<PokemonSearchModal {...defaultProps} activeSlotIndex={null} />);
+        
+        expect(screen.getByText('Select Pokémon for Slot #')).toBeInTheDocument();
+    });
+
     it('should render the search input with correct value', () => {
         render(<PokemonSearchModal {...defaultProps} searchTerm="pika" />);
         
@@ -63,6 +69,54 @@ describe('PokemonSearchModal Component', () => {
         fireEvent.click(pikachuItem);
         
         expect(mockOnSelectPokemon).toHaveBeenCalledWith(2, 'pikachu');
+    });
+
+    it('should render type badges and BST when present', () => {
+        const enrichedSpecies = [
+            {
+                name: 'charizard',
+                pokemon_v2_pokemontypes: [
+                    { pokemon_v2_type: { name: 'fire' } },
+                    { pokemon_v2_type: { name: 'flying' } }
+                ],
+                pokemon_v2_pokemonstats: [
+                    { base_stat: 78 },
+                    { base_stat: 84 },
+                    { base_stat: 78 },
+                    { base_stat: 109 },
+                    { base_stat: 85 },
+                    { base_stat: 100 }
+                ]
+            }
+        ];
+
+        render(<PokemonSearchModal {...defaultProps} filteredSpecies={enrichedSpecies} />);
+
+        // Should render the species name
+        expect(screen.getByText('charizard')).toBeInTheDocument();
+        
+        // Should calculate and render BST
+        expect(screen.getByText('BST: 534')).toBeInTheDocument();
+        
+        // Should render type badges
+        // We assume TypeBadge is not mocked or renders the text
+        // so we check if the text exists.
+        expect(screen.getByText('fire')).toBeInTheDocument();
+        expect(screen.getByText('flying')).toBeInTheDocument();
+    });
+
+    it('should handle missing stats gracefully', () => {
+        const incompleteSpecies = [
+            {
+                name: 'missingno',
+                pokemon_v2_pokemonstats: null,
+                pokemon_v2_pokemontypes: null
+            }
+        ];
+
+        render(<PokemonSearchModal {...defaultProps} filteredSpecies={incompleteSpecies} />);
+        expect(screen.getByText('missingno')).toBeInTheDocument();
+        expect(screen.queryByText(/BST:/)).not.toBeInTheDocument();
     });
 
     it('should not render if show is false', () => {

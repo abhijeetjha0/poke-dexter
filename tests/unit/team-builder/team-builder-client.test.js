@@ -56,7 +56,14 @@ describe('TeamBuilderClient Component', () => {
                 name: 'charizard',
                 types: [{ type: { name: 'fire' } }, { type: { name: 'flying' } }],
                 sprites: { front_default: 'charizard.png' },
-                stats: [{ base_stat: 100 }],
+                stats: [
+                    { stat: { name: 'hp' }, base_stat: 100 },
+                    { stat: { name: 'attack' }, base_stat: 100 },
+                    { stat: { name: 'defense' }, base_stat: 100 },
+                    { stat: { name: 'special-attack' }, base_stat: 100 },
+                    { stat: { name: 'special-defense' }, base_stat: 100 },
+                    { stat: { name: 'speed' }, base_stat: 100 },
+                ],
                 species: { name: 'charizard' },
             }),
         });
@@ -87,9 +94,27 @@ describe('TeamBuilderClient Component', () => {
 
         await waitFor(() => {
             expect(screen.getByText('charizard')).toBeInTheDocument();
-            expect(screen.getByText('BST: 100')).toBeInTheDocument();
+            expect(screen.getByText('BST: 600')).toBeInTheDocument();
             expect(screen.getByText('Switch with:')).toBeInTheDocument();
             expect(screen.getByRole('button', { name: /charizard mega x/i })).toBeInTheDocument();
+        });
+
+        // Test clicking a suggestion button (line 426)
+        fetchPokemonByIdOrName.mockResolvedValueOnce({
+            ok: true,
+            json: async () => ({
+                id: 10034,
+                name: 'charizard-mega-x',
+                types: [{ type: { name: 'fire' } }, { type: { name: 'dragon' } }],
+                sprites: { front_default: 'charizard-mega-x.png' },
+                stats: [],
+                species: { name: 'charizard' },
+            }),
+        });
+        fireEvent.click(screen.getByRole('button', { name: /charizard mega x/i }));
+        
+        await waitFor(() => {
+            expect(screen.getByText('charizard mega x')).toBeInTheDocument();
         });
     });
 
@@ -147,7 +172,7 @@ describe('TeamBuilderClient Component', () => {
                 name: 'charizard',
                 types: [{ type: { name: 'fire' } }, { type: { name: 'flying' } }],
                 sprites: { front_default: 'charizard.png' },
-                stats: [{ base_stat: 100 }], // Mocked BST will be 100
+                stats: [{ stat: { name: 'hp' }, base_stat: 100 }], // Mocked BST will be 100
                 species: { name: 'charizard', url: 'https://pokeapi.co/api/v2/pokemon-species/6/' },
             }),
         });
@@ -242,8 +267,41 @@ describe('TeamBuilderClient Component', () => {
         const sameTypeCheckbox = screen.getByRole('checkbox', { name: /same type:/i });
         fireEvent.click(sameTypeCheckbox);
 
+        const sameGenCheckbox = screen.getByRole('checkbox', { name: /same generation/i });
+        fireEvent.click(sameGenCheckbox);
+
+        const legendariesCheckbox = screen.getByRole('checkbox', { name: /include legendaries/i });
+        fireEvent.click(legendariesCheckbox);
+
         // Suggest button should be re-enabled
         expect(suggestBtn).not.toBeDisabled();
+        
+        // Click suggest again with filters on
+        fetchAdvancedSuggestionsGraphQL.mockResolvedValueOnce({
+            ok: true,
+            json: async () => ({
+                data: {
+                    pokemon_v2_pokemon: []
+                }
+            })
+        });
+        fireEvent.click(suggestBtn);
+
+        await waitFor(() => {
+            expect(screen.getByText(/no pokémon match the selected filters/i)).toBeInTheDocument();
+        });
+
+        // Test error handling
+        fireEvent.click(sameTypeCheckbox); // change filter again to enable button
+        fetchAdvancedSuggestionsGraphQL.mockResolvedValueOnce({ ok: false });
+        fireEvent.click(suggestBtn);
+        await waitFor(() => {
+            expect(screen.getByText(/Failed to load suggestions/i)).toBeInTheDocument();
+        });
+
+        // Close modal
+        fireEvent.click(screen.getByRole('button', { name: /close/i }));
+        expect(screen.queryByText('Alternatives')).not.toBeInTheDocument();
     });
 
     test('filters species list when searching', () => {
@@ -369,5 +427,64 @@ describe('TeamBuilderClient Component', () => {
         await waitFor(() => {
             expect(screen.getAllByRole('button', { name: /Add Pokémon/i }).length).toBe(6);
         });
+    });
+
+    test('randomizes team when Randomize Team button is clicked', async () => {
+        fetchPokemonByIdOrName.mockResolvedValue({
+            ok: true,
+            json: async () => ({
+                id: 25,
+                name: 'pikachu',
+                types: [],
+                sprites: { front_default: 'pikachu.png' },
+                stats: [],
+                species: { name: 'pikachu' },
+            }),
+        });
+
+        fetchPokemonSpecies.mockResolvedValue({
+            ok: true,
+            json: async () => ({ name: 'pikachu' }),
+        });
+
+        render(<TeamBuilderClient initialSpeciesList={mockSpeciesList} />);
+        
+        const randomizeBtn = screen.getByRole('button', { name: /randomize/i });
+        fireEvent.click(randomizeBtn);
+        
+        // Since there are 2 items in mockSpeciesList, 2 slots will be filled
+        await waitFor(() => {
+            expect(screen.getAllByText('pikachu').length).toBeGreaterThan(0);
+        });
+    });
+
+    test('shows critical weaknesses warning', async () => {
+        // Mock fetch to return a fire type
+        fetchPokemonByIdOrName.mockResolvedValue({
+            ok: true,
+            json: async () => ({
+                id: 6,
+                name: 'charizard',
+                types: [{ type: { name: 'fire' } }],
+                sprites: { front_default: 'charizard.png' },
+                stats: [],
+                species: { name: 'charizard' },
+            }),
+        });
+        fetchPokemonSpecies.mockResolvedValue({
+            ok: true,
+            json: async () => ({ name: 'charizard' }),
+        });
+
+        render(<TeamBuilderClient initialSpeciesList={mockSpeciesList} />);
+
+        // Add 3 fire types to trigger weakness to water/ground/rock
+        for (let i = 0; i < 3; i++) {
+            fireEvent.click(screen.getAllByRole('button', { name: /Add Pokémon/i })[0]);
+            fireEvent.click(screen.getByRole('button', { name: /charizard/i }));
+            await waitFor(() => expect(screen.getAllByText('charizard').length).toBe(i + 1));
+        }
+
+        expect(screen.getByText(/3 or more Pokémon are weak to:/i)).toBeInTheDocument();
     });
 });

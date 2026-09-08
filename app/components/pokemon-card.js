@@ -1,6 +1,7 @@
 'use client';
 
 import Link from 'next/link';
+import Image from 'next/image';
 import { Card, Dropdown } from 'react-bootstrap';
 import MaterialIcon from './material-icon';
 import TypeBadge from './type-badge';
@@ -58,12 +59,16 @@ export default function PokemonCard({
             )}
             <Card.Body className="d-flex align-items-center p-3 gap-3">
                 <div className="pokemon-sprite-wrapper flex-shrink-0">
-                    <Card.Img
+                    <Image
                         src={imageUrl || defaultImageUrl}
                         alt={name}
                         className="pokemon-sprite-img"
-                        loading="lazy"
-                        onError={(e) => { e.target.src = defaultImageUrl; }}
+                        width={64}
+                        height={64}
+                        onError={(e) => { 
+                            e.target.srcset = defaultImageUrl;
+                            e.target.src = defaultImageUrl; 
+                        }}
                     />
                 </div>
                 <div className={`d-flex flex-grow-1 min-w-0 align-items-stretch py-1 ${rightNode ? 'gap-4' : ''}`}>

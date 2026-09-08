@@ -2,6 +2,7 @@
 
 import React from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { Container, Row, Col, Card, Badge, ListGroup } from 'react-bootstrap';
 import { getPokemonImageUrl } from '../lib/pokemon-utils';
 import MaterialIcon from '../components/material-icon';
@@ -54,12 +55,12 @@ export default function GenerationsClient() {
                                     <div
                                         className="position-absolute end-0 bottom-0 opacity-75"
                                     >
-                                        <img
+                                        <Image
                                             src={getPokemonImageUrl(gen.mascotId)}
                                             alt={`${gen.region} mascot`}
-                                            loading="lazy"
-                                            width="140"
-                                            height="140"
+                                            width={140}
+                                            height={140}
+                                            loading={gen.id <= 3 ? 'eager' : 'lazy'}
                                         />
                                     </div>
                                 </Card.Body>
@@ -77,12 +78,12 @@ export default function GenerationsClient() {
                             className="bg-dark border-secondary p-3 text-decoration-none hover-primary transition-all d-flex justify-content-between align-items-center"
                         >
                             <div className="d-flex align-items-center gap-4">
-                                <img
+                                <Image
                                     src={getPokemonImageUrl(gen.mascotId)}
                                     alt={`${gen.region} mascot`}
-                                    width="60"
-                                    height="60"
-                                    loading="lazy"
+                                    width={60}
+                                    height={60}
+                                    loading={gen.id <= 3 ? 'eager' : 'lazy'}
                                 />
                                 <div>
                                     <div className="d-flex align-items-baseline gap-2 mb-1">

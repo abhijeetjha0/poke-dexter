@@ -1,0 +1,35 @@
+@use '../variables' as *;
+
+/* Custom App Pagination */
+.pokedex-pagination {
+  .page-link {
+    background-color: #212529;
+    border-color: #495057;
+    color: #f3f4f6;
+    transition: all 0.2s ease;
+
+    &:hover {
+      background-color: #343a40;
+      border-color: #6c757d;
+      color: $accent-cyan;
+    }
+
+    &:focus {
+      box-shadow: 0 0 0 0.25rem rgba(6, 182, 212, 0.25);
+    }
+  }
+
+  .page-item.active .page-link {
+    background-color: $accent-cyan;
+    border-color: $accent-cyan;
+    color: #080a10;
+    font-weight: 700;
+    box-shadow: 0 0 10px rgba(6, 182, 212, 0.4);
+  }
+
+  .page-item.disabled .page-link {
+    background-color: #1a1d20;
+    border-color: #343a40;
+    color: #6c757d;
+  }
+}

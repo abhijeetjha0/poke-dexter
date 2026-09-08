@@ -1,4 +1,5 @@
 import Table from 'react-bootstrap/Table';
+import Image from 'next/image';
 import TypeBadge from './type-badge';
 import MaterialIcon from './material-icon';
 import { formatDisplayName, getPokemonSpriteUrl } from '../lib/pokemon-utils';
@@ -61,14 +62,14 @@ export default function PokemonTableView(props) {
                             >
                                 <td className={sortColumn === 'id' ? 'bg-secondary bg-opacity-10' : ''}>
                                     <div className="d-flex align-items-center gap-2">
-                                        <img
+                                        <Image
                                             src={pokemon.imageUrl}
                                             alt={pokemon.name}
-                                            width="40"
-                                            height="40"
-                                            loading="lazy"
+                                            width={40}
+                                            height={40}
                                             className="pokemon-table-sprite-img"
                                             onError={(e) => {
+                                                e.target.srcset = getPokemonSpriteUrl(pokemon.id);
                                                 e.target.src = getPokemonSpriteUrl(pokemon.id);
                                             }}
                                         />

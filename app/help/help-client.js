@@ -163,7 +163,7 @@ export default function HelpClient() {
             )}
 
             {filteredSections.map(section => (
-                <section key={section.id} id={section.id} className="mb-5 border-bottom pb-4">
+                <section key={section.id} id={section.id} className="mb-5 border-bottom pb-4 help-section">
                     <h2 className="mb-3 d-flex align-items-center">
                         <MaterialIcon icon={section.icon} className={`me-2 ${section.iconClass}`} />
                         <HighlightText text={section.title} highlight={searchTerm} />

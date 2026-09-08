@@ -1,4 +1,5 @@
 import { Modal, Form, Button, Alert } from 'react-bootstrap';
+import Image from 'next/image';
 import { formatDisplayName } from '../lib/pokemon-utils';
 import TypeBadge from './type-badge';
 import MaterialIcon from './material-icon';
@@ -34,11 +35,11 @@ export default function SuggestionModal({
         <Modal show={show} onHide={onHide} centered size="sm">
             <Modal.Header closeButton closeVariant="white" className="bg-dark text-light border-secondary p-2 px-3">
                 <Modal.Title className="fs-5 d-flex align-items-center">
-                    <img 
+                    <Image 
                         src={pokemon.artwork} 
                         alt={pokemon.name} 
-                        width="32"
-                        height="32"
+                        width={32}
+                        height={32}
                         className="me-2 object-fit-contain" 
                     />
                     Alternatives

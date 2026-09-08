@@ -1,0 +1,64 @@
+@use '../variables' as *;
+
+/* Generation Client Utilities */
+.flex-1-300 {
+  flex: 1 1 300px;
+}
+
+.no-underline {
+  text-decoration: none !important;
+}
+
+.z-2 {
+  z-index: 2;
+}
+
+.mascot-container {
+  width: 56px;
+  height: 56px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255, 255, 255, 0.03);
+  border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.flex-baseline-gap {
+  display: flex;
+  align-items: baseline;
+  gap: 0.75rem;
+}
+
+.gen-region-lg {
+  font-size: 1.25rem;
+  font-weight: 800;
+  color: var(--text-main);
+}
+
+.gen-roman-sm {
+  font-size: 0.8rem;
+  font-family: var(--font-digital);
+  font-weight: 700;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.gen-stats-row {
+  display: flex;
+  gap: 1rem;
+  font-size: 0.85rem;
+  margin-top: 0.2rem;
+}
+
+.gen-range-text {
+  color: var(--accent-cyan);
+  font-family: var(--font-digital);
+  font-weight: 700;
+}
+
+.gen-count-text {
+  color: var(--text-muted);
+  font-weight: 600;
+}
