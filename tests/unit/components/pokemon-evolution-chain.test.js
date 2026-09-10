@@ -218,6 +218,84 @@ describe('PokemonEvolutionChain Component', () => {
         expect(container.firstChild).toBeNull();
     });
 
+    test('returns null if active form is not in the chain tree', () => {
+        const { container } = render(<PokemonEvolutionChain {...mockProps} activeVariety={{ name: 'mewtwo' }} name="mewtwo" />);
+        expect(container.firstChild).toBeNull();
+    });
+
+    test('renders lycanroc, toxtricity, urshifu, and unknown forms', () => {
+        const specializedChain = {
+            chain: {
+                species: { name: 'pikachu-cosplay', url: 'https://pokeapi.co/api/v2/pokemon-species/25/' },
+                evolves_to: [
+                    {
+                        species: { name: 'lycanroc', url: 'https://pokeapi.co/api/v2/pokemon-species/745/' },
+                        evolution_details: [
+                            { trigger: { name: 'level-up' }, time_of_day: 'day' },
+                            { trigger: { name: 'level-up' }, time_of_day: 'night' },
+                            { trigger: { name: 'level-up' }, time_of_day: 'dusk' }
+                        ],
+                        evolves_to: []
+                    },
+                    {
+                        species: { name: 'toxtricity', url: 'https://pokeapi.co/api/v2/pokemon-species/849/' },
+                        evolution_details: [
+                            { trigger: { name: 'level-up' }, relative_physical_stats: 1 },
+                            { trigger: { name: 'level-up' }, relative_physical_stats: -1 }
+                        ],
+                        evolves_to: []
+                    },
+                    {
+                        species: { name: 'urshifu', url: 'https://pokeapi.co/api/v2/pokemon-species/892/' },
+                        evolution_details: [
+                            { trigger: { name: 'tower-of-waters' } },
+                            { trigger: { name: 'tower-of-darkness' } }
+                        ],
+                        evolves_to: []
+                    },
+                    {
+                        species: { name: 'unknown-pokemon', url: 'https://pokeapi.co/api/v2/pokemon-species/9999/' },
+                        evolution_details: [
+                            { trigger: null },
+                            { trigger: { name: 'some-new-trigger' } }
+                        ],
+                        evolves_to: [
+                            {
+                                species: { name: 'grandchild-unknown', url: 'https://pokeapi.co/api/v2/pokemon-species/10000/' },
+                                evolution_details: [
+                                    { trigger: { name: 'trigger-one' } },
+                                    { trigger: { name: 'trigger-two' } },
+                                    { trigger: { name: 'trigger-two' } } // Duplicate to hit the !includes logic
+                                ]
+                            }
+                        ]
+                    }
+                ]
+            }
+        };
+
+        render(<PokemonEvolutionChain 
+            {...mockProps} 
+            name="pikachu-cosplay" 
+            activeVariety={{ name: 'pikachu-cosplay' }} 
+            evolutionChainData={specializedChain} 
+        />);
+
+        expect(screen.getByText('Lycanroc (Midday)')).toBeInTheDocument();
+        expect(screen.getByText('Lycanroc (Midnight)')).toBeInTheDocument();
+        expect(screen.getByText('Lycanroc (Dusk)')).toBeInTheDocument();
+
+        expect(screen.getByText('Toxtricity (Amped)')).toBeInTheDocument();
+        expect(screen.getByText('Toxtricity (Low Key)')).toBeInTheDocument();
+
+        expect(screen.getByText('Urshifu (Rapid Strike)')).toBeInTheDocument();
+        expect(screen.getByText('Urshifu (Single Strike)')).toBeInTheDocument();
+
+        expect(screen.getByText('Unknown / Some New Trigger')).toBeInTheDocument();
+        expect(screen.getByText('Trigger One / Trigger Two')).toBeInTheDocument();
+        expect(screen.getByText('grandchild unknown')).toBeInTheDocument();
+    });
+
     test('handles collapse toggle', () => {
         render(<PokemonEvolutionChain {...mockProps} />);
         const header = screen.getByText('Evolution Chain');

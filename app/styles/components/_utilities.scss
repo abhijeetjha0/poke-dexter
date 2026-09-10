@@ -1,0 +1,192 @@
+@use '../variables' as *;
+
+/* Common Layout Utilities */
+.flex-between-wrap {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+.text-center-padded {
+  text-align: center;
+  padding: 3rem;
+}
+
+.pokemon-detail-hero-img {
+  max-height: 220px;
+  width: auto;
+  height: auto;
+  filter: drop-shadow(0 10px 15px rgba(0, 0, 0, 0.5));
+}
+
+.stat-label-col {
+  width: 70px;
+}
+
+.stat-label-xs {
+  font-size: 0.65rem;
+}
+
+.stat-value-col {
+  width: 35px;
+  text-align: right;
+}
+
+.stat-progress-bar {
+  height: 8px;
+}
+
+.matrix-badge {
+  min-width: 28px;
+}
+
+.matrix-table-compact {
+  font-size: 0.8rem;
+
+  th,
+  td {
+    padding: 0.35rem 0.25rem !important;
+  }
+}
+
+/* Spacing Utilities */
+.mb-0 {
+  margin-bottom: 0 !important;
+}
+
+.mb-1 {
+  margin-bottom: 1rem !important;
+}
+
+.mb-2 {
+  margin-bottom: 2rem !important;
+}
+
+.mt-0 {
+  margin-top: 0 !important;
+}
+
+.mt-1 {
+  margin-top: 1rem !important;
+}
+
+.mt-2 {
+  margin-top: 2rem !important;
+}
+
+/* Flex Utilities */
+.flex-gap-1 {
+  display: flex;
+  gap: 1rem;
+}
+
+.flex-gap-075-wrap {
+  display: flex;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+}
+
+/* Common table / list utilities */
+.text-nowrap {
+  white-space: nowrap;
+}
+
+.flex-center-gap-small {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.type-badge-sm {
+  font-size: 0.7rem;
+  padding: 0.15rem 0.4rem;
+  text-transform: uppercase;
+  border-radius: 4px;
+  text-align: center;
+  display: inline-block;
+  min-width: 50px;
+}
+
+.loading-text {
+  color: var(--text-muted);
+  font-size: 0.8rem;
+  font-style: italic;
+}
+
+/* Heading Utilities */
+.panel-heading-lg {
+  font-size: 1.2rem;
+  font-weight: 700;
+  font-family: var(--font-digital);
+}
+
+.panel-subheading {
+  font-size: 1.1rem;
+  font-weight: 700;
+  margin-bottom: 0.75rem;
+  color: var(--text-muted);
+}
+
+.cry-title {
+  font-weight: 700;
+  font-size: 0.95rem;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+
+.text-muted-sm {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  margin-bottom: 1rem;
+}
+
+.text-capitalize {
+  text-transform: capitalize;
+}
+
+.emoji-lg {
+  font-size: 1.5rem;
+}
+
+.w-full {
+  width: 100%;
+}
+
+.tabs-header-flat {
+  margin-top: 1rem;
+  margin-bottom: 0;
+  padding-bottom: 0;
+  border-bottom: none;
+}
+
+.items-search-col {
+  min-width: 250px;
+}
+
+.items-category-col {
+  min-width: 200px;
+}
+
+.pill-badge-btn {
+  font-size: 0.75rem;
+}
+
+.empty-slot-card {
+  min-height: 130px;
+  border-style: dashed !important;
+}
+
+.slot-badge-icon {
+  opacity: 0.8;
+  border-radius: 0 var(--bs-border-radius) 0 var(--bs-border-radius);
+}
+
+.suggestion-btn {
+  font-size: 0.7rem;
+}
+
+.cursor-pointer {
+  cursor: pointer;
+}

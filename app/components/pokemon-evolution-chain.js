@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import Image from 'next/image';
 import Card from 'react-bootstrap/Card';
 import Collapse from 'react-bootstrap/Collapse';
 import MaterialIcon from './material-icon';
@@ -275,11 +276,11 @@ export default function PokemonEvolutionChain(props) {
                             <Link href={v.href}>
                                 <div className={`evolution-link-card ${isActive ? 'active-node' : ''}`}>
                                     {v.id && (
-                                        <img
+                                        <Image
                                             src={getPokemonSpriteUrl(v.id)}
                                             alt={v.displayName}
-                                            width="56"
-                                            height="56"
+                                            width={56}
+                                            height={56}
                                         />
                                     )}
                                     <div className="name">{v.displayName}</div>
@@ -329,11 +330,11 @@ export default function PokemonEvolutionChain(props) {
                                                             <Link href={childVariant.href}>
                                                                 <div className={`evolution-link-card ${isChildActive ? 'active-node' : ''}`}>
                                                                     {childVariant.id && (
-                                                                        <img
+                                                                        <Image
                                                                             src={getPokemonSpriteUrl(childVariant.id)}
                                                                             alt={childVariant.displayName}
-                                                                            width="56"
-                                                                            height="56"
+                                                                            width={56}
+                                                                            height={56}
                                                                         />
                                                                     )}
                                                                     <div className="name">{childVariant.displayName}</div>
@@ -398,13 +399,13 @@ export default function PokemonEvolutionChain(props) {
                                                                                         <Link href={gcVar.href}>
                                                                                             <div className={linkClass}>
                                                                                                 {gcVar.id && (
-                                                                                                    <img
+                                                                                                    <Image
                                                                                                         src={
                                                                                                             gcSpriteUrl
                                                                                                         }
                                                                                                         alt={gcName}
-                                                                                                        width="56"
-                                                                                                        height="56"
+                                                                                                        width={56}
+                                                                                                        height={56}
                                                                                                     />
                                                                                                 )}
                                                                                                 <div className="name">{gcName}</div>

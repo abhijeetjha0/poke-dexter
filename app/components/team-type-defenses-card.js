@@ -24,10 +24,10 @@ export default function TeamTypeDefensesCard({ teamAnalysis, collapsed, setColla
                             <thead>
                                 <tr>
                                     <th className="bg-secondary bg-opacity-25">Type</th>
-                                    <th className="bg-secondary bg-opacity-25" title="Weak (>1x)">2x</th>
                                     <th className="bg-secondary bg-opacity-25" title="Resist (<1x)">1/2x</th>
                                     <th className="bg-secondary bg-opacity-25" title="Immune (0x)">0x</th>
                                     <th className="bg-secondary bg-opacity-25" title="Neutral (1x)">1x</th>
+                                    <th className="bg-secondary bg-opacity-25" title="Weak (>1x)">2x</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -61,10 +61,10 @@ export default function TeamTypeDefensesCard({ teamAnalysis, collapsed, setColla
                                             <td className={isCritical ? 'text-dark' : ''}>
                                                 <TypeBadge type={attackType} />
                                             </td>
-                                            <td>{renderCell(rowData.weak, rowData.weakNames, 'danger')}</td>
                                             <td>{renderCell(rowData.resist, rowData.resistNames, 'success')}</td>
                                             <td>{renderCell(rowData.immune, rowData.immuneNames, 'primary')}</td>
                                             <td>{renderCell(rowData.neutral, rowData.neutralNames, 'secondary')}</td>
+                                            <td>{renderCell(rowData.weak, rowData.weakNames, 'danger')}</td>
                                         </tr>
                                     );
                                 })}

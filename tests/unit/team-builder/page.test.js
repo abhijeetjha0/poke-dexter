@@ -1,9 +1,9 @@
 import { render, screen } from '@testing-library/react';
 import TeamBuilderPage from '../../../app/team-builder/page';
-import { fetchPokemonSpeciesList } from '../../../app/api-requests';
+import { fetchAdvancedSuggestionsGraphQL } from '../../../app/api-requests';
 
 jest.mock('../../../app/api-requests', () => ({
-    fetchPokemonSpeciesList: jest.fn()
+    fetchAdvancedSuggestionsGraphQL: jest.fn()
 }));
 
 jest.mock('../../../app/team-builder/team-builder-client', () => {
@@ -18,10 +18,12 @@ describe('TeamBuilderPage Component', () => {
     });
 
     it('fetches species list and renders the client component with data', async () => {
-        fetchPokemonSpeciesList.mockResolvedValueOnce({
+        fetchAdvancedSuggestionsGraphQL.mockResolvedValueOnce({
             ok: true,
             json: async () => ({
-                results: [{ name: 'bulbasaur' }, { name: 'ivysaur' }]
+                data: {
+                    pokemon_v2_pokemon: [{ name: 'bulbasaur' }, { name: 'ivysaur' }]
+                }
             })
         });
 
@@ -32,8 +34,22 @@ describe('TeamBuilderPage Component', () => {
     });
 
     it('handles failed species list fetch gracefully', async () => {
-        fetchPokemonSpeciesList.mockResolvedValueOnce({
+        fetchAdvancedSuggestionsGraphQL.mockResolvedValueOnce({
             ok: false
+        });
+
+        const jsx = await TeamBuilderPage();
+        render(jsx);
+
+        expect(screen.getByTestId('mock-client')).toHaveTextContent('Client Loaded with 0 species');
+    });
+
+    it('handles unexpected data format gracefully', async () => {
+        fetchAdvancedSuggestionsGraphQL.mockResolvedValueOnce({
+            ok: true,
+            json: async () => ({
+                data: null
+            })
         });
 
         const jsx = await TeamBuilderPage();

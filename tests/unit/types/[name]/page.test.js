@@ -12,9 +12,10 @@ jest.mock('../../../../app/api-requests', () => ({
 }));
 
 jest.mock('../../../../app/pokemons/pokemon-list', () => {
-    return function MockPokemonList({ processedListProp }) {
+    return function MockPokemonList({ processedListProp, sectionTitle }) {
         return (
             <div data-testid="pokemon-grid">
+                {sectionTitle}
                 {processedListProp.length && <span data-testid="mock-img">{processedListProp[0].imageUrl}</span>}
                 {processedListProp.length}
             </div>
@@ -49,5 +50,56 @@ describe('Type Route generateStaticParams', () => {
 
         expect(getByTestId('pokemon-grid')).toHaveTextContent('1');
         expect(getByTestId('mock-img')).toHaveTextContent('https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/1.png');
+    });
+});
+
+import TypePage from '../../../../app/types/[name]/page';
+import { fetchTypeByNameOrId } from '../../../../app/api-requests';
+import { resolvePokemonResource } from '../../../../app/lib/pokemon-utils';
+
+jest.mock('../../../../app/lib/pokemon-utils', () => ({
+    resolvePokemonResource: jest.fn(),
+}));
+
+describe('TypePage Component', () => {
+    beforeEach(() => {
+        jest.clearAllMocks();
+    });
+
+    test('renders not found for failed type fetch', async () => {
+        fetchTypeByNameOrId.mockResolvedValueOnce({ ok: false });
+
+        const jsx = await TypePage({ params: Promise.resolve({ name: 'unknown' }) });
+        const { getByText } = render(jsx);
+
+        expect(getByText('Type "unknown" not found.')).toBeInTheDocument();
+    });
+
+    test('renders empty message when no pokemons', async () => {
+        fetchTypeByNameOrId.mockResolvedValueOnce({
+            ok: true,
+            json: async () => ({ pokemon: [] }),
+        });
+
+        const jsx = await TypePage({ params: Promise.resolve({ name: 'fire' }) });
+        const { getByText } = render(jsx);
+
+        expect(getByText('No Pokémon found for this type.')).toBeInTheDocument();
+    });
+
+    test('renders pokemon list successfully', async () => {
+        fetchTypeByNameOrId.mockResolvedValueOnce({
+            ok: true,
+            json: async () => ({
+                pokemon: [{ pokemon: { name: 'charmander', url: '...' } }],
+            }),
+        });
+
+        resolvePokemonResource.mockResolvedValueOnce({ id: 4, name: 'charmander', imageUrl: 'img' });
+
+        const jsx = await TypePage({ params: Promise.resolve({ name: 'fire' }) });
+        const { getByText } = render(jsx);
+
+        expect(getByText('Type Pokémon')).toBeInTheDocument();
     });
 });

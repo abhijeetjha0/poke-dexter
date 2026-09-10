@@ -15,6 +15,10 @@ describe('GenerationsClient Component', () => {
         
         const grid = container.querySelector('.row');
         expect(grid).toBeInTheDocument();
+
+        const kantoMascot = container.querySelector('img[alt="Kanto mascot"]');
+        expect(kantoMascot).toBeInTheDocument();
+        expect(kantoMascot).toHaveAttribute('loading', 'eager');
     });
 
     test('toggles view mode to list and saves to localStorage', () => {

@@ -59,4 +59,18 @@ describe('HelpPage Component', () => {
         expect(screen.getByText(/No sections matched your search for/i)).toBeInTheDocument();
         expect(screen.queryByText('Team Builder')).not.toBeInTheDocument();
     });
+
+    it('renders sections with anchor IDs and help-section class for proper scroll clearance', () => {
+        const { container } = render(<HelpPage />);
+
+        const sections = container.querySelectorAll('section.help-section');
+        expect(sections.length).toBeGreaterThan(0);
+
+        const expectedIds = ['pokedex', 'pokemon-details', 'team-builder', 'abilities', 'moves', 'items', 'types', 'generations', 'global-search'];
+        expectedIds.forEach(id => {
+            const section = container.querySelector(`section#${id}`);
+            expect(section).toBeInTheDocument();
+            expect(section).toHaveClass('help-section');
+        });
+    });
 });

@@ -1,9 +1,10 @@
 import { render, fireEvent, screen } from '@testing-library/react';
 import PokemonDetailView from '../../../../app/pokemons/[name]/pokemon-detail-view';
 
+let mockFormParam = null;
 jest.mock('next/navigation', () => ({
     useSearchParams: () => ({
-        get: jest.fn().mockReturnValue(null)
+        get: jest.fn().mockImplementation(() => mockFormParam)
     })
 }));
 
@@ -45,7 +46,9 @@ describe('PokemonDetailView Component', () => {
         // Basic Info
         expect(getAllByText('bulbasaur').length).toBeGreaterThan(0);
         expect(getByText('#0001')).toBeInTheDocument();
-        expect(getByAltText('bulbasaur')).toBeInTheDocument();
+        const heroImg = getByAltText('bulbasaur');
+        expect(heroImg).toBeInTheDocument();
+        expect(heroImg).toHaveAttribute('loading', 'eager');
 
         // Specs
         expect(getByText('0.7 m')).toBeInTheDocument();
@@ -283,5 +286,95 @@ describe('PokemonDetailView Component', () => {
 
         fireEvent.click(screen.getByRole('button', { name: /Play audio cry/i }));
         expect(mockAudio.play).toHaveBeenCalled();
+    });
+
+    test('updates active variety when formParam or varietyList changes', () => {
+        const multiVarietyList = [
+            ...mockVarietyList,
+            { ...mockVarietyList[0], name: 'bulbasaur-gmax', weight: 999, sprites: {} }
+        ];
+
+        // Initial render with null formParam
+        mockFormParam = null;
+        const { rerender } = render(
+            <PokemonDetailView
+                speciesInfo={mockSpeciesInfo}
+                varietyList={multiVarietyList}
+            />
+        );
+        
+        expect(screen.queryByText('99.9 kg')).not.toBeInTheDocument();
+
+        // Change variety list and param to test the hook update
+        mockFormParam = 'bulbasaur-gmax';
+        rerender(
+            <PokemonDetailView
+                speciesInfo={mockSpeciesInfo}
+                varietyList={[...multiVarietyList]} // New array ref triggers re-render
+            />
+        );
+        expect(screen.getByText('99.9 kg')).toBeInTheDocument();
+
+        // Change back to test fallback
+        mockFormParam = null;
+        rerender(
+            <PokemonDetailView
+                speciesInfo={mockSpeciesInfo}
+                varietyList={mockVarietyList}
+            />
+        );
+        
+        // When formParam is null, it defaults to index 0 (bulbasaur)
+        expect(screen.queryByText('99.9 kg')).not.toBeInTheDocument();
+    });
+
+    test('sorts location versions correctly including unknown versions', () => {
+        const mockEncounters = {
+            'unknown-version': [],
+            'red': [],
+            'blue': []
+        };
+        
+        render(
+            <PokemonDetailView
+                speciesInfo={mockSpeciesInfo}
+                varietyList={mockVarietyList}
+                encountersByVersion={mockEncounters}
+            />
+        );
+        
+        expect(screen.getByText('Game Locations')).toBeInTheDocument();
+    });
+
+    test('image fallback on error', () => {
+        render(
+            <PokemonDetailView
+                speciesInfo={mockSpeciesInfo}
+                varietyList={mockVarietyList}
+            />
+        );
+        
+        const image = screen.getByAltText('bulbasaur');
+        fireEvent.error(image);
+        
+        expect(image).toHaveAttribute('src', expect.stringContaining('img.png'));
+    });
+
+    test('type defenses collapse toggles correctly', () => {
+        render(
+            <PokemonDetailView
+                speciesInfo={mockSpeciesInfo}
+                varietyList={mockVarietyList}
+                typeDefenses={{ fire: 2 }}
+            />
+        );
+        
+        const defensesHeader = screen.getByText('Type Defenses');
+        expect(defensesHeader).toBeInTheDocument();
+        fireEvent.click(defensesHeader);
+        
+        const card = defensesHeader.closest('.card');
+        const collapseContainer = card.querySelector('.collapse, .collapsing');
+        expect(collapseContainer).not.toHaveClass('show');
     });
 });

@@ -26,3 +26,8 @@ This document guides AI Coding Assistants writing, running, and maintaining unit
 5. **Silencing Expected Errors**:
    - When writing test cases that intentionally simulate errors (like failed API responses or invalid inputs) to test error handling logic, you MUST suppress the expected `console.error` logs.
    - Use `const consoleSpy = jest.spyOn(console, 'error').mockImplementation(() => {});` before the action, and `consoleSpy.mockRestore();` after the assertion, to prevent intentional error logs from polluting the clean test output.
+6. **Mocking Server Components**:
+   - When mocking React components that accept text props or children required by query matchers (e.g., `getByText`), always explicitly render those props/children in the mock structure. For example, render `{sectionTitle}` within your `<MockComponent />` rather than discarding it, to prevent false-negative "Unable to find element with text" test failures.
+
+7. **Mocking Promise.all Dependencies**:
+   - When testing functions or Server Components that dispatch multiple asynchronous operations concurrently (via `Promise.all` or `limitConcurrency`), ensure ALL external dependencies in the batch are explicitly mocked to resolve or reject based on the test scenario. If a single un-mocked or improperly mocked function implicitly rejects, it will fail the entire `Promise.all` chain, bypassing subsequent branch logic you might be attempting to cover.

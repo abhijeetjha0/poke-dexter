@@ -67,16 +67,12 @@
   gap: 0.5rem;
 
   .mascot-img-bulba {
-    width: 150px;
-    height: 150px;
     object-fit: contain;
     animation: float-pokemon 4s ease-in-out infinite;
     z-index: 2;
   }
 
   .mascot-img-chari {
-    width: 220px;
-    height: 220px;
     object-fit: contain;
     animation: float-pokemon 4s ease-in-out infinite reverse;
     animation-delay: 0.5s;

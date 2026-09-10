@@ -29,5 +29,9 @@ Use this skill whenever asked to run test cases, analyze coverage, and write mor
 5. **Strict Verification**:
    - **Zero Test Failures**: Ensure that **NO TESTS FAIL** before declaring the coverage enhancement successful. If tests are failing after adding coverage or making changes, you MUST fix the failing tests.
    - **Clean Console**: Check the test output for `console.error` or `console.warn` logs and resolve them by either fixing the underlying issue or mocking the console correctly.
-6. **Reporting**:
+6. **Mocking Server Components & Text Props**:
+   - When mocking React components that accept text props or children required by query matchers (e.g., `getByText`), explicitly render those props/children in the mock structure (e.g. `{sectionTitle}`) rather than discarding them, preventing false-negative "Unable to find element with text" test failures.
+7. **Mocking Promise.all Dependencies**:
+   - When testing functions or Server Components that dispatch multiple asynchronous operations concurrently (via `Promise.all` or `limitConcurrency`), ensure ALL external dependencies in the batch are explicitly mocked. If a single un-mocked function implicitly rejects, it will fail the entire `Promise.all` chain, bypassing subsequent branch logic you might be attempting to cover.
+8. **Reporting**:
    - After successfully raising the coverage, summarize the gaps that were filled and present the final coverage metrics to the user. For this execute `npm test` again and compare the difference you have made. Say earlier it was X% and now it is Y% and you have contributed in increasing the coverage by Z%.

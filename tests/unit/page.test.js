@@ -10,6 +10,12 @@ describe('HomePage Component', () => {
         const bulbasaur = getByAltText('Bulbasaur Mascot');
         expect(bulbasaur).toBeInTheDocument();
         expect(bulbasaur.getAttribute('src')).toContain('1.png');
+        expect(bulbasaur).toHaveAttribute('loading', 'eager');
+
+        const charizard = getByAltText('Charizard Mascot');
+        expect(charizard).toBeInTheDocument();
+        expect(charizard.getAttribute('src')).toContain('6.png');
+        expect(charizard).toHaveAttribute('loading', 'eager');
 
         const exploreBtn = getByRole('link', { name: /Open PokeDex/i });
         expect(exploreBtn).toBeInTheDocument();

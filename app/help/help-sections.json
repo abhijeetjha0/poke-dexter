@@ -154,7 +154,7 @@
         "steps": [
           "Navigate to the Team Builder page.",
           "Click the \"Add Pokémon\" button.",
-          "A 'Select Pokémon' Modal will open with a search bar.",
+          "A 'Select Pokémon' Modal will open with a search bar. The list will display Pokémon species along with their typing and Base Stat Total (BST).",
           "Type the name of a Pokémon in the search bar and select it from the results to add it to your squad (up to 6)."
         ]
       },

@@ -1,6 +1,6 @@
 import { Suspense } from 'react';
 import TeamBuilderClient from './team-builder-client';
-import { fetchPokemonSpeciesList } from '../api-requests';
+import { fetchAdvancedSuggestionsGraphQL } from '../api-requests';
 
 export const metadata = {
     title: 'Team Builder (Beta)',
@@ -8,12 +8,12 @@ export const metadata = {
 };
 
 export default async function TeamBuilderPage() {
-    const response = await fetchPokemonSpeciesList(2000);
+    const response = await fetchAdvancedSuggestionsGraphQL({ includeLegendaries: true });
     let speciesList = [];
 
     if (response.ok) {
         const data = await response.json();
-        speciesList = data.results || [];
+        speciesList = data.data?.pokemon_v2_pokemon || [];
     }
 
     return (
