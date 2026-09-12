@@ -32,7 +32,7 @@ describe('PokemonCard', () => {
 
         const img = screen.getByAltText('pikachu');
         expect(img).toBeInTheDocument();
-        expect(img).toHaveAttribute('src', 'https://example.com/pikachu.png');
+        expect(img.getAttribute('src')).toContain(encodeURIComponent('https://example.com/pikachu.png'));
     });
 
     it('renders within a link when href is provided', () => {

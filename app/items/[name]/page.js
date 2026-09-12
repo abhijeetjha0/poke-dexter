@@ -91,5 +91,5 @@ export default async function ItemDetailPage({ params }) {
 }
 
 export async function generateStaticParams() {
-    return generateCommonStaticParams(fetchItemList);
+    return generateCommonStaticParams(fetchItemList, 25, "items");
 }

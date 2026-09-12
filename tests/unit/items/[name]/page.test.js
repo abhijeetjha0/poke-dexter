@@ -88,6 +88,6 @@ describe('ItemDetailPage', () => {
         
         const params = await generateStaticParams();
         expect(params).toEqual([{ name: 'potion' }]);
-        expect(staticParamsUtil.generateCommonStaticParams).toHaveBeenCalledWith(apiRequests.fetchItemList);
+        expect(staticParamsUtil.generateCommonStaticParams).toHaveBeenCalledWith(apiRequests.fetchItemList, 25, 'items');
     });
 });

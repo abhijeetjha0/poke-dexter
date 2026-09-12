@@ -28,7 +28,7 @@ app/
 
 ## 📌 Rules for `app/` Codebase
 
-1. **Static Export Compatibility**: The project uses Next.js static HTML export (`output: 'export'` in `next.config.js`). Avoid using dynamic server runtime features incompatible with static exports.
+1. **Vercel Dynamic Deployment & ISR**: The application is deployed dynamically to Vercel (without `output: 'export'`). Dynamic routes (`[name]`) utilize Next.js server components, on-demand dynamic rendering, and Incremental Static Regeneration (ISR). Initial top items are pre-rendered via `generateStaticParams` for fast builds while `dynamicParams = true` handles remaining entities on-demand without 404s.
 2. **Client Component Directives**: Declare `'use client';` at the top of client-side interactive modules (e.g. search bars, pagination controls, client grid wrappers).
 3. **Routing & Parameter Handling**: Use standard Next.js App Router directory conventions (`[name]` dynamic route parameters, `React.use()` for dynamic params where required).
 4. **Style Separation**: Keep custom styles organized under `app/styles/` with SCSS modules/partials (`_listings.scss`, `_details.scss`, `_components.scss`) imported into `global.scss`.

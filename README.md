@@ -1,5 +1,5 @@
 <p align="right">
-  <a href="https://abhijeetjha0.github.io/poke-dexter/">
+  <a href="https://poke-dexter-abhijeetjha0.vercel.app">
     <img src="https://img.shields.io/badge/🌐_Visit_PokeDexter-Live_App-ff5350?style=for-the-badge" alt="Visit Live App" />
   </a>
 </p>
@@ -10,7 +10,6 @@ PokeDexter is a feature-rich, cross-platform application designed to be the defi
 
 We harness the power of the incredible [PokéAPI](https://pokeapi.co/) to deliver deep, interactive data about over 1,000 Pokémon species, moves, items, and more. 
 
-[![Deploy Status](https://github.com/abhijeetjha0/poke-dexter/actions/workflows/deploy.yml/badge.svg)](https://github.com/abhijeetjha0/poke-dexter/actions/workflows/deploy.yml)
 [![Code Coverage](https://abhijeetjha0.github.io/poke-dexter/coverage/badge.svg)](https://abhijeetjha0.github.io/poke-dexter/coverage/)
 
 **Collaborators**: [Abhijit Kumar Jha](https://github.com/abhijeetjha0) and [Kanishk Tanwar](https://github.com/kanishktanwar).
@@ -136,30 +135,27 @@ npm run lint-style-fix    # Automatically fix SCSS styling issues.
 
 ### Testing Production Locally
 
-Because the application is configured for GitHub Pages deployment, we must simulate the production environment to test the exact build output locally. The following steps ensure you see the content exactly as it will appear on GitHub Pages:
+PokeDexter is configured as a dynamic Next.js application optimized for Vercel deployment. To verify the production build locally:
 
-1. **Build the Static Site**: Compiles the Next.js application into static HTML files within the `./out` directory.
+1. **Build the Application**: Compiles the optimized Next.js production bundle into `.next`.
    ```bash
    npm run build
    ```
-2. **Serve the Static Export**: Runs a local server over the static output folder.
+2. **Start the Production Server**: Launches the Next.js production server.
    ```bash
-   npx serve out
+   npm run start
    ```
-3. **View the Site**: Open your browser and navigate to the specific subpath:
+3. **View the Site**: Open your browser and navigate to root:
    ```url
-   http://localhost:3000/poke-dexter
+   http://localhost:3000
    ```
 
-### CI/CD Pipeline
+### Deployment Strategy via Vercel
 
-The deployment process is fully automated via GitHub Actions, ensuring continuous delivery and reliability:
+The application follows a dual-track transition model:
 
-**Workflow**: [`.github/workflows/deploy.yml`](.github/workflows/deploy.yml)
+* **Vercel Deployment (`vercel` branch)**: The primary deployment target is hosted on Vercel from the `vercel` branch via native Git Integration. Every push to the `vercel` branch automatically triggers an optimized Next.js production build (`npm run build`) with dynamic on-demand ISR rendering, edge caching, and image optimization at [`https://poke-dexter-abhijeetjha0.vercel.app`](https://poke-dexter-abhijeetjha0.vercel.app).
+* **GitHub Pages (`main` branch)**: The legacy static export build remains configured on the `main` branch until the `vercel` branch is merged into `main`.
 
-**Pipeline Steps:**
-1. **Setup & Setup**: Restores code and configures the environment using `.nvmrc` for Node.js setup and npm caching.
-2. **Dependency Installation**: Installs project dependencies via `npm ci`.
-3. **Testing**: Executes the mandatory unit test suite (`npm test`).
-4. **Static Site Build**: Compiles Next.js static export to `./out`. 
-5. **Deployment**: Deploys the compiled static files (`./out`) directly to GitHub Pages at: [`https://abhijeetjha0.github.io/poke-dexter/`](https://abhijeetjha0.github.io/poke-dexter/).
+
+

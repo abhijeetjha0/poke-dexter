@@ -11,8 +11,6 @@ Subdirectory-specific guidelines are maintained in modular `AGENTS.md` files thr
 ```
 .
 ├── .agents/                 # Workspace Agent skills (.agents/skills/generate-pr/SKILL.md)
-├── .github/                 # GitHub workflows and CI/CD AGENTS.md
-│   └── workflows/           # Deployment pipeline configuration (deploy.yml)
 ├── .gitignore               # Git ignore pattern rules
 ├── .next/                   # Next.js build output cache (ignored)
 ├── .nvmrc                   # Target Node.js engine version declaration
@@ -39,10 +37,11 @@ Subdirectory-specific guidelines are maintained in modular `AGENTS.md` files thr
 ├── tests/                   # Jest unit testing suite & tests AGENTS.md
 ├── eslint.config.mjs        # ESLint 9 flat configuration
 ├── jest.config.js           # Jest test runner settings
-├── next.config.js           # Next.js static export, basePath, and SCSS configuration
+├── next.config.js           # Next.js Vercel build and SCSS configuration
 ├── package.json             # Dependencies, scripts, and engine boundaries
 ├── package-lock.json        # Locked dependency manifest
 ├── setupTests.js            # Testing environment initialization
+├── vercel.json              # Vercel project configuration
 ├── AGENTS.md                # Master agent instruction & tooling registry
 └── README.md                # Developer documentation & project presentation
 ```
@@ -54,7 +53,7 @@ Subdirectory-specific guidelines are maintained in modular `AGENTS.md` files thr
 | Command | Action | Description |
 | :--- | :--- | :--- |
 | `npm run dev` | Dev Server | Launches Next.js local development server. |
-| `npm run build` | Production Build | Executes Next.js static export build (`next build`). Output placed in `/out`. |
+| `npm run build` | Production Build | Executes Next.js production build (`next build`). Output placed in `.next`. |
 | `npm run start` | Production Server | Starts Next.js production server. |
 | `npm run test` | Unit Tests | Executes Jest unit test suite (`jest`). |
 | `npm run test-filter` | Filtered Test | Executes Jest unit tests matching a pattern (`jest -t`). |
@@ -77,14 +76,15 @@ Subdirectory-specific guidelines are maintained in modular `AGENTS.md` files thr
 6. **Documentation Relative File Links**: File links in documentation files (`README.md`, `AGENTS.md`) MUST use repository-relative paths starting with `./` (e.g., `./app/page.js`). For dynamic route paths containing square brackets (`[name]`), brackets in the link target URL MUST be URL-encoded as `%5B` and `%5D` (e.g., `./app/pokemons/%5Bname%5D/page.js`) to guarantee clickability across markdown parsers.
 7. **No Inline Styles & No Disabled Lint Rules**: NEVER use inline `style={{ ... }}` attributes or `eslint-disable` / `stylelint-disable` comments in application code. All layout, color, and dynamic sizing styles MUST be maintained strictly within SCSS stylesheets (`app/styles/`) using semantic CSS classes or SCSS generators.
 8. **UI Manual Sync Requirement**: Whenever adding, removing, or updating a UI feature, agents MUST automatically update the `app/help/page.js` manual to reflect the changes to keep the project manual accurate and in-sync. The manual must use semantic `<section id="...">` hierarchy without page headers, and maintain anchor IDs to support the global floating help button.
+9. **Deployment Strategy**: The application deploys to Vercel dynamically from the `vercel` branch. The legacy static GitHub Pages deployment remains on `main` until the `vercel` branch is merged into `main`.
 
-> **Note**: Subdirectory-specific guidelines (React component patterns, SCSS style structure, App Router conventions, PR description generation skill, and GitHub Actions workflows) are maintained directly within their respective modular files:
-> - [.agents/skills/browser-automation-test/SKILL.md](.agents/skills/browser-automation-test/SKILL.md)
-> - [.agents/skills/generate-pr/SKILL.md](.agents/skills/generate-pr/SKILL.md)
-> - [.github/AGENTS.md](.github/AGENTS.md)
-> - [app/AGENTS.md](app/AGENTS.md)
-> - [app/api-requests/AGENTS.md](app/api-requests/AGENTS.md)
-> - [app/components/AGENTS.md](app/components/AGENTS.md)
-> - [app/pokemons/AGENTS.md](app/pokemons/AGENTS.md)
-> - [app/styles/AGENTS.md](app/styles/AGENTS.md)
-> - [tests/AGENTS.md](tests/AGENTS.md)
+> **Note**: Subdirectory-specific guidelines (React component patterns, SCSS style structure, App Router conventions, and PR description generation skill) are maintained directly within their respective modular files:
+> - [./.agents/skills/browser-automation-test/SKILL.md](./.agents/skills/browser-automation-test/SKILL.md)
+> - [./.agents/skills/generate-pr/SKILL.md](./.agents/skills/generate-pr/SKILL.md)
+> - [./app/AGENTS.md](./app/AGENTS.md)
+> - [./app/api-requests/AGENTS.md](./app/api-requests/AGENTS.md)
+> - [./app/components/AGENTS.md](./app/components/AGENTS.md)
+> - [./app/pokemons/AGENTS.md](./app/pokemons/AGENTS.md)
+> - [./app/styles/AGENTS.md](./app/styles/AGENTS.md)
+> - [./tests/AGENTS.md](./tests/AGENTS.md)
+

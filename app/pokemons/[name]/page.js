@@ -269,5 +269,5 @@ export default async function Page({ params }) {
 }
 
 export async function generateStaticParams() {
-    return generateCommonStaticParams(fetchPokemonSpeciesList, 2000, "pokemons");
+    return generateCommonStaticParams(fetchPokemonSpeciesList, 151, "pokemons");
 }

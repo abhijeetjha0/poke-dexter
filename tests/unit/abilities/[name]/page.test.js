@@ -1,12 +1,15 @@
 import { render } from '@testing-library/react';
-import AbilityDetailPage from '../../../../app/abilities/[name]/page';
-import { fetchAbilityByNameOrId } from '../../../../app/api-requests';
+import AbilityDetailPage, { generateStaticParams } from '../../../../app/abilities/[name]/page';
+import { fetchAbilityByNameOrId, fetchAbilityList } from '../../../../app/api-requests';
+import * as staticParamsUtil from '../../../../app/lib/static-params-util';
 
 jest.mock('../../../../app/api-requests', () => ({
     fetchAbilityByNameOrId: jest.fn(),
     fetchPokemonByUrl: jest.fn(),
     fetchAbilityList: jest.fn()
 }));
+
+jest.mock('../../../../app/lib/static-params-util');
 
 jest.mock('../../../../app/pokemons/pokemon-list', () => {
     return function MockPokemonList({ processedListProp }) {
@@ -55,5 +58,12 @@ describe('AbilityDetailPage (Server Component)', () => {
         const { getByText } = render(Page);
 
         expect(getByText('Ability "unknown" not found.')).toBeInTheDocument();
+    });
+
+    test('generateStaticParams calls generateCommonStaticParams with fetchAbilityList and limit 25', async () => {
+        staticParamsUtil.generateCommonStaticParams.mockResolvedValue([{ name: 'overgrow' }]);
+        const params = await generateStaticParams();
+        expect(params).toEqual([{ name: 'overgrow' }]);
+        expect(staticParamsUtil.generateCommonStaticParams).toHaveBeenCalledWith(fetchAbilityList, 25, 'abilities');
     });
 });
