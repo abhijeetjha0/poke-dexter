@@ -1,14 +1,16 @@
-const isProd = process.env.NODE_ENV === 'production';
-
 const nextConfig = {
-  output: 'export',
-  basePath: isProd ? '/poke-dexter' : '',
-  images: {
-    unoptimized: true,
-  },
-  sassOptions: {
-    implementation: 'sass-embedded',
-  },
-}
+    images: {
+        remotePatterns: [
+            {
+                protocol: 'https',
+                hostname: 'raw.githubusercontent.com',
+                pathname: '/**',
+            },
+        ],
+    },
+    sassOptions: {
+        implementation: 'sass-embedded',
+    },
+};
 
-module.exports = nextConfig
+module.exports = nextConfig;

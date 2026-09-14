@@ -1,12 +1,15 @@
 import { render } from '@testing-library/react';
-import MoveDetailPage from '../../../../app/moves/[name]/page';
-import { fetchMoveByNameOrId } from '../../../../app/api-requests';
+import MoveDetailPage, { generateStaticParams } from '../../../../app/moves/[name]/page';
+import { fetchMoveByNameOrId, fetchMoveList } from '../../../../app/api-requests';
+import * as staticParamsUtil from '../../../../app/lib/static-params-util';
 
 jest.mock('../../../../app/api-requests', () => ({
     fetchMoveByNameOrId: jest.fn(),
     fetchPokemonByUrl: jest.fn(),
     fetchMoveList: jest.fn()
 }));
+
+jest.mock('../../../../app/lib/static-params-util');
 
 jest.mock('../../../../app/pokemons/pokemon-list', () => {
     return function MockPokemonList({ processedListProp }) {
@@ -66,5 +69,12 @@ describe('MoveDetailPage (Server Component)', () => {
         const { getByText } = render(Page);
 
         expect(getByText('Move "unknown" not found.')).toBeInTheDocument();
+    });
+
+    test('generateStaticParams calls generateCommonStaticParams with fetchMoveList and limit 50', async () => {
+        staticParamsUtil.generateCommonStaticParams.mockResolvedValue([{ name: 'tackle' }]);
+        const params = await generateStaticParams();
+        expect(params).toEqual([{ name: 'tackle' }]);
+        expect(staticParamsUtil.generateCommonStaticParams).toHaveBeenCalledWith(fetchMoveList, 50, 'moves');
     });
 });

@@ -77,5 +77,5 @@ export default async function AbilityDetailPage({ params }) {
 }
 
 export async function generateStaticParams() {
-    return generateCommonStaticParams(fetchAbilityList, 500, "abilities");
+    return generateCommonStaticParams(fetchAbilityList, 25, "abilities");
 }

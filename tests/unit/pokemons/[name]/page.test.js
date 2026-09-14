@@ -1,7 +1,8 @@
 import { render } from '@testing-library/react';
-import PokemonPage from '../../../../app/pokemons/[name]/page';
+import PokemonPage, { generateStaticParams } from '../../../../app/pokemons/[name]/page';
 import * as api from '../../../../app/api-requests';
 import * as moveUtils from '../../../../app/lib/move-type-utils';
+import * as staticParamsUtil from '../../../../app/lib/static-params-util';
 
 jest.mock('../../../../app/api-requests', () => ({
     fetchPokemonSpecies: jest.fn(),
@@ -12,6 +13,8 @@ jest.mock('../../../../app/api-requests', () => ({
     fetchPokemonSpeciesList: jest.fn(),
     fetchEvolutionChainByUrl: jest.fn()
 }));
+
+jest.mock('../../../../app/lib/static-params-util');
 
 jest.mock('../../../../app/lib/move-type-utils', () => ({
     buildMoveMetaMaps: jest.fn()
@@ -142,5 +145,12 @@ describe('PokemonDetailPage (Server Component)', () => {
         const Page = await PokemonPage({ params: { name: 'mew' } });
         render(Page);
         expect(api.fetchEvolutionChainByUrl).toHaveBeenCalledWith('error-url', expect.anything());
+    });
+
+    test('generateStaticParams calls generateCommonStaticParams with fetchPokemonSpeciesList and limit 151', async () => {
+        staticParamsUtil.generateCommonStaticParams.mockResolvedValue([{ name: 'bulbasaur' }]);
+        const params = await generateStaticParams();
+        expect(params).toEqual([{ name: 'bulbasaur' }]);
+        expect(staticParamsUtil.generateCommonStaticParams).toHaveBeenCalledWith(api.fetchPokemonSpeciesList, 151, 'pokemons');
     });
 });

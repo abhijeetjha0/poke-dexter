@@ -98,5 +98,5 @@ export default async function MoveDetailPage({ params }) {
 }
 
 export async function generateStaticParams() {
-    return generateCommonStaticParams(fetchMoveList, 1000, "moves");
+    return generateCommonStaticParams(fetchMoveList, 50, "moves");
 }

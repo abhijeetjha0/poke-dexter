@@ -1,7 +1,7 @@
 {
   "name": "pokemon",
   "private": true,
-  "homepage": "https://abhijeetjha0.github.io/poke-dexter/",
+  "homepage": "https://poke-dexter-abhijeetjha0.vercel.app",
   "version": "1.0.1",
   "description": "Poke Dexter is a Pokemon Information Cross Platform Application.",
   "main": "script.js",
