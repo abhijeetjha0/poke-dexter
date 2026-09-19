@@ -1,6 +1,7 @@
 import Link from 'next/link';
 import Image from 'next/image';
 import { getPokemonImageUrl } from './lib/pokemon-utils';
+import PwaInstallButton from './components/pwa-install-button';
 
 export default function HomePage() {
     return (
@@ -19,6 +20,7 @@ export default function HomePage() {
                     <Link href="/pokemons" className="btn btn-success btn-explore" id="home-explore-btn">
                         Open PokeDex
                     </Link>
+                    <PwaInstallButton />
                 </div>
             </div>
             <div className="hero-artwork">

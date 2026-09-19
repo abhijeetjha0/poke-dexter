@@ -1,8 +1,14 @@
 import { render } from '@testing-library/react';
 import HomePage from '../../app/page';
 
+jest.mock('next/navigation', () => ({
+    useRouter: () => ({
+        push: jest.fn(),
+    }),
+}));
+
 describe('HomePage Component', () => {
-    test('renders hero text and mascot images', () => {
+    test('renders hero text, mascot images, and action buttons', () => {
         const { getByText, getByAltText, getByRole } = render(<HomePage />);
 
         expect(getByText(/Poke Dexter is a Pokemon Information/)).toBeInTheDocument();
@@ -20,5 +26,9 @@ describe('HomePage Component', () => {
         const exploreBtn = getByRole('link', { name: /Open PokeDex/i });
         expect(exploreBtn).toBeInTheDocument();
         expect(exploreBtn.getAttribute('href')).toBe('/pokemons');
+
+        const installBtn = getByRole('link', { name: /Install PokeDexter App/i });
+        expect(installBtn).toBeInTheDocument();
+        expect(installBtn).toHaveTextContent('Install App');
     });
 });
