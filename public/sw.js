@@ -73,9 +73,9 @@ self.addEventListener('fetch', (event) => {
     }
 
     // 2. PokéAPI requests & Pokémon sprite images (Option B: cache-as-you-browse)
-    const isPokeApi = url.hostname.includes('pokeapi.co');
+    const isPokeApi = url.hostname === 'pokeapi.co' || url.hostname.endsWith('.pokeapi.co');
     const isPokemonImage =
-        url.hostname.includes('raw.githubusercontent.com') ||
+        url.hostname === 'raw.githubusercontent.com' ||
         (url.pathname.match(/\.(png|jpg|jpeg|svg|webp)$/i) && !url.pathname.startsWith('/_next'));
 
     if (isPokeApi || isPokemonImage) {
@@ -129,7 +129,7 @@ self.addEventListener('fetch', (event) => {
                 if (
                     networkResponse &&
                     networkResponse.status === 200 &&
-                    (url.origin === self.location.origin || url.hostname.includes('fonts.gstatic.com'))
+                    (url.origin === self.location.origin || url.hostname === 'fonts.gstatic.com')
                 ) {
                     const responseToCache = networkResponse.clone();
                     caches.open(STATIC_CACHE).then((cache) => {
