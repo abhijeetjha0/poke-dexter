@@ -13,7 +13,7 @@ Subdirectory-specific guidelines are maintained in modular `AGENTS.md` files thr
 ├── .agents/                 # Workspace Agent skills (.agents/skills/generate-pr/SKILL.md)
 ├── .github/                 # GitHub configuration
 │   └── workflows/           # GitHub Actions CI/CD workflows
-│       └── coverage-badge.yml  # Auto-generates & publishes coverage badge to GitHub Pages
+│       └── coverage-badge.yml  # Generates coverage badge & deploys GitHub Pages via Actions
 ├── .gitignore               # Git ignore pattern rules
 ├── .next/                   # Next.js build output cache (ignored)
 ├── .nvmrc                   # Target Node.js engine version declaration
@@ -36,6 +36,7 @@ Subdirectory-specific guidelines are maintained in modular `AGENTS.md` files thr
 │   └── page.js              # Home landing page route
 ├── coverage/                # Generated Jest test coverage reports & metrics
 ├── node_modules/            # Installed npm dependencies
+├── docs/                    # GitHub Pages static landing page (index.html)
 ├── scripts/                 # Automation scripts (generate-coverage-badge.sh)
 ├── tests/                   # Jest unit testing suite & tests AGENTS.md
 ├── eslint.config.mjs        # ESLint 9 flat configuration

@@ -1,16 +1,26 @@
-name: Coverage Badge
+name: Coverage Badge & GitHub Pages
 
 on:
   push:
     branches:
       - main
 
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
 jobs:
-  coverage-badge:
-    name: Generate & Publish Coverage Badge
+  deploy:
+    name: Generate Coverage & Deploy Pages
     runs-on: ubuntu-latest
-    permissions:
-      contents: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
 
     steps:
       - name: Checkout repository
@@ -31,10 +41,20 @@ jobs:
       - name: Generate coverage badge
         run: bash scripts/generate-coverage-badge.sh
 
-      - name: Deploy badge to GitHub Pages
-        uses: peaceiris/actions-gh-pages@v4
+      - name: Assemble Pages content
+        run: |
+          mkdir -p _site/coverage
+          cp docs/index.html _site/
+          cp -r coverage/lcov-report/* _site/coverage/
+
+      - name: Configure Pages
+        uses: actions/configure-pages@v5
+
+      - name: Upload Pages artifact
+        uses: actions/upload-pages-artifact@v3
         with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: ./coverage/lcov-report
-          destination_dir: coverage
-          keep_files: true
+          path: _site
+
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
