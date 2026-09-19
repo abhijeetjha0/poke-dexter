@@ -11,6 +11,9 @@ Subdirectory-specific guidelines are maintained in modular `AGENTS.md` files thr
 ```
 .
 ├── .agents/                 # Workspace Agent skills (.agents/skills/generate-pr/SKILL.md)
+├── .github/                 # GitHub configuration
+│   └── workflows/           # GitHub Actions CI/CD workflows
+│       └── coverage-badge.yml  # Auto-generates & publishes coverage badge to GitHub Pages
 ├── .gitignore               # Git ignore pattern rules
 ├── .next/                   # Next.js build output cache (ignored)
 ├── .nvmrc                   # Target Node.js engine version declaration
@@ -37,6 +40,7 @@ Subdirectory-specific guidelines are maintained in modular `AGENTS.md` files thr
 ├── tests/                   # Jest unit testing suite & tests AGENTS.md
 ├── eslint.config.mjs        # ESLint 9 flat configuration
 ├── jest.config.js           # Jest test runner settings
+├── LICENSE                  # MIT License
 ├── next.config.js           # Next.js Vercel build and SCSS configuration
 ├── package.json             # Dependencies, scripts, and engine boundaries
 ├── package-lock.json        # Locked dependency manifest
@@ -58,6 +62,7 @@ Subdirectory-specific guidelines are maintained in modular `AGENTS.md` files thr
 | `npm run test` | Unit Tests | Executes Jest unit test suite (`jest`). |
 | `npm run test-filter` | Filtered Test | Executes Jest unit tests matching a pattern (`jest -t`). |
 | `npm run test:watch` | Test Watcher | Launches Jest interactive test runner in watch mode. |
+| `npm run coverage-badge` | Coverage Badge | Generates `coverage/lcov-report/badge.svg` from `coverage/coverage-summary.json`. Run after `npm test`. |
 | `npm run lint` | Code Quality | Runs ESLint across JavaScript and JSX files (`eslint .`). |
 | `npm run lint-fix` | Lint Auto-Fix | Runs ESLint with automatic fixes (`eslint . --fix`). |
 | `npm run lint-style` | SCSS Linting | Runs Stylelint across all SCSS files (`stylelint '**/*.scss'`). |
@@ -76,7 +81,7 @@ Subdirectory-specific guidelines are maintained in modular `AGENTS.md` files thr
 6. **Documentation Relative File Links**: File links in documentation files (`README.md`, `AGENTS.md`) MUST use repository-relative paths starting with `./` (e.g., `./app/page.js`). For dynamic route paths containing square brackets (`[name]`), brackets in the link target URL MUST be URL-encoded as `%5B` and `%5D` (e.g., `./app/pokemons/%5Bname%5D/page.js`) to guarantee clickability across markdown parsers.
 7. **No Inline Styles & No Disabled Lint Rules**: NEVER use inline `style={{ ... }}` attributes or `eslint-disable` / `stylelint-disable` comments in application code. All layout, color, and dynamic sizing styles MUST be maintained strictly within SCSS stylesheets (`app/styles/`) using semantic CSS classes or SCSS generators.
 8. **UI Manual Sync Requirement**: Whenever adding, removing, or updating a UI feature, agents MUST automatically update the `app/help/page.js` manual to reflect the changes to keep the project manual accurate and in-sync. The manual must use semantic `<section id="...">` hierarchy without page headers, and maintain anchor IDs to support the global floating help button.
-9. **Deployment Strategy**: The application deploys to Vercel dynamically from the `vercel` branch. The legacy static GitHub Pages deployment remains on `main` until the `vercel` branch is merged into `main`.
+9. **Deployment Strategy**: The application deploys to Vercel from the `main` branch. The `main` branch is the production branch mapping to the primary domain. Every push to `main` triggers the live Vercel deployment.
 
 > **Note**: Subdirectory-specific guidelines (React component patterns, SCSS style structure, App Router conventions, and PR description generation skill) are maintained directly within their respective modular files:
 > - [./.agents/skills/browser-automation-test/SKILL.md](./.agents/skills/browser-automation-test/SKILL.md)

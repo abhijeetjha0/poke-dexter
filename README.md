@@ -11,6 +11,8 @@ PokeDexter is a feature-rich, cross-platform application designed to be the defi
 We harness the power of the incredible [PokéAPI](https://pokeapi.co/) to deliver deep, interactive data about over 1,000 Pokémon species, moves, items, and more. 
 
 [![Code Coverage](https://abhijeetjha0.github.io/poke-dexter/coverage/badge.svg)](https://abhijeetjha0.github.io/poke-dexter/coverage/)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](./LICENSE)
+[![Vercel](https://img.shields.io/github/deployments/abhijeetjha0/poke-dexter/production?label=Vercel&logo=vercel)](https://poke-dexter-abhijeetjha0.vercel.app)
 
 **Collaborators**: [Abhijit Kumar Jha](https://github.com/abhijeetjha0) and [Kanishk Tanwar](https://github.com/kanishktanwar).
 
@@ -152,10 +154,6 @@ PokeDexter is configured as a dynamic Next.js application optimized for Vercel d
 
 ### Deployment Strategy via Vercel
 
-The application follows a dual-track transition model:
+The application deploys to Vercel from the `main` branch:
 
-* **Vercel Deployment (`vercel` branch)**: The primary deployment target is hosted on Vercel from the `vercel` branch via native Git Integration. Every push to the `vercel` branch automatically triggers an optimized Next.js production build (`npm run build`) with dynamic on-demand ISR rendering, edge caching, and image optimization at [`https://poke-dexter-abhijeetjha0.vercel.app`](https://poke-dexter-abhijeetjha0.vercel.app).
-* **GitHub Pages (`main` branch)**: The legacy static export build remains configured on the `main` branch until the `vercel` branch is merged into `main`.
-
-
-
+* **Production — `main` branch**: The primary deployment target hosted on Vercel via native Git Integration. Every push to `main` automatically triggers an optimized Next.js production build with dynamic ISR rendering, edge caching, and image optimization. Live at [`https://poke-dexter-abhijeetjha0.vercel.app`](https://poke-dexter-abhijeetjha0.vercel.app).

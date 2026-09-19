@@ -7,9 +7,10 @@
   "main": "script.js",
   "scripts": {
     "build": "next build",
-    "clean": "rm -rf .next && rm -rf node_modules",
-    "dev": "next dev",
     "check-duplicate": "jscpd",
+    "clean": "rm -rf .next && rm -rf node_modules",
+    "coverage-badge": "bash scripts/generate-coverage-badge.sh",
+    "dev": "next dev",
     "lint": "eslint .",
     "lint-fix": "eslint . --fix",
     "lint-style": "stylelint '**/*.scss' --ignore-path .gitignore",
