@@ -7,7 +7,7 @@ This document specifies rules and standards for AI Coding Assistants creating or
 ## 🧩 Component Guidelines
 
 1. **Separation of Concerns**:
-   - UI components (`navbar.js`, `pokemon-grid.js`, `damage-class-icon.js`, `base-stats-card.js`, `type-badge.js`, `count-badge.js`, `app-pagination.js`) must focus on UI presentation and user interactions.
+   - UI components (`navbar.js`, `pokemon-grid.js`, `damage-class-icon.js`, `base-stats-card.js`, `type-badge.js`, `count-badge.js`, `app-pagination.js`, `pwa-install-button.js`, `service-worker-registration.js`) must focus on UI presentation and user interactions.
    - Place data transformations, type effectiveness calculations, and PokéAPI formatting helpers inside `app/lib/`.
 2. **Performance & Key Stability**:
    - Always use unique, data-driven keys (e.g. Pokémon IDs, move names, ability slugs) derived from dataset models when rendering lists. Avoid raw array indices as React keys.

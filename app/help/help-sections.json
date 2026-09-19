@@ -463,5 +463,52 @@
         ]
       }
     ]
+  },
+  {
+    "id": "pwa-install",
+    "icon": "install_mobile",
+    "iconClass": "text-danger",
+    "title": "Install App & Offline Mode",
+    "description": "PokeDexter is a Progressive Web App (PWA). You can install it on your mobile device or desktop computer for an immersive fullscreen experience and offline browsing.",
+    "points": [
+      {
+        "label": "Installing on Chromium Browsers & Android",
+        "text": "Chromium-based browsers (Google Chrome, Microsoft Edge, Brave, Opera, Vivaldi) and Android browsers provide native app installation directly from the address bar or via our homepage \"Install App\" button.",
+        "steps": [
+          "Click the \"Install App\" button on the homepage, or click the Install icon in your browser address bar.",
+          "Confirm the installation dialog to add PokeDexter to your desktop or home screen.",
+          "Launch PokeDexter from your home screen, desktop, or application launcher to enjoy standalone fullscreen mode."
+        ]
+      },
+      {
+        "label": "Installing on Safari (macOS)",
+        "text": "On Mac running macOS Sonoma (Safari 17) or later, Safari allows installing PokeDexter as a standalone web app directly to your Dock.",
+        "steps": [
+          "Open PokeDexter in Safari on your Mac.",
+          "Click File in the top menu bar and select \"Add to Dock...\" (or click the Share button in the Safari toolbar and choose \"Add to Dock\").",
+          "Confirm the app title and click \"Add\".",
+          "Launch PokeDexter from your Dock or Launchpad to open it in its own distraction-free window."
+        ]
+      },
+      {
+        "label": "Installing on Safari (iOS & iPadOS)",
+        "text": "Apple iPhone and iPad devices can install PokeDexter through Safari's native Add to Home Screen feature.",
+        "steps": [
+          "Open PokeDexter in Safari on your iPhone or iPad.",
+          "Tap the Share button (the square icon with an upward arrow) in the Safari toolbar.",
+          "Scroll down the share options and tap \"Add to Home Screen\".",
+          "Tap \"Add\" in the top-right corner to place the PokeDexter icon on your home screen."
+        ]
+      },
+      {
+        "label": "Offline Browsing",
+        "text": "PokeDexter caches visited Pokémon, moves, and abilities as you browse so you can access them even without an active internet connection.",
+        "steps": [
+          "Browse Pokémon, moves, and abilities while connected to the internet.",
+          "When you go offline, any previously visited pages and sprite images remain instantly available.",
+          "If you navigate to an uncached page while offline, a helpful offline notice will appear with an option to retry."
+        ]
+      }
+    ]
   }
 ]

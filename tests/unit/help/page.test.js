@@ -20,7 +20,8 @@ describe('HelpPage Component', () => {
             'Items',
             'Types',
             'Generations',
-            'Global Search'
+            'Global Search',
+            'Install App & Offline Mode'
         ];
 
         categories.forEach(category => {
@@ -34,6 +35,17 @@ describe('HelpPage Component', () => {
 
         expect(screen.getByText('Browsing the List')).toBeInTheDocument();
         expect(screen.getByText(/The Pokedex is the core feature of the application/i)).toBeInTheDocument();
+    });
+
+    it('renders PWA installation instructions for Chromium, Safari Mac, and Safari iOS', () => {
+        render(<HelpPage />);
+
+        expect(screen.getByText('Installing on Chromium Browsers & Android')).toBeInTheDocument();
+        expect(screen.getByText(/Chromium-based browsers \(Google Chrome, Microsoft Edge, Brave, Opera, Vivaldi\)/i)).toBeInTheDocument();
+        expect(screen.getByText('Installing on Safari (macOS)')).toBeInTheDocument();
+        expect(screen.getAllByText(/Add to Dock/i).length).toBeGreaterThan(0);
+        expect(screen.getByText('Installing on Safari (iOS & iPadOS)')).toBeInTheDocument();
+        expect(screen.getAllByText(/Add to Home Screen/i).length).toBeGreaterThan(0);
     });
 
     it('filters sections based on search input', () => {
@@ -66,7 +78,7 @@ describe('HelpPage Component', () => {
         const sections = container.querySelectorAll('section.help-section');
         expect(sections.length).toBeGreaterThan(0);
 
-        const expectedIds = ['pokedex', 'pokemon-details', 'team-builder', 'abilities', 'moves', 'items', 'types', 'generations', 'global-search'];
+        const expectedIds = ['pokedex', 'pokemon-details', 'team-builder', 'abilities', 'moves', 'items', 'types', 'generations', 'global-search', 'pwa-install'];
         expectedIds.forEach(id => {
             const section = container.querySelector(`section#${id}`);
             expect(section).toBeInTheDocument();

@@ -1,0 +1,27 @@
+@use '../variables' as *;
+
+.btn-install-app {
+  font-family: $font-sans;
+  font-size: 1.1rem;
+  padding: 0.8rem 1.75rem;
+  border-radius: 8px;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  border-color: $accent-red;
+  color: $accent-red;
+  background: transparent;
+  transition: all 0.2s ease;
+
+  &:hover {
+    background: $accent-red;
+    border-color: $accent-red;
+    color: #fff;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(239, 68, 68, 0.35);
+  }
+
+  .pwa-btn-icon {
+    font-size: 1.3rem;
+  }
+}

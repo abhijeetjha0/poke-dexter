@@ -23,20 +23,27 @@ Subdirectory-specific guidelines are maintained in modular `AGENTS.md` files thr
 │   ├── api-requests/        # Centralized PokéAPI request module & AGENTS.md
 │   ├── components/          # Reusable UI components & components AGENTS.md
 │   ├── generations/         # Generation hub route & interactive client component
+│   ├── help/                # In-app user manual and help guide
 │   ├── items/               # Items index and details routes
 │   ├── lib/                 # Utility functions & helpers (move-type-utils.js)
 │   ├── moves/               # Moves index and details routes
 │   ├── pokemons/            # Pokedex routes & pokemons AGENTS.md
 │   ├── styles/              # SCSS architecture & styles AGENTS.md
+│   ├── team-builder/        # Interactive team builder and defense analysis
 │   ├── types/               # Types hub route & type-filtered listings
 │   ├── global-error.js      # Global Next.js error boundary
 │   ├── global.scss          # Root SCSS import entry point
 │   ├── icon.svg             # Application SVG favicon
 │   ├── layout.js            # Root App Router layout wrapper
+│   ├── manifest.js          # Native Web App Manifest route
 │   └── page.js              # Home landing page route
 ├── coverage/                # Generated Jest test coverage reports & metrics
-├── node_modules/            # Installed npm dependencies
 ├── docs/                    # GitHub Pages static landing page (index.html)
+├── node_modules/            # Installed npm dependencies
+├── public/                  # Static assets served at root & PWA resources
+│   ├── icons/               # PWA app icons (192x192, 512x512, maskable)
+│   ├── offline.html         # Offline fallback HTML page
+│   └── sw.js                # Service Worker (Option B runtime caching)
 ├── scripts/                 # Automation scripts (generate-coverage-badge.sh)
 ├── tests/                   # Jest unit testing suite & tests AGENTS.md
 ├── eslint.config.mjs        # ESLint 9 flat configuration

@@ -38,6 +38,7 @@ PokeDexter is packed with powerful tools, making it the ultimate resource for Po
     *   **Types**: Dynamic list of all 18 element types categorized by species.
 *   **Generations Hub**: A navigation hub to easily view all Pokémon from each generation.
 *   **Global Search**: Unified autocomplete search across the application for instant navigation to Pokémon, Moves, or Abilities.
+*   **Progressive Web App (PWA) & Offline Browsing**: Installable across Chromium-based browsers (Chrome, Edge, Brave, Opera), Android, and Safari on macOS and iOS with a dedicated homepage install option. Equipped with a custom Service Worker delivering cache-as-you-browse offline support for visited Pokémon profiles, moves, and sprites.
 *   **Mobile First Design**: Optimized using flexible edge-to-edge grid layouts and an animated mobile hamburger menu for seamless experience.
 *   **In-App UI Manual**: A comprehensive Help section integrated directly into the app for step-by-step feature guidance.
 
@@ -62,6 +63,8 @@ We utilize the **Next.js App Router** with file-system-based routing, ensuring a
 *   **Types List (`/types`)**: [app/types/page.js](./app/types/page.js) - Listing of Pokémon categorized by standard element types.
 *   **Type Details (`/types/[name]`)**: [app/types/[name]/page.js](./app/types/%5Bname%5D/page.js) - Detailed list of Pokémon belonging to a specific element type.
 *   **Help / User Manual (`/help`)**: [app/help/page.js](./app/help/page.js) - In-app manual explaining how to use all the UI features.
+*   **Web App Manifest (`/manifest.webmanifest`)**: [app/manifest.js](./app/manifest.js) - Native Next.js App Router Web App Manifest configuration.
+*   **Service Worker & Offline Assets (`/sw.js`)**: [public/sw.js](./public/sw.js) - Service worker handling app shell caching, Option B cache-as-you-browse runtime caching for PokéAPI data, and offline fallbacks.
 
 --- 
 
