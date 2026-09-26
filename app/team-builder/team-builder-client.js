@@ -1,13 +1,13 @@
 'use client';
 
 import { useState, useMemo } from 'react';
-import { fetchPokemonByIdOrName, fetchPokemonSpecies, fetchEvolutionChainByUrl } from '../api-requests';
+
 import {
     calculateTeamTypeDefenses,
     calculateTeamAverageStats,
 } from '../lib/type-effectiveness-utils';
 import MaterialIcon from '../components/material-icon';
-import { formatDisplayName } from '../lib/pokemon-utils';
+import { formatDisplayName, fetchFullPokemonData } from '../lib/pokemon-utils';
 import { Container, Row, Col, Card, Button, Alert } from 'react-bootstrap';
 import BaseStatsCard from '../components/base-stats-card';
 import TypeBadge from '../components/type-badge';
@@ -33,11 +33,15 @@ export default function TeamBuilderClient(props) {
     const [suggestModalSlot, setSuggestModalSlot] = useState(null);
     const [filterSameType, setFilterSameType] = useState(false);
     const [filterSameGeneration, setFilterSameGeneration] = useState(false);
+
     const [includeLegendaries, setIncludeLegendaries] = useState(false);
     const [suggestionResults, setSuggestionResults] = useState(null);
     const [isSearchingSuggestions, setIsSearchingSuggestions] = useState(false);
     const [suggestionError, setSuggestionError] = useState(null);
     const [lastSearchedFilters, setLastSearchedFilters] = useState(null);
+
+    const teamAnalysis = calculateTeamTypeDefenses(team);
+    const averageStats = calculateTeamAverageStats(team);
 
     const filteredSpecies = useMemo(() => {
         const term = searchTerm.trim().toLowerCase();
@@ -49,127 +53,13 @@ export default function TeamBuilderClient(props) {
         return initialSpeciesList.filter((species) => species.name.includes(term)).slice(0, 40);
     }, [searchTerm, initialSpeciesList]);
 
-    const extractEvolutionNames = (chainNode, acc = []) => {
-        if (!chainNode) {
-            return acc;
-        }
-
-        if (chainNode.species?.name) {
-            acc.push(chainNode.species.name);
-        }
-
-        const { evolves_to } = chainNode;
-
-        if (evolves_to && evolves_to.length) {
-            for (const childNode of evolves_to) {
-                extractEvolutionNames(childNode, acc);
-            }
-        }
-
-        return acc;
-    };
+    const [isBalancingTeam, setIsBalancingTeam] = useState(false);
 
     const loadPokemonIntoSlot = async (slotIndex, pokemonNameOrId) => {
         setLoadingSlots((prev) => ({ ...prev, [slotIndex]: true }));
 
         try {
-            let pokeRes = await fetchPokemonByIdOrName(pokemonNameOrId);
-
-            if (!pokeRes.ok) {
-                // Fallback for species whose default /pokemon/{name} slug differs from species name
-                const fallbackSpeciesRes = await fetchPokemonSpecies(pokemonNameOrId);
-
-                if (fallbackSpeciesRes.ok) {
-                    const fallbackSpeciesData = await fallbackSpeciesRes.json();
-                    const defaultVarietyName = fallbackSpeciesData.varieties?.[0]?.pokemon?.name;
-
-                    if (defaultVarietyName) {
-                        pokeRes = await fetchPokemonByIdOrName(defaultVarietyName);
-                    }
-                }
-            }
-
-            if (!pokeRes.ok) {
-                throw new Error(`Failed to fetch pokemon for '${pokemonNameOrId}'`);
-            }
-
-            const pokeData = await pokeRes.json();
-
-            const speciesName = pokeData.species?.name || pokeData.name;
-            let varieties = [];
-            let evolutions = [];
-            let generationId = null;
-            let isLegendary = false;
-
-            const speciesRes = await fetchPokemonSpecies(speciesName);
-
-            if (speciesRes.ok) {
-                const speciesData = await speciesRes.json();
-                varieties = (speciesData.varieties || []).map((v) => v.pokemon.name);
-                
-                if (speciesData.generation?.url) {
-                    const parts = speciesData.generation.url.split('/');
-                    generationId = parseInt(parts[parts.length - 2], 10);
-                }
-                
-                isLegendary = speciesData.is_legendary || speciesData.is_mythical;
-
-                if (speciesData.evolution_chain?.url) {
-                    const evoRes = await fetchEvolutionChainByUrl(speciesData.evolution_chain.url);
-
-                    if (evoRes.ok) {
-                        const evoData = await evoRes.json();
-                        evolutions = extractEvolutionNames(evoData.chain);
-                    }
-                }
-            }
-
-            const artwork = pokeData.sprites?.other?.['official-artwork']?.front_default || pokeData.sprites?.front_default || '';
-            const stats = { hp: 0, attack: 0, defense: 0, specialAttack: 0, specialDefense: 0, speed: 0 };
-
-            (pokeData.stats || []).forEach((s) => {
-                const statName = s.stat?.name;
-
-                if (statName === 'hp') {
-                    stats.hp = s.base_stat;
-                }
-
-                if (statName === 'attack') {
-                    stats.attack = s.base_stat;
-                }
-
-                if (statName === 'defense') {
-                    stats.defense = s.base_stat;
-                }
-
-                if (statName === 'special-attack') {
-                    stats.specialAttack = s.base_stat;
-                }
-
-                if (statName === 'special-defense') {
-                    stats.specialDefense = s.base_stat;
-                }
-
-                if (statName === 'speed') {
-                    stats.speed = s.base_stat;
-                }
-            });
-
-            const bst = (pokeData.stats || []).reduce((acc, statObj) => acc + statObj.base_stat, 0);
-
-            const teamMember = {
-                id: pokeData.id,
-                name: pokeData.name,
-                speciesName,
-                types: (pokeData.types || []).map((t) => t.type.name),
-                artwork,
-                stats,
-                bst,
-                generationId,
-                isLegendary,
-                varieties,
-                evolutions,
-            };
+            const teamMember = await fetchFullPokemonData(pokemonNameOrId);
 
             setTeam((prevTeam) => {
                 const nextTeam = [...prevTeam];
@@ -178,8 +68,8 @@ export default function TeamBuilderClient(props) {
                 return nextTeam;
             });
 
-            const formSuggestions = Array.from(new Set([...varieties, ...evolutions]))
-                .filter((item) => item !== pokeData.name);
+            const formSuggestions = Array.from(new Set([...teamMember.varieties, ...teamMember.evolutions]))
+                .filter((item) => item !== teamMember.name);
 
             setSuggestionsMap((prevMap) => ({ ...prevMap, [slotIndex]: formSuggestions }));
         } catch (error) {
@@ -237,6 +127,7 @@ export default function TeamBuilderClient(props) {
             
             if (filterSameType && member.types.length) {
                 filters.types = member.types;
+                filters.typesOperator = '_and';
             }
 
             if (filterSameGeneration && member.generationId) {
@@ -305,6 +196,7 @@ export default function TeamBuilderClient(props) {
             setLastSearchedFilters({
                 filterSameType,
                 filterSameGeneration,
+
                 includeLegendaries
             });
         } catch (error) {
@@ -312,6 +204,147 @@ export default function TeamBuilderClient(props) {
             setSuggestionError('Failed to load suggestions. Please try again.');
         } finally {
             setIsSearchingSuggestions(false);
+        }
+    };
+
+    const handleAutoBalanceTeam = async () => {
+        if (!initialSpeciesList.length) {return;}
+
+        setIsBalancingTeam(true);
+
+        try {
+            let currentTeam = [...team];
+            
+            const hasEmptySlots = currentTeam.some((m) => !m);
+            const checkDuplicate = (teamArray, name) => teamArray.some(
+                (m) => m && (m.name === name || m.speciesName === name)
+            );
+            
+            let nextSuggestionsMap = { ...suggestionsMap };
+            
+            if (hasEmptySlots) {
+                for (let i = 0; i < currentTeam.length; i++) {
+                    if (!currentTeam[i]) {
+                        let randomSpecies;
+                        let isDuplicate = true;
+
+                        while (isDuplicate) {
+                            randomSpecies = getRandomElement(initialSpeciesList);
+                            isDuplicate = checkDuplicate(currentTeam, randomSpecies.name);
+                        }
+                        
+                        const fullMember = await fetchFullPokemonData(randomSpecies.name);
+                        currentTeam[i] = fullMember;
+                        
+                        const formSuggestions = Array.from(new Set([...fullMember.varieties, ...fullMember.evolutions]))
+                            .filter((item) => item !== fullMember.name);
+                        nextSuggestionsMap[i] = formSuggestions;
+                    }
+                }
+                
+                setTeam([...currentTeam]);
+                setSuggestionsMap({ ...nextSuggestionsMap });
+            }
+
+            let loopCounter = 0;
+            const maxLoops = 200; // prevent absolute infinite loop just in case
+
+            while (loopCounter < maxLoops) {
+                loopCounter++;
+                const analysis = calculateTeamTypeDefenses(currentTeam);
+                
+                if (analysis.criticalWeaknesses.length === 0) {
+                    break;
+                }
+
+                const criticalType = analysis.criticalWeaknesses[0];
+                
+                // Find a culprit on the team (someone weak to criticalType)
+                let culpritIndex = -1;
+
+                for (let i = 0; i < currentTeam.length; i++) {
+                    const member = currentTeam[i];
+
+                    if (member) {
+                        const dmgMap = calculateTeamTypeDefenses([member]).summary[criticalType];
+
+                        if (dmgMap && dmgMap.weak > 0) {
+                            culpritIndex = i;
+                            break;
+                        }
+                    }
+                }
+
+                if (culpritIndex === -1) {break;} 
+
+                const currentBst = currentTeam[culpritIndex]?.bst || 0;
+
+                const validReplacements = initialSpeciesList.filter((species) => {
+                    const speciesBst = (species.pokemon_v2_pokemonstats || [])
+                        .reduce((acc, stat) => acc + stat.base_stat, 0);
+                    
+                    return speciesBst >= currentBst;
+                });
+
+                if (validReplacements.length === 0) {
+                    break; // No valid replacements that maintain/improve BST
+                }
+
+                // Pick a random new pokemon
+                let replacementFound = false;
+                let innerLoopCounter = 0;
+
+                while (!replacementFound && innerLoopCounter < 100) {
+                    innerLoopCounter++;
+                    const randomSpecies = getRandomElement(validReplacements);
+                    const isDuplicate = currentTeam.some(
+                        (m) => m && (m.name === randomSpecies.name || m.speciesName === randomSpecies.name)
+                    );
+                    
+                    if (isDuplicate) {continue;}
+
+                    // Read types directly from the GraphQL pre-fetched list
+                    const types = (randomSpecies.pokemon_v2_pokemontypes || []).map(t => t.pokemon_v2_type.name);
+
+                    // Evaluate new team
+                    const mockMember = { types }; 
+                    const testTeam = [...currentTeam];
+                    testTeam[culpritIndex] = mockMember;
+                    
+                    const testAnalysis = calculateTeamTypeDefenses(testTeam);
+                    const oldCriticalCount = analysis.criticalWeaknesses.length;
+                    const newCriticalCount = testAnalysis.criticalWeaknesses.length;
+                    const oldWeaknessCount = analysis.summary[criticalType].weak;
+                    const newWeaknessCount = testAnalysis.summary[criticalType]?.weak || 0;
+
+                    const isImproved = newCriticalCount < oldCriticalCount 
+                        || (newCriticalCount === oldCriticalCount && newWeaknessCount < oldWeaknessCount);
+
+                    if (isImproved) {
+                        // Improved! Fetch full data for UI
+                        const fullMember = await fetchFullPokemonData(randomSpecies.name);
+                        currentTeam[culpritIndex] = fullMember;
+                        
+                        const formSuggestions = Array.from(new Set([...fullMember.varieties, ...fullMember.evolutions]))
+                            .filter((item) => item !== fullMember.name);
+                        nextSuggestionsMap[culpritIndex] = formSuggestions;
+
+                        // Update state immediately so UI updates
+                        setTeam([...currentTeam]);
+                        setSuggestionsMap({ ...nextSuggestionsMap });
+                        replacementFound = true;
+                    }
+                }
+
+                // If no replacement found after 100 attempts, break outer loop to prevent infinite hang
+                if (!replacementFound) {
+                    break;
+                }
+            }
+        } catch (error) {
+            console.error('Error auto-balancing team:', error);
+        } finally {
+            setIsBalancingTeam(false);
         }
     };
 
@@ -337,8 +370,6 @@ export default function TeamBuilderClient(props) {
         loadPokemonIntoSlot(slotIndex, randomSpecies.name);
     };
 
-    const teamAnalysis = useMemo(() => calculateTeamTypeDefenses(team), [team]);
-    const averageStats = useMemo(() => calculateTeamAverageStats(team), [team]);
     const activeMemberCount = team.filter((m) => (m && m.types && m.types.length ? true : false)).length;
 
     return (
@@ -348,9 +379,13 @@ export default function TeamBuilderClient(props) {
                 <div>
                     <CountBadge count={`${activeMemberCount}/6`} className="fs-6 px-3 py-1" />
                 </div>
-                <div className="d-flex gap-2">
-                    <Button variant="outline-info" onClick={handleRandomizeTeam}>
-                        <MaterialIcon icon="casino" className="align-middle fs-6 me-1" /> Randomize
+                <div className="d-flex flex-wrap gap-2">
+                    <Button variant="outline-warning" onClick={handleAutoBalanceTeam} disabled={isBalancingTeam}>
+                        <MaterialIcon icon={isBalancingTeam ? 'sync' : 'balance'} className={`align-middle fs-6 me-1 ${isBalancingTeam ? 'spin-icon' : ''}`} /> 
+                        {isBalancingTeam ? 'Balancing...' : 'Auto-Balance'}
+                    </Button>
+                    <Button variant="outline-info" onClick={handleRandomizeTeam} disabled={isBalancingTeam}>
+                        <MaterialIcon icon="casino" className="align-middle fs-6 me-1" /> Surprise me
                     </Button>
                     <Button variant="outline-danger" onClick={handleClearTeam}>
                         <MaterialIcon icon="delete" className="align-middle fs-6 me-1" /> Clear Team
@@ -401,7 +436,7 @@ export default function TeamBuilderClient(props) {
                                             onClick: () => handleRemoveSlot(index) 
                                         },
                                         { 
-                                            label: 'Randomize', 
+                                            label: 'Surprise me', 
                                             onClick: () => handleRandomizeSlot(index) 
                                         },
                                         { 

@@ -175,6 +175,7 @@
           "Open the Alternatives popup from a Pokémon's kebab menu.",
           "Use the 'Same Type' filter to only suggest Pokémon that share the exact same elemental types.",
           "Use the 'Same Generation' filter to only suggest Pokémon introduced in the same generation.",
+          "Toggle 'Balance Team Typing' to suggest Pokémon with high base stats that specifically resist your team's most critical shared weaknesses.",
           "Toggle 'Include Legendaries' to allow rare legendary or mythical Pokémon in your results.",
           "Click the \"Clear\" button to reset any applied filters.",
           "Click the \"Suggest\" button to generate a fresh list of recommendations based on your criteria."

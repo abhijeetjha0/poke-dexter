@@ -1,4 +1,9 @@
-import { fetchPokemonByUrl } from '../api-requests';
+import { 
+    fetchPokemonByUrl, 
+    fetchPokemonByIdOrName, 
+    fetchPokemonSpecies, 
+    fetchEvolutionChainByUrl 
+} from '../api-requests';
 
 /**
  * Helper to resolve the base species name for Pokémon varieties that are considered
@@ -177,3 +182,101 @@ export async function resolvePokemonResource(pokemon) {
         imageUrl: getPokemonImageUrl(id),
     };
 }
+
+export const fetchFullPokemonData = async (pokemonNameOrId) => {
+    let pokeRes = await fetchPokemonByIdOrName(pokemonNameOrId);
+
+    if (!pokeRes.ok) {
+        const fallbackSpeciesRes = await fetchPokemonSpecies(pokemonNameOrId);
+
+        if (fallbackSpeciesRes.ok) {
+            const fallbackSpeciesData = await fallbackSpeciesRes.json();
+            const defaultVarietyName = fallbackSpeciesData.varieties?.[0]?.pokemon?.name;
+
+            if (defaultVarietyName) {
+                pokeRes = await fetchPokemonByIdOrName(defaultVarietyName);
+            }
+        }
+    }
+
+    if (!pokeRes.ok) {
+        throw new Error(`Failed to fetch pokemon for '${pokemonNameOrId}'`);
+    }
+
+    const pokeData = await pokeRes.json();
+    const speciesName = pokeData.species?.name || pokeData.name;
+    let varieties = [];
+    let evolutions = [];
+    let generationId = null;
+    let isLegendary = false;
+
+    const speciesRes = await fetchPokemonSpecies(speciesName);
+
+    if (speciesRes.ok) {
+        const speciesData = await speciesRes.json();
+        varieties = (speciesData.varieties || []).map((v) => v.pokemon.name);
+        
+        if (speciesData.generation?.url) {
+            const parts = speciesData.generation.url.split('/');
+            generationId = parseInt(parts[parts.length - 2], 10);
+        }
+        
+        isLegendary = speciesData.is_legendary || speciesData.is_mythical;
+
+        if (speciesData.evolution_chain?.url) {
+            const evoRes = await fetchEvolutionChainByUrl(speciesData.evolution_chain.url);
+
+            if (evoRes.ok) {
+                const evoData = await evoRes.json();
+
+                const extractEvo = (node, acc = []) => {
+                    if (!node) {return acc;}
+
+                    if (node.species?.name) {acc.push(node.species.name);}
+
+                    if (node.evolves_to && node.evolves_to.length) {
+                        for (const child of node.evolves_to) {extractEvo(child, acc);}
+                    }
+
+                    return acc;
+                };
+
+                evolutions = extractEvo(evoData.chain);
+            }
+        }
+    }
+
+    const artwork = pokeData.sprites?.other?.['official-artwork']?.front_default || pokeData.sprites?.front_default || '';
+    const stats = { hp: 0, attack: 0, defense: 0, specialAttack: 0, specialDefense: 0, speed: 0 };
+    (pokeData.stats || []).forEach((s) => {
+        const statName = s.stat?.name;
+
+        if (statName === 'hp') {stats.hp = s.base_stat;}
+
+        if (statName === 'attack') {stats.attack = s.base_stat;}
+
+        if (statName === 'defense') {stats.defense = s.base_stat;}
+
+        if (statName === 'special-attack') {stats.specialAttack = s.base_stat;}
+
+        if (statName === 'special-defense') {stats.specialDefense = s.base_stat;}
+
+        if (statName === 'speed') {stats.speed = s.base_stat;}
+    });
+
+    const bst = (pokeData.stats || []).reduce((acc, statObj) => acc + statObj.base_stat, 0);
+
+    return {
+        id: pokeData.id,
+        name: pokeData.name,
+        speciesName,
+        types: (pokeData.types || []).map((t) => t.type.name),
+        artwork,
+        stats,
+        bst,
+        generationId,
+        isLegendary,
+        varieties,
+        evolutions,
+    };
+};

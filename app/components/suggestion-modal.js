@@ -69,6 +69,7 @@ export default function SuggestionModal({
                             checked={filterSameGeneration}
                             onChange={(e) => setFilterSameGeneration(e.target.checked)}
                         />
+
                         <Form.Check 
                             type="switch"
                             id="filter-legendary"

@@ -408,9 +408,9 @@ describe('TeamBuilderClient Component', () => {
         // It should open suggestion modal
         await waitFor(() => expect(screen.getByText('Alternatives')).toBeInTheDocument());
 
-        // Add again to test Randomize
+        // Add again to test Surprise me
         fireEvent.click(screen.getAllByText('more_vert')[0]);
-        fireEvent.click(screen.getAllByText('Randomize')[1]);
+        fireEvent.click(screen.getAllByText('Surprise me')[1]);
         
         // Wait for randomize fetch to complete
         await waitFor(() => expect(screen.getByText('charizard')).toBeInTheDocument());
@@ -429,7 +429,7 @@ describe('TeamBuilderClient Component', () => {
         });
     });
 
-    test('randomizes team when Randomize Team button is clicked', async () => {
+    test('randomizes team when Surprise me button is clicked', async () => {
         fetchPokemonByIdOrName.mockResolvedValue({
             ok: true,
             json: async () => ({
@@ -449,7 +449,7 @@ describe('TeamBuilderClient Component', () => {
 
         render(<TeamBuilderClient initialSpeciesList={mockSpeciesList} />);
         
-        const randomizeBtn = screen.getByRole('button', { name: /randomize/i });
+        const randomizeBtn = screen.getByRole('button', { name: /surprise me/i });
         fireEvent.click(randomizeBtn);
         
         // Since there are 2 items in mockSpeciesList, 2 slots will be filled
