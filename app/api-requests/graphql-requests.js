@@ -22,8 +22,10 @@ export async function fetchAdvancedSuggestionsGraphQL(filters = {}, options = {}
         delete whereClause.pokemon_v2_pokemonspecy;
     }
 
+    const typesOp = filters.typesOperator || '_and';
+
     if (types && types.length > 0) {
-        whereClause._and = types.map(t => ({
+        whereClause[typesOp] = types.map(t => ({
             pokemon_v2_pokemontypes: {
                 pokemon_v2_type: { name: { _eq: t } }
             }

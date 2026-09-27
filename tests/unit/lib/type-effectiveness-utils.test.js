@@ -3,6 +3,7 @@ import {
     getMultiplierClass,
     calculateTypeDefenses,
     calculateTeamTypeDefenses,
+    getOptimalDefensiveTypes,
 } from '../../../app/lib/type-effectiveness-utils';
 
 describe('Type Effectiveness Utilities', () => {
@@ -56,5 +57,38 @@ describe('Type Effectiveness Utilities', () => {
 
         // Electric hits Gyarados for 4x, Charizard 2x, Magmar 1x, Flareon 1x -> 2 weak
         expect(summary.electric.weak).toBe(2);
+    });
+
+    test('getOptimalDefensiveTypes calculates best defensive types for given weaknesses', () => {
+        // Weak to fire and ground
+        const optimalTypes = getOptimalDefensiveTypes(['fire', 'ground']);
+        
+        // Flying is immune to ground (resists 1) but normal against fire (resists 0) -> resists 1
+        // Water resists fire (resists 1) but normal against ground -> resists 1
+        // Bug is weak to fire...
+        
+        // Let's find what resists both fire and ground
+        // Fire is resisted by Fire, Water, Rock, Dragon
+        // Ground is resisted by Grass, Bug, immune by Flying
+        // No type natively resists BOTH Fire and Ground in a single typing.
+        // So the max score should be 1, and there will be several types returned.
+        expect(optimalTypes.length).toBeGreaterThan(0);
+        
+        // Let's check a case with a shared resistance
+        // Water is weak to Electric and Grass.
+        // Grass is weak to Fire, Ice, Poison, Flying, Bug.
+        // Let's find what resists Electric and Grass.
+        // Electric is resisted by Electric, Grass, Dragon. Immune by Ground.
+        // Grass is resisted by Fire, Grass, Poison, Flying, Bug, Dragon, Steel.
+        // Grass and Dragon resist BOTH Electric and Grass.
+        
+        const sharedOptimal = getOptimalDefensiveTypes(['electric', 'grass']);
+        expect(sharedOptimal).toContain('grass');
+        expect(sharedOptimal).toContain('dragon');
+        // Because Grass and Dragon resist 2 out of 2 weaknesses, they should be the only ones.
+        expect(sharedOptimal.length).toBe(2);
+
+        // Test with empty array
+        expect(getOptimalDefensiveTypes([])).toEqual([]);
     });
 });

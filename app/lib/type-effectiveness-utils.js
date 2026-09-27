@@ -248,3 +248,44 @@ export function calculateTeamAverageStats(team = []) {
         bst: Math.round(totals.bst / count),
     };
 }
+
+/**
+ * Identifies the best single defensive types to resist a given list of attack types.
+ * Returns an array of type names sorted by how many of the weak types they resist.
+ * 
+ * @param {string[]} weaknesses - Array of attack types to resist (e.g., ['fire', 'ground'])
+ * @returns {string[]} Array of optimal defensive type names
+ */
+export function getOptimalDefensiveTypes(weaknesses = []) {
+    if (!weaknesses.length) {
+        return [];
+    }
+
+    const typeScores = [];
+
+    for (const defType of ALL_TYPES) {
+        const defenses = calculateTypeDefenses([defType]);
+        let resistCount = 0;
+        
+        for (const attack of weaknesses) {
+            if (defenses[attack] < 1) { // 0.5 or 0
+                resistCount++;
+            }
+        }
+
+        if (resistCount > 0) {
+            typeScores.push({ type: defType, score: resistCount });
+        }
+    }
+
+    if (typeScores.length === 0) {return [];}
+
+    // Sort by highest resistCount
+    typeScores.sort((a, b) => b.score - a.score);
+
+    // Get the highest score
+    const maxScore = typeScores[0].score;
+
+    // Return all types that have the highest score
+    return typeScores.filter(t => t.score === maxScore).map(t => t.type);
+}
