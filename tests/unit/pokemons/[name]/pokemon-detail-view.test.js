@@ -377,4 +377,29 @@ describe('PokemonDetailView Component', () => {
         const collapseContainer = card.querySelector('.collapse, .collapsing');
         expect(collapseContainer).not.toHaveClass('show');
     });
+
+    test('renders genus, base happiness, and egg groups when available', () => {
+        const enrichedSpecies = {
+            ...mockSpeciesInfo,
+            base_happiness: 70,
+            egg_groups: [{ name: 'monster' }, { name: 'plant' }],
+            genera: [
+                { genus: 'Grown Pokémon', language: { name: 'fr' } },
+                { genus: 'Seed Pokémon', language: { name: 'en' } }
+            ]
+        };
+
+        render(
+            <PokemonDetailView
+                speciesInfo={enrichedSpecies}
+                varietyList={mockVarietyList}
+            />
+        );
+
+        expect(screen.getByText('Seed Pokémon')).toBeInTheDocument();
+        expect(screen.getByText('Base Happiness')).toBeInTheDocument();
+        expect(screen.getByText('70 / 255')).toBeInTheDocument();
+        expect(screen.getByText('Egg Groups')).toBeInTheDocument();
+        expect(screen.getByText('monster, plant')).toBeInTheDocument();
+    });
 });

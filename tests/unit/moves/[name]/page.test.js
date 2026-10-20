@@ -62,6 +62,52 @@ describe('MoveDetailPage (Server Component)', () => {
         expect(getByTestId('mock-img')).toHaveTextContent('https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/19.png');
     });
 
+    test('renders combat metadata (meta) and stat_changes badges', async () => {
+        const mockMoveWithMeta = {
+            name: 'giga-drain',
+            power: 75,
+            accuracy: 100,
+            pp: 10,
+            priority: 0,
+            type: { name: 'grass' },
+            damage_class: { name: 'special' },
+            target: { name: 'selected-pokemon' },
+            effect_entries: [{ language: { name: 'en' }, effect: 'Recovers 50% of damage dealt.' }],
+            learned_by_pokemon: [],
+            stat_changes: [
+                { change: 2, stat: { name: 'special-attack' } },
+                { change: -1, stat: { name: 'speed' } }
+            ],
+            meta: {
+                drain: 50,
+                healing: 25,
+                crit_rate: 1,
+                min_hits: 2,
+                max_hits: 5,
+                flinch_chance: 30,
+                ailment: { name: 'paralysis' },
+                ailment_chance: 20
+            }
+        };
+
+        fetchMoveByNameOrId.mockResolvedValue({
+            ok: true,
+            json: jest.fn().mockResolvedValue(mockMoveWithMeta)
+        });
+
+        const Page = await MoveDetailPage({ params: { name: 'giga-drain' } });
+        const { getByText } = render(Page);
+
+        expect(getByText('+2 special attack')).toBeInTheDocument();
+        expect(getByText('-1 speed')).toBeInTheDocument();
+        expect(getByText('Drain: 50%')).toBeInTheDocument();
+        expect(getByText('Heal: 25%')).toBeInTheDocument();
+        expect(getByText('High Critical (+1)')).toBeInTheDocument();
+        expect(getByText('Hits: 2-5')).toBeInTheDocument();
+        expect(getByText('Flinch: 30%')).toBeInTheDocument();
+        expect(getByText('paralysis (20%)')).toBeInTheDocument();
+    });
+
     test('renders 404 state when not found', async () => {
         fetchMoveByNameOrId.mockResolvedValue({ ok: false });
 

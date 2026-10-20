@@ -114,7 +114,12 @@ function PokemonDetailViewInner({
         id: speciesId,
         capture_rate,
         growth_rate,
+        base_happiness,
+        egg_groups,
+        genera,
     } = speciesInfo;
+
+    const englishGenus = (genera || []).find(g => g.language?.name === 'en')?.genus;
 
     const {
         abilities,
@@ -190,10 +195,17 @@ function PokemonDetailViewInner({
                                     }}
                                 />
                             </div>
-                            <div className="d-flex justify-content-between align-items-center mt-1 gap-2 flex-wrap">
-                                <h3 className="text-capitalize mb-0 fw-bold fs-4 me-auto">
-                                    {formatDisplayName(activeVariety.name)}
-                                </h3>
+                            <div className="d-flex justify-content-between align-items-start mt-1 gap-2 flex-wrap">
+                                <div>
+                                    <h3 className="text-capitalize mb-0 fw-bold fs-4">
+                                        {formatDisplayName(activeVariety.name)}
+                                    </h3>
+                                    {englishGenus && (
+                                        <div className="text-muted small fw-medium mt-0">
+                                            {englishGenus}
+                                        </div>
+                                    )}
+                                </div>
                                 <div className="d-flex align-items-center gap-1">
                                     {types.map(({ type }) => (
                                         <TypeBadge key={type.name} type={type.name} />
@@ -230,10 +242,24 @@ function PokemonDetailViewInner({
                                     <span className="text-muted fw-bold">Capture Rate</span>
                                     <span>{capture_rate} / 255</span>
                                 </ListGroup.Item>
+                                {base_happiness !== undefined && base_happiness !== null && (
+                                    <ListGroup.Item className="bg-transparent text-light border-0 d-flex justify-content-between py-0">
+                                        <span className="text-muted fw-bold">Base Happiness</span>
+                                        <span>{base_happiness} / 255</span>
+                                    </ListGroup.Item>
+                                )}
                                 <ListGroup.Item className="bg-transparent text-light border-0 d-flex justify-content-between py-0">
                                     <span className="text-muted fw-bold">Growth Rate</span>
                                     <span className="text-capitalize">{formatDisplayName(growth_rate?.name)}</span>
                                 </ListGroup.Item>
+                                {egg_groups && egg_groups.length > 0 && (
+                                    <ListGroup.Item className="bg-transparent text-light border-0 d-flex justify-content-between py-0">
+                                        <span className="text-muted fw-bold">Egg Groups</span>
+                                        <span className="text-capitalize">
+                                            {egg_groups.map(group => formatDisplayName(group.name)).join(', ')}
+                                        </span>
+                                    </ListGroup.Item>
+                                )}
                             </ListGroup>
                         </Card.Body>
                     </Card>

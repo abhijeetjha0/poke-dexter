@@ -296,6 +296,64 @@ describe('PokemonEvolutionChain Component', () => {
         expect(screen.getByText('grandchild unknown')).toBeInTheDocument();
     });
 
+    test('renders modern PokéAPI v2 evolution mechanics (steps, multiplayer, moves, natures, full moon)', () => {
+        const modernChain = {
+            chain: {
+                species: { name: 'pawmi', url: 'https://pokeapi.co/api/v2/pokemon-species/921/' },
+                evolves_to: [
+                    {
+                        species: { name: 'pawmo', url: 'https://pokeapi.co/api/v2/pokemon-species/922/' },
+                        evolution_details: [
+                            {
+                                trigger: { name: 'level-up' },
+                                min_steps: 1000,
+                                needs_multiplayer: true,
+                                used_move: { name: 'rage-fist' },
+                                min_move_count: 20,
+                                min_damage_taken: 49,
+                                near_special_rock: true,
+                                time_of_day: 'full-moon',
+                                region: { name: 'hisui' },
+                                allowed_natures: [{ name: 'hardy' }, { name: 'brave' }]
+                            }
+                        ],
+                        evolves_to: []
+                    },
+                    {
+                        species: { name: 'rattata', url: 'https://pokeapi.co/api/v2/pokemon-species/19/' },
+                        evolution_details: [
+                            {
+                                trigger: { name: 'level-up' },
+                                evolved_pokemon_form: {
+                                    name: 'raticate-alola',
+                                    url: 'https://pokeapi.co/api/v2/pokemon-form/10194/'
+                                }
+                            }
+                        ],
+                        evolves_to: []
+                    }
+                ]
+            }
+        };
+
+        render(<PokemonEvolutionChain 
+            {...mockProps} 
+            name="pawmi" 
+            activeVariety={{ name: 'pawmi' }} 
+            evolutionChainData={modernChain} 
+        />);
+
+        expect(screen.getByText(/Walk 1000 steps/)).toBeInTheDocument();
+        expect(screen.getByText(/Union Circle \/ Multiplayer/)).toBeInTheDocument();
+        expect(screen.getByText(/Use Rage Fist 20x/)).toBeInTheDocument();
+        expect(screen.getByText(/Take 49\+ dmg/)).toBeInTheDocument();
+        expect(screen.getByText(/Near special rock/)).toBeInTheDocument();
+        expect(screen.getByText(/Full Moon/)).toBeInTheDocument();
+        expect(screen.getByText(/Nature: Hardy\/Brave/)).toBeInTheDocument();
+        expect(screen.getByText(/in Hisui/)).toBeInTheDocument();
+        expect(screen.getByText('raticate alola')).toBeInTheDocument();
+    });
+
     test('handles collapse toggle', () => {
         render(<PokemonEvolutionChain {...mockProps} />);
         const header = screen.getByText('Evolution Chain');

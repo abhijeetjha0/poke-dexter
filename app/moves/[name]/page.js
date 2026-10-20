@@ -1,5 +1,5 @@
 import Link from 'next/link';
-import { Container } from 'react-bootstrap';
+import { Container, Badge } from 'react-bootstrap';
 import PokemonList from '../../pokemons/pokemon-list';
 import DamageClassIcon from '../../components/damage-class-icon';
 import TypeBadge from '../../components/type-badge';
@@ -48,6 +48,18 @@ export default async function MoveDetailPage({ params }) {
     const priorityVal = moveJSON.priority !== undefined && moveJSON.priority !== null ? moveJSON.priority : 0;
     const priorityText = priorityVal > 0 ? `+${priorityVal}` : `${priorityVal}`;
 
+    const hasMeta = Boolean(
+        moveJSON.meta && (
+            (moveJSON.meta.drain !== undefined && moveJSON.meta.drain !== 0) ||
+            (moveJSON.meta.healing !== undefined && moveJSON.meta.healing > 0) ||
+            (moveJSON.meta.crit_rate !== undefined && moveJSON.meta.crit_rate > 0) ||
+            moveJSON.meta.min_hits ||
+            (moveJSON.meta.flinch_chance !== undefined && moveJSON.meta.flinch_chance > 0) ||
+            (moveJSON.meta.ailment?.name && moveJSON.meta.ailment.name !== 'none')
+        )
+    );
+    const hasStatChanges = Boolean(moveJSON.stat_changes?.length);
+
     return (
         <Container fluid className="p-0">
             {/* Header / Info Panel (Inline Compact) */}
@@ -76,6 +88,56 @@ export default async function MoveDetailPage({ params }) {
                         )}
                     </div>
                     <p className="mb-0 text-light">— {descriptionText.replace('$effect_chance', moveJSON.effect_chance)}</p>
+
+                    {(hasStatChanges || hasMeta) && (
+                        <div className="d-flex flex-wrap align-items-center gap-2 mt-3 pt-3 border-top border-secondary">
+                            {moveJSON.stat_changes?.map(sc => {
+                                const sign = sc.change > 0 ? `+${sc.change}` : `${sc.change}`;
+                                const isPositive = sc.change > 0;
+
+                                return (
+                                    <Badge
+                                        key={sc.stat.name}
+                                        bg={isPositive ? 'success' : 'danger'}
+                                        className="fw-normal px-2 py-1"
+                                    >
+                                        {sign} {formatDisplayName(sc.stat.name)}
+                                    </Badge>
+                                );
+                            })}
+                            {moveJSON.meta?.drain !== undefined && moveJSON.meta?.drain !== 0 && (
+                                <Badge bg={moveJSON.meta.drain > 0 ? 'info' : 'warning'} className="text-dark fw-normal px-2 py-1">
+                                    {moveJSON.meta.drain > 0 ? `Drain: ${moveJSON.meta.drain}%` : `Recoil: ${Math.abs(moveJSON.meta.drain)}%`}
+                                </Badge>
+                            )}
+                            {moveJSON.meta?.healing !== undefined && moveJSON.meta?.healing > 0 && (
+                                <Badge bg="success" className="fw-normal px-2 py-1">
+                                    Heal: {moveJSON.meta.healing}%
+                                </Badge>
+                            )}
+                            {moveJSON.meta?.crit_rate !== undefined && moveJSON.meta?.crit_rate > 0 && (
+                                <Badge bg="danger" className="fw-normal px-2 py-1">
+                                    High Critical (+{moveJSON.meta.crit_rate})
+                                </Badge>
+                            )}
+                            {moveJSON.meta?.min_hits && (
+                                <Badge bg="secondary" className="fw-normal px-2 py-1">
+                                    Hits: {moveJSON.meta.min_hits === moveJSON.meta.max_hits ? moveJSON.meta.min_hits : `${moveJSON.meta.min_hits}-${moveJSON.meta.max_hits}`}
+                                </Badge>
+                            )}
+                            {moveJSON.meta?.flinch_chance !== undefined && moveJSON.meta?.flinch_chance > 0 && (
+                                <Badge bg="secondary" className="fw-normal px-2 py-1">
+                                    Flinch: {moveJSON.meta.flinch_chance}%
+                                </Badge>
+                            )}
+                            {moveJSON.meta?.ailment?.name && moveJSON.meta.ailment.name !== 'none' && (
+                                <Badge bg="secondary" className="fw-normal px-2 py-1 text-capitalize">
+                                    {formatDisplayName(moveJSON.meta.ailment.name)}
+                                    {moveJSON.meta.ailment_chance ? ` (${moveJSON.meta.ailment_chance}%)` : ''}
+                                </Badge>
+                            )}
+                        </div>
+                    )}
                 </div>
             </div>
 

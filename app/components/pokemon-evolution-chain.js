@@ -8,7 +8,9 @@ import { getSpeciesName, getPokemonSpriteUrl, formatDisplayName, EVOLUTION_FORMS
 function getSpeciesIdFromUrl(url) {
     if (!url) { return null; }
 
-    const matches = url.match(/\/pokemon-species\/(\d+)\//);
+    const matches = url.match(/\/pokemon-species\/(\d+)\//) ||
+        url.match(/\/pokemon-form\/(\d+)\//) ||
+        url.match(/\/pokemon\/(\d+)\//);
 
     return matches ? parseInt(matches[1], 10) : null;
 }
@@ -28,6 +30,13 @@ function parseSingleEvolutionDetail(details) {
         [details.held_item, `holding ${capitalizeWords(details.held_item?.name)}`],
         [details.known_move, `knows ${capitalizeWords(details.known_move?.name)}`],
         [details.known_move_type, `knows ${capitalizeWords(details.known_move_type?.name)}-type move`],
+        [
+            details.used_move,
+            details.min_move_count
+                ? `Use ${capitalizeWords(details.used_move?.name)} ${details.min_move_count}x`
+                : `Use ${capitalizeWords(details.used_move?.name)}`
+        ],
+        [details.min_steps, `Walk ${details.min_steps} steps`],
         [details.location, `at ${capitalizeWords(details.location?.name)}`],
         [details.min_happiness, 'High Friendship'],
         [details.min_beauty, 'High Beauty'],
@@ -36,7 +45,11 @@ function parseSingleEvolutionDetail(details) {
             details.time_of_day,
             details.time_of_day === 'day'
                 ? 'Day'
-                : (details.time_of_day === 'night' ? 'Night' : capitalizeWords(details.time_of_day))
+                : (details.time_of_day === 'night'
+                    ? 'Night'
+                    : (details.time_of_day === 'full-moon'
+                        ? 'Full Moon'
+                        : capitalizeWords(details.time_of_day)))
         ],
         [details.relative_physical_stats === 1, 'Attack > Defense'],
         [details.relative_physical_stats === -1, 'Attack < Defense'],
@@ -45,6 +58,14 @@ function parseSingleEvolutionDetail(details) {
         [details.party_type, `with ${capitalizeWords(details.party_type?.name)}-type in party`],
         [details.needs_overworld_rain, 'Rain'],
         [details.turn_upside_down, 'Upside down'],
+        [details.needs_multiplayer, 'Union Circle / Multiplayer'],
+        [details.near_special_rock, 'Near special rock'],
+        [details.min_damage_taken, `Take ${details.min_damage_taken}+ dmg`],
+        [details.region, `in ${capitalizeWords(details.region?.name)}`],
+        [
+            details.allowed_natures && details.allowed_natures.length,
+            `Nature: ${details.allowed_natures?.map(n => capitalizeWords(n.name)).join('/')}`
+        ],
     ];
 
     detailRules.forEach(([condition, text]) => {
@@ -60,7 +81,7 @@ function parseSingleEvolutionDetail(details) {
 
         if (details.gender === 2) { conditions.push('Male'); }
 
-        if (details.time_of_day) { conditions.push(details.time_of_day === 'day' ? 'Day' : (details.time_of_day === 'night' ? 'Night' : capitalizeWords(details.time_of_day))); }
+        if (details.time_of_day) { conditions.push(details.time_of_day === 'day' ? 'Day' : (details.time_of_day === 'night' ? 'Night' : (details.time_of_day === 'full-moon' ? 'Full Moon' : capitalizeWords(details.time_of_day)))); }
     } else if (trigger === 'trade') {
         conditions.push('Trade');
 
@@ -147,6 +168,26 @@ export default function PokemonEvolutionChain(props) {
             urlName: childSpeciesName,
             href: `/pokemons/${childSpeciesName}`
         };
+
+        if (detail?.evolved_pokemon_form?.name) {
+            const formName = detail.evolved_pokemon_form.name;
+            const matchesRegion = !activeRegion || formName.includes(activeRegion);
+            const reqMatches = !detail.required_pokemon_form?.name ||
+                !activeRegion ||
+                detail.required_pokemon_form.name.includes(activeRegion);
+
+            if (matchesRegion && reqMatches) {
+                const formId = getSpeciesIdFromUrl(detail.evolved_pokemon_form.url) || baseId;
+
+                return {
+                    name: formName,
+                    displayName: formatDisplayName(formName),
+                    id: formId,
+                    urlName: formName,
+                    href: `/pokemons/${childSpeciesName}?form=${formName}`
+                };
+            }
+        }
 
         if (childSpeciesName === 'lycanroc') {
             const timeOfDay = detail?.time_of_day;
