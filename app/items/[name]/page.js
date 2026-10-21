@@ -33,7 +33,12 @@ export default async function ItemDetailPage({ params }) {
     const flavorTextEntry = itemJSON.flavor_text_entries?.find(entry => entry.language?.name === 'en');
     const descriptionText = effectEntry?.effect || effectEntry?.short_effect || flavorTextEntry?.text || 'No description available in English.';
 
-    const spriteUrl = getItemSpriteUrl(itemJSON.name);
+    const spriteUrl = itemJSON.sprites?.default || getItemSpriteUrl(itemJSON.name);
+
+    // Extract pricing: support PokéAPI v2 prices array with fallback to legacy cost
+    const latestPrice = itemJSON.prices?.length ? itemJSON.prices[itemJSON.prices.length - 1] : null;
+    const purchasePrice = latestPrice?.purchase_price ?? (typeof itemJSON.cost === 'number' ? itemJSON.cost : null);
+    const sellPrice = latestPrice?.sell_price ?? (purchasePrice ? Math.floor(purchasePrice / 2) : null);
 
     return (
         <Container fluid className="p-0">
@@ -53,11 +58,20 @@ export default async function ItemDetailPage({ params }) {
                         <span className="text-muted ms-md-auto">
                             Category: <strong className="text-light text-capitalize">{formatDisplayName(itemJSON.category?.name)}</strong>
                         </span>
-                        {itemJSON.cost && (
+                        {purchasePrice !== null && purchasePrice !== undefined && purchasePrice > 0 ? (
+                            <span className="text-muted">
+                                Cost: <strong className="text-warning">🪙 {purchasePrice}</strong>
+                            </span>
+                        ) : itemJSON.cost ? (
                             <span className="text-muted">
                                 Cost: <strong className="text-warning">🪙 {itemJSON.cost}</strong>
                             </span>
-                        )}
+                        ) : null}
+                        {sellPrice !== null && sellPrice !== undefined && sellPrice > 0 ? (
+                            <span className="text-muted">
+                                Sell: <strong className="text-success">🪙 {sellPrice}</strong>
+                            </span>
+                        ) : null}
                     </div>
                     <p className="mb-3 text-light">— {descriptionText}</p>
 
@@ -83,6 +97,12 @@ export default async function ItemDetailPage({ params }) {
                                 </>
                             ) : <span className="text-muted">Cannot be flung</span>}
                         </div>
+                        {itemJSON.baby_trigger_for && (
+                            <div>
+                                <span className="text-muted me-2">Breeding:</span>
+                                <Badge bg="info" className="text-dark fw-normal px-2 py-1">Baby Incense</Badge>
+                            </div>
+                        )}
                     </div>
                 </div>
             </div>

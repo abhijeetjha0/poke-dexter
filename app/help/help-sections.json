@@ -73,8 +73,8 @@
         "text": "This section provides biological and lore information about the Pokémon.",
         "steps": [
           "Read the flavor text to learn about the Pokémon's behavior and lore.",
-          "Review the characteristics table for physical traits like Height, Weight, and specific categories.",
-          "Check the Catch Rate and Base Experience yield."
+          "Review the characteristics table for biological genus classification, physical traits like Height and Weight, Base Happiness, and Egg Groups.",
+          "Check the Catch Rate and Growth Rate."
         ]
       },
       {
@@ -109,7 +109,7 @@
         "steps": [
           "Scroll to the Evolution flowchart section.",
           "Trace the path to see what this Pokémon evolves from or evolves into.",
-          "Note the specific conditions required for evolution (e.g., leveling up, using an item)."
+          "Note specific conditions required for evolution (e.g., leveling up, using an item, step counts, multiplayer, combat moves used, damage taken, rocks, full moon, or regional form triggers)."
         ]
       },
       {
@@ -295,11 +295,11 @@
       },
       {
         "label": "Viewing Details",
-        "text": "Each Move has specific mechanical details like Power and Accuracy.",
+        "text": "Each Move has specific mechanical details like Power, Accuracy, and stat modifiers.",
         "steps": [
           "Find the Move in the list.",
           "Read its description and core stats directly from the table.",
-          "Pay close attention to its Damage Class (Physical, Special, or Status)."
+          "Pay close attention to its Damage Class (Physical, Special, or Status), stat stage alterations (+/- Stat buffs/debuffs), and combat metadata such as drain, recoil, healing, critical hit boost, multi-hit strikes, flinch chance, and ailment effects."
         ]
       },
       {
@@ -347,10 +347,11 @@
       },
       {
         "label": "Viewing Details",
-        "text": "Each item has a specific description and category.",
+        "text": "Each item has a specific description, pricing breakdown, and category.",
         "steps": [
           "Find the item in the list.",
-          "Review the item's description and its shop cost.",
+          "Review the item's description, purchase price, sell price, and category attributes.",
+          "Check if the item triggers baby Pokémon hatching or evolutions.",
           "Click on the item's category to find other similar items."
         ]
       }

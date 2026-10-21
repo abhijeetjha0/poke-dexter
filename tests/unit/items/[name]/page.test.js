@@ -71,6 +71,39 @@ describe('ItemDetailPage', () => {
         expect(screen.getByText('None')).toBeInTheDocument(); // No attributes
     });
 
+    it('renders prices array, native sprite, and baby breeding trigger correctly', async () => {
+        apiRequests.fetchItemByNameOrId.mockResolvedValue({
+            ok: true,
+            json: async () => ({
+                name: 'lax-incense',
+                category: { name: 'held-items' },
+                sprites: { default: 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/items/lax-incense.png' },
+                prices: [
+                    {
+                        purchase_price: 5000,
+                        sell_price: 2500,
+                        currency: { name: 'poke-dollar' }
+                    }
+                ],
+                effect_entries: [
+                    { language: { name: 'en' }, effect: 'Helps breed Wynaut.' }
+                ],
+                attributes: [],
+                fling_power: 10,
+                baby_trigger_for: { url: 'https://pokeapi.co/api/v2/evolution-chain/160/' }
+            })
+        });
+
+        const ServerComponent = await ItemDetailPage({ params: Promise.resolve({ name: 'lax-incense' }) });
+        render(ServerComponent);
+
+        expect(screen.getByText('lax incense:')).toBeInTheDocument();
+        expect(screen.getByText('🪙 5000')).toBeInTheDocument();
+        expect(screen.getByText('🪙 2500')).toBeInTheDocument();
+        expect(screen.getByText('Baby Incense')).toBeInTheDocument();
+        expect(screen.getByTestId('client-image')).toHaveAttribute('src', 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/items/lax-incense.png');
+    });
+
     it('renders Not Found alert when API fails', async () => {
         apiRequests.fetchItemByNameOrId.mockResolvedValue({
             ok: false
